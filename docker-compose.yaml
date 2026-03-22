@@ -3,24 +3,24 @@ services:
   # BIND9 — Authoritative DNS (primary)
   # Zones: amer.home, merenda.home.arpa, reverse DNS
   # ExternalDNS writes here via RFC2136 + TSIG
+  # IP: 10.100.20.18 (Mac Mini primary)
   # ============================================================
   bind9:
     image: ubuntu/bind9:latest
     container_name: bind9
     restart: unless-stopped
-    # BIND9 is internal-only — not exposed to host/LAN
-    # Pi-hole forwards .amer.home queries here via the dns-internal network
+    ports:
+      - "10.100.20.18:53:53/tcp"
+      - "10.100.20.18:53:53/udp"
     volumes:
       - ./bind9/named.conf:/etc/bind/named.conf:ro
       - ./bind9/keys:/etc/bind/keys:ro
       - ./bind9/zones:/var/cache/bind
-    networks:
-      dns-internal:
-        ipv4_address: 172.21.0.10
 
   # ============================================================
   # Pihole — Ad-blocking DNS resolver
   # Upstream: BIND9 for .amer.home, Cloudflare for external
+  # IP: 10.100.20.3 (alias on Mac Mini)
   # ============================================================
   pihole:
     image: pihole/pihole:latest
@@ -28,22 +28,19 @@ services:
     restart: unless-stopped
     depends_on:
       - bind9
-    networks:
-      - default
-      - dns-internal
     dns:
       - 1.1.1.1
       - 8.8.8.8
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "80:80/tcp"
+      - "10.100.20.3:53:53/tcp"
+      - "10.100.20.3:53:53/udp"
+      - "10.100.20.3:80:80/tcp"
     environment:
       TZ: "America/New_York"
       WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
       DNSMASQ_LISTENING: "all"
       PIHOLE_DNS_: "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4"
-      FTLCONF_LOCAL_IPV4: "10.100.20.18"
+      FTLCONF_LOCAL_IPV4: "10.100.20.3"
       FTLCONF_dns_cache_size: "10000"
       CACHE_QUERY_MINIMUM_TTL: "0"
       CACHE_QUERY_MAXIMUM_TTL: "300"
@@ -57,9 +54,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-
-  # NOTE: Cloudflared DNS proxy was removed (deprecated since 2026.2.0).
-  # Pi-hole uses 1.1.1.1 and 8.8.8.8 directly as upstream DNS.
 
   # ============================================================
   # Home Assistant — Smart home hub
@@ -78,7 +72,6 @@ services:
       TZ: "America/New_York"
     volumes:
       - ha-config:/config
-      # Git-tracked configuration (read-only bind mounts)
       - ./homeassistant/configuration/automations:/config/automations:ro
       - ./homeassistant/configuration/blueprints/automation:/config/blueprints/automation/_defaults:ro
       - ./homeassistant/configuration/helpers/generated/input_boolean:/config/helpers/input_boolean:ro
@@ -128,20 +121,8 @@ services:
       PIHOLE_HOSTNAME: "pihole"
       PIHOLE_PASSWORD: "${PIHOLE_WEBPASSWORD}"
       PORT: "9617"
-    networks:
-      - default
 
 volumes:
   pihole-data:
   pihole-dnsmasq:
   ha-config:
-
-networks:
-  default:
-    driver: bridge
-  dns-internal:
-    driver: bridge
-    internal: true
-    ipam:
-      config:
-        - subnet: 172.21.0.0/24
