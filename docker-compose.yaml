@@ -29,9 +29,9 @@ services:
     depends_on:
       - bind9
     ports:
-      - "10.100.20.18:53:53/tcp"
-      - "10.100.20.18:53:53/udp"
-      - "10.100.20.18:80:80/tcp"
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
     environment:
       TZ: "America/New_York"
       WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
