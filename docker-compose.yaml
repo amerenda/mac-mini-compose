@@ -8,9 +8,8 @@ services:
     image: ubuntu/bind9:latest
     container_name: bind9
     restart: unless-stopped
-    ports:
-      - "10.100.20.18:53:53/tcp"
-      - "10.100.20.18:53:53/udp"
+    # BIND9 only listens on Docker network — Pi-hole forwards .amer.home here
+    # Not exposed to LAN; ExternalDNS reaches it via k3s service (future: direct)
     volumes:
       - ./bind9/named.conf:/etc/bind/named.conf:ro
       - ./bind9/keys:/etc/bind/keys:ro
@@ -22,7 +21,8 @@ services:
       timeout: 5s
       retries: 3
     networks:
-      - default
+      default:
+        ipv4_address: 172.20.0.10
 
   # ============================================================
   # Pihole — Ad-blocking DNS resolver
@@ -36,15 +36,15 @@ services:
       bind9:
         condition: service_healthy
     ports:
-      - "10.100.20.19:53:53/tcp"
-      - "10.100.20.19:53:53/udp"
-      - "10.100.20.19:80:80/tcp"
+      - "10.100.20.18:53:53/tcp"
+      - "10.100.20.18:53:53/udp"
+      - "10.100.20.18:80:80/tcp"
     environment:
       TZ: "America/New_York"
       WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
       DNSMASQ_LISTENING: "all"
       PIHOLE_DNS_: "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4"
-      FTLCONF_LOCAL_IPV4: "10.100.20.19"
+      FTLCONF_LOCAL_IPV4: "10.100.20.18"
       FTLCONF_dns_cache_size: "10000"
       CACHE_QUERY_MINIMUM_TTL: "0"
       CACHE_QUERY_MAXIMUM_TTL: "300"
@@ -170,3 +170,7 @@ volumes:
 networks:
   default:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
