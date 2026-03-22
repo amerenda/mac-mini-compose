@@ -8,15 +8,15 @@ services:
     image: ubuntu/bind9:latest
     container_name: bind9
     restart: unless-stopped
-    # BIND9 only listens on Docker network — Pi-hole forwards .amer.home here
-    # Not exposed to LAN; ExternalDNS reaches it via k3s service (future: direct)
+    # BIND9 is internal-only — not exposed to host/LAN
+    # Pi-hole forwards .amer.home queries here via the dns-internal network
     volumes:
       - ./bind9/named.conf:/etc/bind/named.conf:ro
       - ./bind9/keys:/etc/bind/keys:ro
       - ./bind9/zones:/var/cache/bind
     networks:
-      default:
-        ipv4_address: 172.20.0.10
+      dns-internal:
+        ipv4_address: 172.21.0.10
 
   # ============================================================
   # Pihole — Ad-blocking DNS resolver
@@ -28,6 +28,9 @@ services:
     restart: unless-stopped
     depends_on:
       - bind9
+    networks:
+      - default
+      - dns-internal
     dns:
       - 1.1.1.1
       - 8.8.8.8
@@ -138,7 +141,9 @@ volumes:
 networks:
   default:
     driver: bridge
+  dns-internal:
+    driver: bridge
+    internal: true
     ipam:
       config:
-        - subnet: 172.20.0.0/24
-          gateway: 172.20.0.1
+        - subnet: 172.21.0.0/24
