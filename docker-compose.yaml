@@ -14,26 +14,20 @@ services:
       - ./bind9/named.conf:/etc/bind/named.conf:ro
       - ./bind9/keys:/etc/bind/keys:ro
       - ./bind9/zones:/var/cache/bind
-    healthcheck:
-      test: ["CMD-SHELL", "rndc status | grep -q 'server is up and running'"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     networks:
       default:
         ipv4_address: 172.20.0.10
 
   # ============================================================
   # Pihole — Ad-blocking DNS resolver
-  # Upstream: BIND9 for .amer.home, cloudflared DoH for external
+  # Upstream: BIND9 for .amer.home, Cloudflare for external
   # ============================================================
   pihole:
     image: pihole/pihole:latest
     container_name: pihole
     restart: unless-stopped
     depends_on:
-      bind9:
-        condition: service_healthy
+      - bind9
     ports:
       - "10.100.20.18:53:53/tcp"
       - "10.100.20.18:53:53/udp"
