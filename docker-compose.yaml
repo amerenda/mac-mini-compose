@@ -1,14 +1,19 @@
 services:
   # ============================================================
   # BIND9 — Authoritative DNS (primary)
-  # Listens on 10.100.20.18:8053 (non-standard port, internal use)
-  # Pi-hole forwards .amer.home queries here
+  # Internal only on port 5353 — Pi-hole forwards .amer.home here
+  # ExternalDNS writes here via RFC2136 + TSIG on host port 5353
   # ============================================================
   bind9:
     image: ubuntu/bind9:latest
     container_name: bind9
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - "5353:5353/tcp"
+      - "5353:5353/udp"
+    networks:
+      default:
+        ipv4_address: 172.20.0.10
     volumes:
       - ./bind9/named.conf:/etc/bind/named.conf:ro
       - ./bind9/keys:/etc/bind/keys:ro
@@ -16,8 +21,8 @@ services:
 
   # ============================================================
   # Pihole — Ad-blocking DNS resolver
-  # Listens on 10.100.20.18:53 (LAN-facing)
-  # Upstream: BIND9 on localhost:8053 for .amer.home, 1.1.1.1 for external
+  # Listens on host port 53 (LAN-facing)
+  # Upstream: BIND9 on host.docker.internal:5353 for .amer.home
   # ============================================================
   pihole:
     image: pihole/pihole:latest
@@ -122,3 +127,10 @@ volumes:
   pihole-data:
   pihole-dnsmasq:
   ha-config:
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
