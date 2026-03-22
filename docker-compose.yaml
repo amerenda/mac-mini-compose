@@ -28,6 +28,9 @@ services:
     restart: unless-stopped
     depends_on:
       - bind9
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     ports:
       - "53:53/tcp"
       - "53:53/udp"
