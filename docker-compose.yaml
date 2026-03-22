@@ -60,16 +60,8 @@ services:
     networks:
       - default
 
-  # ============================================================
-  # Cloudflared — DNS over HTTPS sidecar for Pihole
-  # ============================================================
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflared
-    restart: unless-stopped
-    command: proxy-dns --port 5053 --upstream https://1.1.1.1/dns-query --upstream https://1.0.0.1/dns-query
-    networks:
-      - default
+  # NOTE: Cloudflared DNS proxy was removed (deprecated since 2026.2.0).
+  # Pi-hole uses 1.1.1.1 and 8.8.8.8 directly as upstream DNS.
 
   # ============================================================
   # Home Assistant — Smart home hub
