@@ -15,7 +15,7 @@ services:
       - ./bind9/keys:/etc/bind/keys:ro
       - ./bind9/zones:/var/cache/bind
     healthcheck:
-      test: ["CMD", "dig", "@127.0.0.1", "amer.home", "SOA", "+short"]
+      test: ["CMD-SHELL", "rndc status | grep -q 'server is up and running'"]
       interval: 30s
       timeout: 5s
       retries: 3
