@@ -6,8 +6,8 @@ Docker Compose stack for the Mac Mini M4, running core services migrated from k3
 
 | Service | IP | Port | Purpose |
 |---------|-----|------|---------|
-| BIND9 | 10.100.20.30 | 53 | Authoritative DNS (primary) for amer.home |
-| Pihole | 10.100.20.31 | 53, 80 | Ad-blocking DNS resolver |
+| BIND9 | 10.100.20.18 | 53 | Authoritative DNS (primary) for amer.home |
+| Pihole | 10.100.20.19 | 53, 80 | Ad-blocking DNS resolver |
 | Cloudflared | (internal) | 5053 | DNS-over-HTTPS upstream for Pihole |
 | Home Assistant | (host net) | 8123 | Smart home hub |
 | Whisper | 0.0.0.0 | 10300 | Speech-to-text (Wyoming protocol) |
@@ -18,7 +18,7 @@ Docker Compose stack for the Mac Mini M4, running core services migrated from k3
 
 1. Copy `.env.example` to `.env` and fill in secrets from Bitwarden
 2. Place TSIG key in `bind9/keys/key.conf` (format in `.env.example`)
-3. Add secondary IP for Pihole: `sudo ifconfig en0 alias 10.100.20.31 255.255.255.0`
+3. Add secondary IP for Pihole: `sudo ifconfig en0 alias 10.100.20.19 255.255.255.0`
 4. Start services: `docker compose up -d`
 
 ## Zigbee (ser2net)
