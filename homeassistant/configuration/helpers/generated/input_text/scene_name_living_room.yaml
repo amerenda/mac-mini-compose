@@ -1,0 +1,5 @@
+scene_name_living_room:
+  name: "Living Room Scene Name"
+  initial: ""
+  max: 100
+

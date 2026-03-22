@@ -1,0 +1,9 @@
+alias: "Members - Camera Privacy (Away)"
+mode: "restart"
+triggers:
+  - trigger: "state"
+    entity_id: "group.members"
+    to: "not_home"
+    from: "home"
+actions:
+  - action: script.manage_camera_privacy

@@ -1,0 +1,17 @@
+light_latency_record_press:
+  alias: "Record switch press timestamp"
+  mode: "restart"
+  fields:
+    room:
+      description: "Room name"
+  sequence:
+    - service: input_number.set_value
+      target:
+        entity_id: "input_number.light_latency_press_ts"
+      data:
+        value: "{{ as_timestamp(now()) }}"
+    - service: input_text.set_value
+      target:
+        entity_id: "input_text.light_latency_room"
+      data:
+        value: "{{ room }}"

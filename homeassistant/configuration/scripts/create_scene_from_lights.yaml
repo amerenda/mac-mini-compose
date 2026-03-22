@@ -1,0 +1,35 @@
+create_scene_from_lights:
+  alias: "Create Scene from Current Light States"
+  mode: "single"
+  fields:
+    scene_name:
+      description: "Display name for the scene"
+      example: "Morning Scene"
+    scene_id:
+      description: "Scene entity ID (without scene. prefix)"
+      example: "bedroom_morning"
+    light_entities:
+      description: "List of light entity IDs to capture in the scene"
+      example: "['light.bedroom_1', 'light.bedroom_2']"
+  sequence:
+    - variables:
+        scene_full_id: "scene.{{ scene_id }}"
+        lights_list: >-
+          {% if light_entities is string %}
+            {{ light_entities.split(',') | map('trim') | list }}
+          {% elif light_entities is sequence %}
+            {{ light_entities | list }}
+          {% else %}
+            {{ [] }}
+          {% endif %}
+    - service: scene.create
+      data:
+        snapshot_entities: "{{ lights_list }}"
+        name: "{{ scene_name }}"
+      target:
+        entity_id: "{{ scene_full_id }}"
+    - service: logbook.log
+      data:
+        name: "Scene Creator"
+        message: "Created scene '{{ scene_full_id }}' ({{ scene_name }}) from {{ lights_list | length }} light(s): {{ lights_list }}"
+

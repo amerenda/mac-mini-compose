@@ -1,0 +1,239 @@
+strategy:
+  type: custom:mushroom-strategy
+  options:
+    # Hide unavailable entities and specific entity configurations
+    card_options:
+      # Camera cards - hide when privacy mode is enabled
+      camera.bedroom_fluent:
+        hidden: "{{ is_state('switch.bedroom_privacy_mode', 'on') }}"
+      camera.living_room_fluent:
+        hidden: "{{ is_state('switch.living_room_privacy_mode', 'on') }}"
+      # Hide individual lights that duplicate single-member groups
+      light.fixture:
+        hidden: true
+      light.bathroom_1:
+        hidden: true
+      light.hallway_1:
+        hidden: true
+      # Hide PTZ and guard buttons, sirens, and motion/animal sensors for bedroom and living room when unavailable
+      # Bedroom entities
+      button.bedroom_guard_go_to:
+        hidden: true
+      button.bedroom_ptz_down:
+        hidden: true
+      button.bedroom_ptz_left:
+        hidden: true
+      button.bedroom_ptz_right:
+        hidden: true
+      button.bedroom_ptz_up:
+        hidden: true
+      button.bedroom_ptz_stop:
+        hidden: true
+      siren.bedroom_siren:
+        hidden: true
+      binary_sensor.bedroom_animal:
+        hidden: true
+      binary_sensor.bedroom_motion:
+        hidden: true
+      binary_sensor.bedroom_baby_crying:
+        hidden: true
+      binary_sensor.bedroom_person:
+        hidden: true
+
+      # Living room entities
+      button.living_room_guard_go_to:
+        hidden: true
+      button.living_room_ptz_down:
+        hidden: true
+      button.living_room_ptz_left:
+        hidden: true
+      button.living_room_ptz_right:
+        hidden: true
+      button.living_room_ptz_up:
+        hidden: true
+      button.living_room_ptz_stop:
+        hidden: true
+      siren.living_room_siren:
+        hidden: true
+      binary_sensor.living_room_animal:
+        hidden: true
+      binary_sensor.living_room_motion:
+        hidden: true
+      binary_sensor.living_room_baby_crying:
+        hidden: true
+      binary_sensor.living_room_person:
+        hidden: true
+
+    # Hide unavailable entities using card_options templates
+    # Note: mushroom-strategy doesn't support domain-level filtering by state
+    # We need to add specific entities here as they're discovered
+    # Alternatively, entities can be hidden individually in card_options above
+
+    # Quick access cards (between greeting and area cards)
+    # Extra cards (below area cards)
+    extra_cards:
+      - type: custom:mushroom-title-card
+        title: Home Scene Control
+      # Scene Control Card - Toggle home lights and activate scenes for all rooms
+      - type: grid
+        square: true
+        columns: 3
+        cards:
+          # Toggle home lights button - icon only
+          - type: button
+            entity: light.home
+            show_name: false
+            icon: mdi:lightbulb
+            tap_action:
+              action: toggle
+            show_state: false
+          # Morning scene button - icon only
+          - type: button
+            show_name: false
+            icon: mdi:weather-sunset-up
+            tap_action:
+              action: call-service
+              service: script.activate_all_room_scenes
+              service_data:
+                slot: morning
+          # Day scene button - icon only
+          - type: button
+            show_name: false
+            icon: mdi:weather-sunny
+            tap_action:
+              action: call-service
+              service: script.activate_all_room_scenes
+              service_data:
+                slot: day
+          # Evening scene button - icon only
+          - type: button
+            show_name: false
+            icon: mdi:weather-sunset-down
+            tap_action:
+              action: call-service
+              service: script.activate_all_room_scenes
+              service_data:
+                slot: evening
+          # Night scene button - icon only
+          - type: button
+            show_name: false
+            icon: mdi:weather-night
+            tap_action:
+              action: call-service
+              service: script.activate_all_room_scenes
+              service_data:
+                slot: night
+          # Movie scene button - icon only
+          - type: button
+            show_name: false
+            icon: mdi:movie-open
+            tap_action:
+              action: call-service
+              service: scene.turn_on
+            target:
+              entity_id: scene.home_movie
+
+      - type: custom:mushroom-title-card
+        title: Latest Pet Detection
+      - type: conditional
+        conditions:
+          - entity: input_text.event_image_location
+            state_not: ""
+          - entity: input_text.event_image_location
+            state_not: "unknown"
+        card:
+          type: markdown
+          content: >
+            {% set loc = states('input_text.event_image_location') %}
+            {% set ts = states('input_text.event_image_timestamp') %}
+            ![Pet](/local/pets/{{ loc }}_{{ ts }}.jpg)
+
+    # Area configuration
+    areas:
+      living_room:
+        name: Living Room
+        icon: mdi:sofa
+        icon_color: blue
+        order: 1
+        extra_cards:
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: entities
+              title: Camera Controls
+              show_header_toggle: false
+            filter:
+              include:
+                - entity_id: button.living_room_guard_go_to
+                - entity_id: button.living_room_ptz_down
+                - entity_id: button.living_room_ptz_left
+                - entity_id: button.living_room_ptz_right
+                - entity_id: button.living_room_ptz_up
+                - entity_id: button.living_room_ptz_stop
+                - entity_id: siren.living_room_siren
+                - entity_id: binary_sensor.living_room_animal
+                - entity_id: binary_sensor.living_room_motion
+                - entity_id: binary_sensor.living_room_baby_crying
+                - entity_id: binary_sensor.living_room_person
+              exclude:
+                - state: "unavailable"
+                - state: "unknown"
+      kitchen:
+        name: Kitchen
+        icon: mdi:silverware-fork-knife
+        icon_color: orange
+        order: 2
+      bathroom:
+        name: Bathroom
+        icon: mdi:shower
+        icon_color: cyan
+        order: 3
+      bedroom:
+        name: Bedroom
+        icon: mdi:bed
+        icon_color: purple
+        order: 4
+        extra_cards:
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: entities
+              title: Camera Controls
+              show_header_toggle: false
+            filter:
+              include:
+                - entity_id: button.bedroom_guard_go_to
+                - entity_id: button.bedroom_ptz_down
+                - entity_id: button.bedroom_ptz_left
+                - entity_id: button.bedroom_ptz_right
+                - entity_id: button.bedroom_ptz_up
+                - entity_id: button.bedroom_ptz_stop
+                - entity_id: siren.bedroom_siren
+                - entity_id: binary_sensor.bedroom_animal
+                - entity_id: binary_sensor.bedroom_motion
+                - entity_id: binary_sensor.bedroom_baby_crying
+                - entity_id: binary_sensor.bedroom_person
+              exclude:
+                - state: "unavailable"
+                - state: "unknown"
+      hallway:
+        name: Hallway
+        icon: mdi:door-open
+        icon_color: amber
+        order: 5
+      # Hide the 'home' area card, but keep the main dashboard view
+      home:
+        hidden: true
+
+    # View customizations
+    views:
+      # Customize default view
+      home:
+        title: Home
+        icon: mdi:home
+        path: home
+      # Ensure switch view is visible
+      switch:
+        hidden: false
+
+

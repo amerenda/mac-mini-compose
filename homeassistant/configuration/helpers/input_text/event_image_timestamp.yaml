@@ -1,0 +1,5 @@
+# Global input_text helper for pet detection event timestamp
+event_image_timestamp:
+  name: "Event Image Timestamp Text"
+  initial: ""
+  max: 20

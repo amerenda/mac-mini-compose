@@ -1,0 +1,5 @@
+scene_name_kitchen:
+  name: "Kitchen Scene Name"
+  initial: ""
+  max: 100
+

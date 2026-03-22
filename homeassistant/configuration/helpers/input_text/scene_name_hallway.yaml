@@ -1,0 +1,5 @@
+scene_name_hallway:
+  name: "Hallway Scene Name"
+  initial: ""
+  max: 100
+

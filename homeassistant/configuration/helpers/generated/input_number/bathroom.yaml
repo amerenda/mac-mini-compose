@@ -1,0 +1,83 @@
+# Template for input_number helpers per room
+# Usage:
+#   jinja2 input_number_template.yaml.j2 -D room=bedroom > input_number/bedroom.yaml
+
+bathroom_brightness_step_pct:
+  name: Bathroom Brightness step (%)
+  min: 1
+  max: 50
+  step: 1
+  unit_of_measurement: "%"
+  initial: 10
+bathroom_min_brightness_pct:
+  name: Bathroom Min brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 1
+bathroom_max_brightness_pct:
+  name: Bathroom Max brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 100
+
+bathroom_morning_auto_off:
+  name: Bathroom Morning auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 5
+bathroom_day_auto_off:
+  name: Bathroom Day auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 10
+bathroom_evening_auto_off:
+  name: Bathroom Evening auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+bathroom_night_auto_off:
+  name: Bathroom Night auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 30
+
+motion_auto_off_bathroom_morning:
+  name: Bathroom - Motion Morning Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_bathroom_day:
+  name: Bathroom - Motion Day Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_bathroom_evening:
+  name: Bathroom - Motion Evening Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_bathroom_night:
+  name: Bathroom - Motion Night Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15

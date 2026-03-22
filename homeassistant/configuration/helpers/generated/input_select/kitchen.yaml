@@ -1,0 +1,45 @@
+# Template for input_select helpers per room
+# Usage:
+#   jinja2 input_select_template.yaml.j2 -D room=bedroom > input_select/bedroom.yaml
+
+kitchen_morning_scene:
+  name: Kitchen Morning scene
+  options:
+    - scene.kitchen_morning
+    - scene.kitchen_day
+    - scene.kitchen_evening
+    - scene.kitchen_night
+  initial: scene.kitchen_morning
+kitchen_day_scene:
+  name: Kitchen Day scene
+  options:
+    - scene.kitchen_day
+    - scene.kitchen_morning
+    - scene.kitchen_evening
+    - scene.kitchen_night
+  initial: scene.kitchen_day
+kitchen_evening_scene:
+  name: Kitchen Evening scene
+  options:
+    - scene.kitchen_evening
+    - scene.kitchen_day
+    - scene.kitchen_morning
+    - scene.kitchen_night
+  initial: scene.kitchen_evening
+kitchen_night_scene:
+  name: Kitchen Night scene
+  options:
+    - scene.kitchen_night
+    - scene.kitchen_evening
+    - scene.kitchen_day
+    - scene.kitchen_morning
+  initial: scene.kitchen_night
+
+kitchen_scene_cycle:
+  name: Kitchen Scene Cycle
+  options:
+    - morning
+    - day
+    - evening
+    - night
+  initial: morning

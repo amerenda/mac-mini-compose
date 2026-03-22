@@ -1,0 +1,5 @@
+alex_last_significant_zone:
+  name: "Alex Last Significant Zone"
+  initial: "home"
+  max: 50
+

@@ -1,0 +1,15 @@
+debug_set_last_intruder:
+  alias: "Debug - Set Last Intruder Image"
+  mode: single
+  icon: mdi:bug
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.intruder_image_location
+      data:
+        value: "bedroom"
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.intruder_image_timestamp
+      data:
+        value: "20251124_163149"

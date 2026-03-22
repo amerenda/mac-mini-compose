@@ -1,0 +1,48 @@
+alias: "Light Latency Tracker"
+description: >
+  Measures the time between a Hue switch button press and any light
+  changing state. Stores the result in input_number.light_latency_ms
+  for Prometheus/Grafana monitoring.
+mode: restart
+trigger:
+  - platform: event
+    event_type: hue_event
+variables:
+  press_time: "{{ as_timestamp(now()) }}"
+  event_id: "{{ trigger.event.data.id | default('unknown') }}"
+  event_type: "{{ trigger.event.data.type | default('unknown') }}"
+condition:
+  - condition: template
+    value_template: "{{ event_type in ['initial_press', 'short_release'] }}"
+action:
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.light_latency_press_ts
+    data:
+      value: "{{ press_time }}"
+  - service: input_text.set_value
+    target:
+      entity_id: input_text.light_latency_switch
+    data:
+      value: "{{ event_id }}"
+  # Wait for any light entity to change state
+  - wait_for_trigger:
+      - platform: state
+        entity_id: all
+        to: null
+    timeout:
+      seconds: 5
+    continue_on_timeout: true
+  # Calculate and store latency
+  - service: input_number.set_value
+    target:
+      entity_id: input_number.light_latency_ms
+    data:
+      value: >-
+        {% set delta = (as_timestamp(now()) - press_time) * 1000 %}
+        {{ [delta | round(0), 10000] | min }}
+  - service: logbook.log
+    data:
+      name: "light_latency"
+      message: >-
+        switch={{ event_id }} latency={{ ((as_timestamp(now()) - press_time) * 1000) | round(0) }}ms

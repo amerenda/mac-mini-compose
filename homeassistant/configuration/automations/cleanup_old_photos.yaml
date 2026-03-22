@@ -1,0 +1,9 @@
+alias: "System - Cleanup Old Photos (30+ days)"
+mode: "single"
+triggers:
+  - platform: "time"
+    at: "02:00:00"
+conditions: []
+actions:
+  - service: "shell_command.cleanup_old_photos"
+    data: {}

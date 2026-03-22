@@ -1,0 +1,21 @@
+activate_scene_with_helper:
+  alias: "Activate Scene and Update Helper"
+  mode: "parallel"
+  fields:
+    scene_entity:
+      description: "Scene entity to activate (e.g., scene.bathroom_morning)"
+    helper_entity:
+      description: "Helper entity to update (e.g., input_select.bathroom_scene_cycle)"
+    slot_name:
+      description: "Slot name to set in helper (morning, day, evening, night)"
+  sequence:
+    - parallel:
+        - service: "scene.turn_on"
+          target:
+            entity_id: "{{ scene_entity }}"
+        - service: "input_select.select_option"
+          target:
+            entity_id: "{{ helper_entity }}"
+          data:
+            option: "{{ slot_name }}"
+

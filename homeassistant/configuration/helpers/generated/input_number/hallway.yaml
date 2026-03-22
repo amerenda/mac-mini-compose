@@ -1,0 +1,83 @@
+# Template for input_number helpers per room
+# Usage:
+#   jinja2 input_number_template.yaml.j2 -D room=bedroom > input_number/bedroom.yaml
+
+hallway_brightness_step_pct:
+  name: Hallway Brightness step (%)
+  min: 1
+  max: 50
+  step: 1
+  unit_of_measurement: "%"
+  initial: 10
+hallway_min_brightness_pct:
+  name: Hallway Min brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 1
+hallway_max_brightness_pct:
+  name: Hallway Max brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 100
+
+hallway_morning_auto_off:
+  name: Hallway Morning auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 5
+hallway_day_auto_off:
+  name: Hallway Day auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 10
+hallway_evening_auto_off:
+  name: Hallway Evening auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+hallway_night_auto_off:
+  name: Hallway Night auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 30
+
+motion_auto_off_hallway_morning:
+  name: Hallway - Motion Morning Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_hallway_day:
+  name: Hallway - Motion Day Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_hallway_evening:
+  name: Hallway - Motion Evening Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_hallway_night:
+  name: Hallway - Motion Night Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15

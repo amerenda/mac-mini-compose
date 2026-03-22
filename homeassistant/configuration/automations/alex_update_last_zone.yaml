@@ -1,0 +1,33 @@
+alias: "Alex - Update Last Significant Zone"
+mode: queued
+triggers:
+  - trigger: state
+    entity_id: device_tracker.pixel_9_pro_xl
+  - trigger: homeassistant
+    event: start
+variables:
+  current_zone: >-
+    {% if trigger.platform == 'state' %}
+      {{ trigger.to_state.state | lower }}
+    {% else %}
+      {{ states('device_tracker.pixel_9_pro_xl') | lower }}
+    {% endif %}
+actions:
+  - service: logbook.log
+    data:
+      name: "Alex Last Zone Debug"
+      message: "Detected zone change to: {{ current_zone }}"
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ current_zone in ['home', 'work'] }}"
+        sequence:
+          - action: input_text.set_value
+            target:
+              entity_id: input_text.alex_last_significant_zone
+            data:
+              value: "{{ current_zone }}"
+          - service: logbook.log
+            data:
+              name: "Alex Last Zone Update"
+              message: "Updated last significant zone to: {{ current_zone }}"

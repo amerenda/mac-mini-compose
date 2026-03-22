@@ -1,0 +1,9 @@
+alias: "Guest - Camera Privacy Home (WiFi Connected)"
+mode: "restart"
+triggers:
+  - trigger: "state"
+    entity_id:
+      - "group.guests"
+    to: "home"
+actions:
+  - action: script.manage_camera_privacy

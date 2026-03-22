@@ -1,0 +1,74 @@
+room_toggle:
+  alias: "Room Toggle (smart with debug)"
+  mode: "parallel"
+  fields:
+    target_lights:
+      description: "Entity or group to control (entity_id, list, or target)"
+  sequence:
+    - variables:
+        _ids: >-
+          {% set tl = target_lights | default('') %}
+          {% if tl is mapping and 'entity_id' in tl %}
+            {{ tl.entity_id }}
+          {% else %}
+            {{ tl }}
+          {% endif %}
+        id_list: >-
+          {% if _ids is string and _ids != '' %}
+            {{ [_ids] }}
+          {% elif _ids is sequence and _ids is not string %}
+            {{ _ids | list }}
+          {% else %}
+            {{ [] }}
+          {% endif %}
+
+        # Check group state directly (for Hue groups that don't expand)
+        group_on: >-
+          {% if id_list | length == 1 %}
+            {{ is_state(id_list[0], 'on') }}
+          {% else %}
+            {{ false }}
+          {% endif %}
+
+        # Check member entities via expand (for normal groups)
+        expanded: "{{ expand(id_list) }}"
+        members_on: "{{ expanded | selectattr('state','eq','on') | list | count > 0 }}"
+
+        # Check member entities via state_attr (for Hue groups)
+        attr_members: >-
+          {% if id_list | length == 1 %}
+            {{ state_attr(id_list[0], 'entity_id') | default([]) }}
+          {% else %}
+            {{ [] }}
+          {% endif %}
+        attr_members_on: "{{ expand(attr_members) | selectattr('state','eq','on') | list | count > 0 }}"
+
+        # Any method indicates lights are on
+        any_on: "{{ group_on or members_on or attr_members_on }}"
+
+    # DEBUG: Log what we detected
+    - service: "logbook.log"
+      data:
+        name: "room_toggle DEBUG"
+        message: >-
+          id_list={{ id_list }}, group_on={{ group_on }},
+          members_on={{ members_on }}, attr_members_on={{ attr_members_on }},
+          any_on={{ any_on }}
+    - choose:
+        - conditions: "{{ any_on }}"
+          sequence:
+            - service: "logbook.log"
+              data:
+                name: "room_toggle"
+                message: "Turning OFF {{ id_list }}"
+            - service: "light.turn_off"
+              target:
+                entity_id: "{{ id_list }}"
+      default:
+        - service: "logbook.log"
+          data:
+            name: "room_toggle"
+            message: "Turning ON {{ id_list[0] if id_list|length>0 else 'target_lights' }} via scheduled_light_on"
+        - service: "script.scheduled_light_on"
+          data:
+            fallback_lights: "{{ id_list[0] if id_list|length>0 else '' }}"

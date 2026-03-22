@@ -1,0 +1,5 @@
+# Global input_text helper for pet detection event location
+event_image_location:
+  name: "Event Image Location Text"
+  initial: ""
+  max: 50

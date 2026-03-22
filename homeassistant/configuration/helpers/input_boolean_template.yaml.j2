@@ -1,0 +1,45 @@
+# Template for input_boolean helpers per room
+# Usage:
+#   jinja2 input_boolean_template.yaml.j2 -D room=bedroom > input_boolean/bedroom.yaml
+
+{{ room }}_custom_schedule:
+  name: {{ room|replace('_',' ')|title }} - Use custom schedule
+{{ room }}_morning_custom_time:
+  name: {{ room|replace('_',' ')|title }} - Use custom Morning time
+{{ room }}_day_custom_time:
+  name: {{ room|replace('_',' ')|title }} - Use custom Day time
+{{ room }}_evening_custom_time:
+  name: {{ room|replace('_',' ')|title }} - Use custom Evening time
+{{ room }}_night_custom_time:
+  name: {{ room|replace('_',' ')|title }} - Use custom Night time
+{{ room }}_motion_enabled:
+  name: {{ room|replace('_',' ')|title }} - Motion Control Enabled
+{{ room }}_timer_enabled:
+  name: {{ room|replace('_',' ')|title }} - Timer Control Enabled
+
+enable_{{ room }}_morning:
+  name: {{ room|replace('_',' ')|title }} - Timer Morning Enabled
+enable_{{ room }}_day:
+  name: {{ room|replace('_',' ')|title }} - Timer Day Enabled
+enable_{{ room }}_evening:
+  name: {{ room|replace('_',' ')|title }} - Timer Evening Enabled
+enable_{{ room }}_night:
+  name: {{ room|replace('_',' ')|title }} - Timer Night Enabled
+
+auto_on_{{ room }}_morning:
+  name: {{ room|replace('_',' ')|title }} - Timer Morning Auto-on
+auto_on_{{ room }}_day:
+  name: {{ room|replace('_',' ')|title }} - Timer Day Auto-on
+auto_on_{{ room }}_evening:
+  name: {{ room|replace('_',' ')|title }} - Timer Evening Auto-on
+auto_on_{{ room }}_night:
+  name: {{ room|replace('_',' ')|title }} - Timer Night Auto-on
+
+motion_activated_{{ room }}_morning:
+  name: {{ room|replace('_',' ')|title }} - Motion Morning Activated
+motion_activated_{{ room }}_day:
+  name: {{ room|replace('_',' ')|title }} - Motion Day Activated
+motion_activated_{{ room }}_evening:
+  name: {{ room|replace('_',' ')|title }} - Motion Evening Activated
+motion_activated_{{ room }}_night:
+  name: {{ room|replace('_',' ')|title }} - Motion Night Activated

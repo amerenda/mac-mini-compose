@@ -1,0 +1,45 @@
+# Template for input_boolean helpers per room
+# Usage:
+#   jinja2 input_boolean_template.yaml.j2 -D room=bedroom > input_boolean/bedroom.yaml
+
+bathroom_custom_schedule:
+  name: Bathroom - Use custom schedule
+bathroom_morning_custom_time:
+  name: Bathroom - Use custom Morning time
+bathroom_day_custom_time:
+  name: Bathroom - Use custom Day time
+bathroom_evening_custom_time:
+  name: Bathroom - Use custom Evening time
+bathroom_night_custom_time:
+  name: Bathroom - Use custom Night time
+bathroom_motion_enabled:
+  name: Bathroom - Motion Control Enabled
+bathroom_timer_enabled:
+  name: Bathroom - Timer Control Enabled
+
+enable_bathroom_morning:
+  name: Bathroom - Timer Morning Enabled
+enable_bathroom_day:
+  name: Bathroom - Timer Day Enabled
+enable_bathroom_evening:
+  name: Bathroom - Timer Evening Enabled
+enable_bathroom_night:
+  name: Bathroom - Timer Night Enabled
+
+auto_on_bathroom_morning:
+  name: Bathroom - Timer Morning Auto-on
+auto_on_bathroom_day:
+  name: Bathroom - Timer Day Auto-on
+auto_on_bathroom_evening:
+  name: Bathroom - Timer Evening Auto-on
+auto_on_bathroom_night:
+  name: Bathroom - Timer Night Auto-on
+
+motion_activated_bathroom_morning:
+  name: Bathroom - Motion Morning Activated
+motion_activated_bathroom_day:
+  name: Bathroom - Motion Day Activated
+motion_activated_bathroom_evening:
+  name: Bathroom - Motion Evening Activated
+motion_activated_bathroom_night:
+  name: Bathroom - Motion Night Activated

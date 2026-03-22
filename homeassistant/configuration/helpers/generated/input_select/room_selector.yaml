@@ -1,0 +1,10 @@
+room_selector:
+  name: Room Selector
+  options:
+    - bathroom
+    - bedroom
+    - hallway
+    - kitchen
+    - living_room
+  initial: bathroom
+

@@ -1,0 +1,137 @@
+# Template for creating input helpers per room
+# Usage:
+#   jinja2 _room_helpers_template.yaml.j2 -D room=bedroom > bedroom_helpers.yaml
+
+input_boolean:
+  {{ room }}_custom_schedule:
+    name: {{ room|replace('_',' ')|title }} - Use custom schedule
+  {{ room }}_motion_enabled:
+    name: {{ room|replace('_',' ')|title }} - Motion Control Enabled
+  {{ room }}_timer_enabled:
+    name: {{ room|replace('_',' ')|title }} - Timer Control Enabled
+
+  enable_{{ room }}_morning:
+    name: {{ room|replace('_',' ')|title }} - Timer Morning Enabled
+  enable_{{ room }}_day:
+    name: {{ room|replace('_',' ')|title }} - Timer Day Enabled
+  enable_{{ room }}_evening:
+    name: {{ room|replace('_',' ')|title }} - Timer Evening Enabled
+  enable_{{ room }}_night:
+    name: {{ room|replace('_',' ')|title }} - Timer Night Enabled
+
+  auto_on_{{ room }}_morning:
+    name: {{ room|replace('_',' ')|title }} - Timer Morning Auto-on
+  auto_on_{{ room }}_day:
+    name: {{ room|replace('_',' ')|title }} - Timer Day Auto-on
+  auto_on_{{ room }}_evening:
+    name: {{ room|replace('_',' ')|title }} - Timer Evening Auto-on
+  auto_on_{{ room }}_night:
+    name: {{ room|replace('_',' ')|title }} - Timer Night Auto-on
+
+input_datetime:
+  {{ room }}_s1_start:
+    name: {{ room|replace('_',' ')|title }} Morning start
+    has_time: true
+  {{ room }}_s2_start:
+    name: {{ room|replace('_',' ')|title }} Day start
+    has_time: true
+  {{ room }}_s3_start:
+    name: {{ room|replace('_',' ')|title }} Evening start
+    has_time: true
+  {{ room }}_s4_start:
+    name: {{ room|replace('_',' ')|title }} Night start
+    has_time: true
+
+input_select:
+  {{ room }}_morning_scene:
+    name: {{ room|replace('_',' ')|title }} Morning scene
+    options:
+      - scene.{{ room }}_morning
+      - scene.{{ room }}_day
+      - scene.{{ room }}_evening
+      - scene.{{ room }}_night
+    initial: scene.{{ room }}_morning
+  {{ room }}_day_scene:
+    name: {{ room|replace('_',' ')|title }} Day scene
+    options:
+      - scene.{{ room }}_day
+      - scene.{{ room }}_morning
+      - scene.{{ room }}_evening
+      - scene.{{ room }}_night
+    initial: scene.{{ room }}_day
+  {{ room }}_evening_scene:
+    name: {{ room|replace('_',' ')|title }} Evening scene
+    options:
+      - scene.{{ room }}_evening
+      - scene.{{ room }}_day
+      - scene.{{ room }}_morning
+      - scene.{{ room }}_night
+    initial: scene.{{ room }}_evening
+  {{ room }}_night_scene:
+    name: {{ room|replace('_',' ')|title }} Night scene
+    options:
+      - scene.{{ room }}_night
+      - scene.{{ room }}_evening
+      - scene.{{ room }}_day
+      - scene.{{ room }}_morning
+    initial: scene.{{ room }}_night
+  {{ room }}_scene_cycle:
+    name: {{ room|replace('_',' ')|title }} Scene Cycle
+    options:
+      - morning
+      - day
+      - evening
+      - night
+    initial: morning
+
+input_number:
+  {{ room }}_brightness_step_pct:
+    name: {{ room|replace('_',' ')|title }} Brightness step (%)
+    min: 1
+    max: 50
+    step: 1
+    unit_of_measurement: "%"
+    initial: 10
+  {{ room }}_min_brightness_pct:
+    name: {{ room|replace('_',' ')|title }} Min brightness (%)
+    min: 1
+    max: 100
+    step: 1
+    unit_of_measurement: "%"
+    initial: 1
+  {{ room }}_max_brightness_pct:
+    name: {{ room|replace('_',' ')|title }} Max brightness (%)
+    min: 1
+    max: 100
+    step: 1
+    unit_of_measurement: "%"
+    initial: 100
+
+  {{ room }}_morning_auto_off:
+    name: {{ room|replace('_',' ')|title }} Morning auto-off (min)
+    min: 1
+    max: 60
+    step: 1
+    unit_of_measurement: "min"
+    initial: 5
+  {{ room }}_day_auto_off:
+    name: {{ room|replace('_',' ')|title }} Day auto-off (min)
+    min: 1
+    max: 60
+    step: 1
+    unit_of_measurement: "min"
+    initial: 10
+  {{ room }}_evening_auto_off:
+    name: {{ room|replace('_',' ')|title }} Evening auto-off (min)
+    min: 1
+    max: 60
+    step: 1
+    unit_of_measurement: "min"
+    initial: 15
+  {{ room }}_night_auto_off:
+    name: {{ room|replace('_',' ')|title }} Night auto-off (min)
+    min: 1
+    max: 60
+    step: 1
+    unit_of_measurement: "min"
+    initial: 30

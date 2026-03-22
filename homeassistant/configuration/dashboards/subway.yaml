@@ -1,0 +1,320 @@
+views:
+  - title: Dynamic
+    icon: mdi:map-marker-radius
+    cards:
+      - type: custom:auto-entities
+        card:
+          type: entities
+          title: To Work (Atlantic Av - N/Q/D)
+          icon: mdi:briefcase
+          show_header_toggle: false
+        filter:
+          template: |
+            {% set current = states('device_tracker.pixel_9_pro_xl') %}
+            {% set last = states('input_text.alex_last_significant_zone') %}
+            {% if (current == 'home') or (current != 'work' and last == 'home') %}
+              [
+                {% for state in states.sensor -%}
+                  {%- if state.attributes.friendly_name is defined and ('Atlantic Av' in state.attributes.friendly_name or 'Barclays' in state.attributes.friendly_name) and state.attributes.route_id in ['N', 'Q', 'D'] and state.state not in ['unavailable', 'unknown'] -%}
+                    {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                    {%- if headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                    {
+                      "entity": "{{ state.entity_id }}",
+                      "name": "{{ state.attributes.route_id }} to {{ headsign }}",
+                      "secondary_info": "last-updated"
+                    },
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor %}
+              ]
+            {% else %}
+              []
+            {% endif %}
+        show_empty: false
+        sort:
+          method: state
+          numeric: true
+
+      - type: custom:auto-entities
+        card:
+          type: entities
+          title: To Home (57 St - N/Q/R/W)
+          icon: mdi:home
+          show_header_toggle: false
+        filter:
+          template: |
+            {% set current = states('device_tracker.pixel_9_pro_xl') %}
+            {% set last = states('input_text.alex_last_significant_zone') %}
+            {% if (current == 'work') or (current != 'home' and last == 'work') %}
+              [
+                {% for state in states.sensor -%}
+                  {%- if state.attributes.friendly_name is defined and '57 St' in state.attributes.friendly_name and state.attributes.route_id in ['N', 'Q', 'R', 'W'] and state.state not in ['unavailable', 'unknown'] -%}
+                    {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                    {%- if not headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                    {
+                      "entity": "{{ state.entity_id }}",
+                      "name": "{{ state.attributes.route_id }} to {{ headsign }}",
+                      "secondary_info": "last-updated"
+                    },
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor %}
+              ]
+            {% else %}
+              []
+            {% endif %}
+        show_empty: false
+        sort:
+          method: state
+          numeric: true
+
+  - title: Overview
+    icon: mdi:train
+    cards:
+      - type: vertical-stack
+        cards:
+          # -----------------------------------
+          #      NORTHBOUND (Manhattan/Qns)
+          # -----------------------------------
+          - type: custom:auto-entities
+            card:
+              type: entities
+              title: Northbound (to Manhattan/Queens)
+              show_header_toggle: false
+            filter:
+              template: |
+                [
+                  {% set ns = namespace(rows=[]) %}
+                  # --- ATLANTIC AV ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "Atlantic Av-Barclays Ctr" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and ('Atlantic Av' in state.attributes.friendly_name or 'Barclays' in state.attributes.friendly_name) and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+
+                  # --- BERGEN ST ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "Bergen St" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and 'Bergen St' in state.attributes.friendly_name and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+
+                  # --- FULTON ST ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "Fulton St" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and 'Fulton St' in state.attributes.friendly_name and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+
+                  # --- LAFAYETTE AV ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "Lafayette Av" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and 'Lafayette Av' in state.attributes.friendly_name and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+
+                  # --- 57 ST ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "57 St-7 Av" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and '57 St' in state.attributes.friendly_name and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+                  
+                  {% for row in ns.rows %}
+                    {{ row }},
+                  {% endfor %}
+                ]
+            # NO SORTING - keep the order we defined above (Station by Station)
+            sort:
+              method: none
+
+          # -----------------------------------
+          #      SOUTHBOUND (Brooklyn)
+          # -----------------------------------
+          - type: custom:auto-entities
+            card:
+              type: entities
+              title: Southbound (to Brooklyn)
+              show_header_toggle: false
+            filter:
+              template: |
+                [
+                  {% set ns = namespace(rows=[]) %}
+                  # --- ATLANTIC AV ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "Atlantic Av-Barclays Ctr" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and ('Atlantic Av' in state.attributes.friendly_name or 'Barclays' in state.attributes.friendly_name) and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if not headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+
+                  # --- BERGEN ST ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "Bergen St" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and 'Bergen St' in state.attributes.friendly_name and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if not headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+
+                  # --- FULTON ST ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "Fulton St" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and 'Fulton St' in state.attributes.friendly_name and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if not headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+
+                  # --- LAFAYETTE AV ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "Lafayette Av" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and 'Lafayette Av' in state.attributes.friendly_name and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if not headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+
+                  # --- 57 ST ---
+                  {% set ns.rows = ns.rows + [{ "type": "section", "label": "57 St-7 Av" }] %}
+                  {% for state in states.sensor -%}
+                    {%- if state.attributes.friendly_name is defined and '57 St' in state.attributes.friendly_name and state.state not in ['unavailable', 'unknown'] -%}
+                      {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                      {%- if not headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                        {% set ns.rows = ns.rows + [{
+                          "entity": state.entity_id,
+                          "name": state.attributes.route_id ~ " to " ~ headsign,
+                          "secondary_info": "last-updated"
+                        }] %}
+                      {%- endif -%}
+                    {%- endif -%}
+                  {%- endfor %}
+                  
+                  {% for row in ns.rows %}
+                    {{ row }},
+                  {% endfor %}
+                ]
+            # NO SORTING - keep the order we defined above (Station by Station)
+            sort:
+              method: none
+
+  - title: Morning Commute
+    icon: mdi:weather-sunset-up
+    cards:
+      - type: custom:auto-entities
+        card:
+          type: entities
+          title: Morning Commute (Atlantic Av - N/Q/D)
+          show_header_toggle: false
+        filter:
+          template: |
+            [
+              {% for state in states.sensor -%}
+                {%- if state.attributes.friendly_name is defined and ('Atlantic Av' in state.attributes.friendly_name or 'Barclays' in state.attributes.friendly_name) and state.attributes.route_id in ['N', 'Q', 'D'] and state.state not in ['unavailable', 'unknown'] -%}
+                  {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                  {%- if headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                  {
+                    "entity": "{{ state.entity_id }}",
+                    "name": "{{ state.attributes.route_id }} to {{ headsign }}",
+                    "secondary_info": "last-updated"
+                  },
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor %}
+            ]
+        sort:
+          method: state
+          numeric: true
+
+  - title: Evening Commute
+    icon: mdi:weather-night
+    cards:
+      - type: custom:auto-entities
+        card:
+          type: entities
+          title: Evening Commute (57 St - N/Q/R/W)
+          show_header_toggle: false
+        filter:
+          template: |
+            [
+              {% for state in states.sensor -%}
+                {%- if state.attributes.friendly_name is defined and '57 St' in state.attributes.friendly_name and state.attributes.route_id in ['N', 'Q', 'R', 'W'] and state.state not in ['unavailable', 'unknown'] -%}
+                  {%- set headsign = state.attributes.headsign | default('Unknown') -%}
+                  {%- if not headsign is search('Manhattan|Astoria|Forest Hills|Jamaica|96 St|205 St|Wakefield|Harlem|Ditmars|Midtown|Bedford|168 St|57 St|Woodlawn|Eastchester|Dyre|Nereid|145 St|148 St|Court Sq') -%}
+                  {
+                    "entity": "{{ state.entity_id }}",
+                    "name": "{{ state.attributes.route_id }} to {{ headsign }}",
+                    "secondary_info": "last-updated"
+                  },
+                  {%- endif -%}
+                {%- endif -%}
+              {%- endfor %}
+            ]
+        sort:
+          method: state
+          numeric: true

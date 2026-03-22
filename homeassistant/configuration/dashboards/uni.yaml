@@ -1,0 +1,129 @@
+views:
+  - title: Uni
+    icon: mdi:cat
+    cards:
+      - type: grid
+        columns: 1
+        square: false
+        cards:
+          - type: custom:mushroom-title-card
+            title: Cat Monitor
+            subtitle: "Location & Activity"
+
+          # Current Room / Last Seen
+          - type: custom:mushroom-template-card
+            primary: >
+              {% set loc = states('input_text.event_image_location') %}
+              {% if loc in ['unknown', 'unavailable', ''] %}
+                Unknown
+              {% else %}
+                {{ loc | replace('_', ' ') | title }}
+              {% endif %}
+            secondary: >
+               {% set ts = states('input_text.event_image_timestamp') %}
+               {% if ts not in ['unknown', 'unavailable', ''] %}
+                 {% set dt = strptime(ts, '%Y%m%d_%H%M%S') %}
+                 {% if dt %}
+                   Last seen: {{ dt.strftime('%-I:%M %p') }}
+                 {% else %}
+                   Last seen: {{ ts }}
+                 {% endif %}
+               {% else %}
+                 Last seen: Unknown
+               {% endif %}
+            icon: mdi:cat
+            icon_color: >
+              {% set loc = states('input_text.event_image_location') %}
+              {% if loc == 'bedroom' %}
+                purple
+              {% elif loc == 'living_room' %}
+                blue
+              {% else %}
+                grey
+              {% endif %}
+
+          # Latest Picture
+          - type: markdown
+            content: >
+              {% set loc = states('input_text.event_image_location') %}
+              {% set ts = states('input_text.event_image_timestamp') %}
+              {% if loc and loc not in ['unknown', 'unavailable', ''] %}
+                ![Pet](/local/pets/{{ loc }}_{{ ts }}.jpg)
+              {% else %}
+                No pet detected recently.
+              {% endif %}
+
+          # Activity Graph
+          - type: history-graph
+            title: "Activity (Last 24h)"
+            hours_to_show: 24
+            refresh_interval: 60
+            entities:
+              - entity: binary_sensor.bedroom_animal
+                name: Bedroom
+              - entity: binary_sensor.living_room_animal
+                name: Living Room
+
+          - type: custom:mushroom-title-card
+            title: Water Fountain
+            subtitle: "Status & Controls"
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:mushroom-entity-card
+                entity: sensor.eversweet_solo_2_filter
+                name: Filter Status
+                icon: mdi:filter
+                primary_info: state
+                secondary_info: name
+                icon_color: blue
+
+              - type: custom:mushroom-entity-card
+                entity: sensor.eversweet_solo_2_purified_water_today
+                name: Filtered Today
+                icon: mdi:water-check
+                primary_info: state
+                secondary_info: name
+                icon_color: cyan
+
+              - type: custom:mushroom-template-card
+                entity: binary_sensor.eversweet_solo_2_water_level
+                primary: Water Level
+                secondary: >
+                  {% if is_state('binary_sensor.eversweet_solo_2_water_level', 'off') %}
+                    Normal
+                  {% else %}
+                    Low
+                  {% endif %}
+                icon: >
+                  {% if is_state('binary_sensor.eversweet_solo_2_water_level', 'off') %}
+                    mdi:water
+                  {% else %}
+                    mdi:water-alert
+                  {% endif %}
+                icon_color: >
+                  {% if is_state('binary_sensor.eversweet_solo_2_water_level', 'off') %}
+                    blue
+                  {% else %}
+                    red
+                  {% endif %}
+
+              - type: custom:mushroom-entity-card
+                entity: switch.eversweet_solo_2_power
+                name: Power
+                layout: horizontal
+                tap_action:
+                  action: toggle
+
+#      - type: entities
+#        title: Advanced Settings
+#        show_header_toggle: false
+#        entities:
+#          - entity: select.eversweet_solo_2_light_brightness
+#            name: LED Brightness
+#          - entity: select.eversweet_solo_2_mode
+#            name: Operating Mode
+#          - entity: switch.eversweet_solo_2_power
+#            name: Power Switch

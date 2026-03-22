@@ -1,0 +1,50 @@
+activate_all_room_scenes:
+  alias: "Activate Scene Slot for All Rooms"
+  description: "Activates the specified time slot scene for all rooms, respecting override helpers"
+  mode: "parallel"
+  fields:
+    slot:
+      description: "Time slot to activate (morning, day, evening, night)"
+      selector:
+        select:
+          options:
+            - morning
+            - day
+            - evening
+            - night
+  sequence:
+    - variables:
+        rooms: ['living_room', 'bedroom', 'bathroom', 'hallway', 'kitchen']
+        slot_name: "{{ slot }}"
+    - repeat:
+        for_each: "{{ rooms }}"
+        sequence:
+          - variables:
+              room: "{{ repeat.item }}"
+              override_select: "input_select.{{ room }}_{{ slot_name }}_scene"
+              override_val: >-
+                {% set val = states(override_select) | default('') %}
+                {{ '' if val in ['unknown', 'unavailable', '', None] else val }}
+              default_scene: "scene.{{ room }}_{{ slot_name }}"
+              scene_to_activate: "{{ override_val if override_val else default_scene }}"
+              scene_exists: >-
+                {{ scene_to_activate in (states.scene | map(attribute='entity_id') | list) }}
+              helper_entity: "input_select.{{ room }}_scene_cycle"
+          - if:
+              - condition: template
+                value_template: "{{ scene_exists }}"
+            then:
+              - parallel:
+                  - service: "scene.turn_on"
+                    target:
+                      entity_id: "{{ scene_to_activate }}"
+                  - if:
+                      - condition: template
+                        value_template: "{{ helper_entity in (states.input_select | map(attribute='entity_id') | list) }}"
+                    then:
+                      - service: "input_select.select_option"
+                        target:
+                          entity_id: "{{ helper_entity }}"
+                        data:
+                          option: "{{ slot_name }}"
+

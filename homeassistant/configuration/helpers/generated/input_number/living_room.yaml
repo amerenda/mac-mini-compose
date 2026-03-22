@@ -1,0 +1,83 @@
+# Template for input_number helpers per room
+# Usage:
+#   jinja2 input_number_template.yaml.j2 -D room=bedroom > input_number/bedroom.yaml
+
+living_room_brightness_step_pct:
+  name: Living Room Brightness step (%)
+  min: 1
+  max: 50
+  step: 1
+  unit_of_measurement: "%"
+  initial: 10
+living_room_min_brightness_pct:
+  name: Living Room Min brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 1
+living_room_max_brightness_pct:
+  name: Living Room Max brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 100
+
+living_room_morning_auto_off:
+  name: Living Room Morning auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 5
+living_room_day_auto_off:
+  name: Living Room Day auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 10
+living_room_evening_auto_off:
+  name: Living Room Evening auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+living_room_night_auto_off:
+  name: Living Room Night auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 30
+
+motion_auto_off_living_room_morning:
+  name: Living Room - Motion Morning Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_living_room_day:
+  name: Living Room - Motion Day Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_living_room_evening:
+  name: Living Room - Motion Evening Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_living_room_night:
+  name: Living Room - Motion Night Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15

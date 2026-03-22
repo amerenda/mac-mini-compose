@@ -1,0 +1,100 @@
+views:
+  - title: Cameras
+    path: cameras
+    icon: mdi:cctv
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Camera Controls
+            heading_style: title
+            icon: mdi:camera-lock
+          - type: entities
+            entities:
+              - switch.bedroom_privacy_mode
+              - switch.living_room_privacy_mode
+      - type: grid
+        cards:
+          - type: heading
+            heading: Camera Feeds
+            heading_style: title
+            icon: mdi:camera
+          - type: grid
+            square: false
+            columns: 1
+            cards:
+              - type: picture-entity
+                entity: camera.bedroom_fluent
+              - type: picture-entity
+                entity: camera.living_room_fluent
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Latest Human Detection
+            heading_style: title
+            icon: mdi:account-alert
+          - type: markdown
+            content: >
+              {% set loc = states('input_text.intruder_image_location') %}
+              {% set ts = states('input_text.intruder_image_timestamp') %}
+              {% if loc and loc not in ['unknown', 'unavailable', ''] %}
+                ![Intruder](/local/intruders/{{ loc }}_{{ ts }}.jpg)
+                
+                **Location:** {{ loc | replace('_', ' ') | title }}
+                **Time:** {{ strptime(ts, '%Y%m%d_%H%M%S').strftime('%-I:%M %p on %b %d') if ts and ts not in ['unknown', 'unavailable'] else 'Unknown' }}
+              {% else %}
+                No intruder detected.
+              {% endif %}
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Events
+            heading_style: title
+            icon: mdi:walk
+          - type: entities
+            entities:
+              - binary_sensor.bedroom_animal
+              - binary_sensor.living_room_animal
+          - type: entities
+            entities:
+              - binary_sensor.bedroom_person
+              - binary_sensor.living_room_person
+    header:
+      card:
+        type: markdown
+        text_only: true
+        content: '# Security'
+
+  - title: Guests
+    path: guests
+    icon: mdi:account-group
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Guests Present
+            heading_style: title
+            icon: mdi:account-check
+          - type: custom:auto-entities
+            card:
+              type: entities
+              show_header_toggle: false
+              state_color: true
+            filter:
+              include:
+                - group: group.guests
+                  state: home
+            show_empty: false
+          - type: heading
+            heading: All Guests
+            heading_style: title
+            icon: mdi:account-group
+          - type: custom:auto-entities
+            card:
+              type: entities
+              show_header_toggle: false
+            filter:
+              include:
+                - group: group.guests

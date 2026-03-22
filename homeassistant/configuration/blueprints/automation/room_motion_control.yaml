@@ -1,0 +1,327 @@
+blueprint:
+  name: "Room - Motion Control (scheduled scene, per-window options)"
+  description: >
+    On motion: optionally turn on using script.scheduled_light_on based on current schedule slot
+    (morning/day/evening/night). For each window you can block "turn-on" and set an auto-off
+    timeout after motion clears. Supports per-room schedule overrides via helpers.
+  domain: "automation"
+
+  input:
+    room_key:
+      name: "Room Key"
+      description: "Short name used by scenes: scene.<room_key>_(morning|day|evening|night)"
+      selector: { text: {} }
+
+    target_lights:
+      name: "Target lights (group or list)"
+      selector: { target: { entity: { domain: "light" } } }
+
+    motion_sensor:
+      name: "Motion sensor (binary_sensor)"
+      selector: { entity: { domain: "binary_sensor" } }
+
+    motion_enabled:
+      name: "Motion Control Enabled (input_boolean)"
+      description: "If OFF, motion won't control lights in this room."
+      selector: { entity: { domain: "input_boolean" } }
+
+    # ---- Optional: pass your per-room schedule overrides to scheduled_light_on
+    custom_schedule_enabled:
+      name: "(Optional) Custom schedule enabled boolean"
+      default:
+      selector: { entity: { domain: "input_boolean" } }
+    custom_s1_start:
+      name: "(Optional) Morning start (time-only)"
+      default:
+      selector: { entity: { domain: "input_datetime" } }
+    custom_s2_start:
+      name: "(Optional) Day start (time-only)"
+      default:
+      selector: { entity: { domain: "input_datetime" } }
+    custom_s3_start:
+      name: "(Optional) Evening start (time-only)"
+      default:
+      selector: { entity: { domain: "input_datetime" } }
+    custom_s4_start:
+      name: "(Optional) Night start (time-only)"
+      default:
+      selector: { entity: { domain: "input_datetime" } }
+
+    # ---- Per-window controls (helpers optional; defaults provided)
+    # Note: motion_activated helpers replace the old block_* helpers
+    # motion_activated=True means motion WILL activate lights, motion_activated=False means it won't
+    morning_motion_activated_helper:
+      name: "(Optional) Morning motion activated (input_boolean)"
+      default:
+      selector: { entity: { domain: "input_boolean" } }
+    day_motion_activated_helper:
+      name: "(Optional) Day motion activated (input_boolean)"
+      default:
+      selector: { entity: { domain: "input_boolean" } }
+    evening_motion_activated_helper:
+      name: "(Optional) Evening motion activated (input_boolean)"
+      default:
+      selector: { entity: { domain: "input_boolean" } }
+    night_motion_activated_helper:
+      name: "(Optional) Night motion activated (input_boolean)"
+      default:
+      selector: { entity: { domain: "input_boolean" } }
+
+    morning_auto_off_default:
+      name: "Morning auto-off (minutes, default if no helper)"
+      default: 15
+      selector: { number: { min: 0, max: 240, mode: "slider" } }
+    morning_auto_off_helper:
+      name: "(Optional) Morning auto-off helper (input_number)"
+      default:
+      selector: { entity: { domain: "input_number" } }
+    day_auto_off_default:
+      name: "Day auto-off (minutes, default if no helper)"
+      default: 15
+      selector: { number: { min: 0, max: 240, mode: "slider" } }
+    day_auto_off_helper:
+      name: "(Optional) Day auto-off helper (input_number)"
+      default:
+      selector: { entity: { domain: "input_number" } }
+    evening_auto_off_default:
+      name: "Evening auto-off (minutes, default if no helper)"
+      default: 15
+      selector: { number: { min: 0, max: 240, mode: "slider" } }
+    evening_auto_off_helper:
+      name: "(Optional) Evening auto-off helper (input_number)"
+      default:
+      selector: { entity: { domain: "input_number" } }
+    night_auto_off_default:
+      name: "Night auto-off (minutes, default if no helper)"
+      default: 15
+      selector: { number: { min: 0, max: 240, mode: "slider" } }
+    night_auto_off_helper:
+      name: "(Optional) Night auto-off helper (input_number)"
+      default:
+      selector: { entity: { domain: "input_number" } }
+
+mode: "restart"
+max_exceeded: "silent"
+
+variables:
+  # Materialize optional schedule inputs
+  custom_schedule_enabled_input: !input custom_schedule_enabled
+  custom_s1_start_input: !input custom_s1_start
+  custom_s2_start_input: !input custom_s2_start
+  custom_s3_start_input: !input custom_s3_start
+  custom_s4_start_input: !input custom_s4_start
+  
+  # Materialize motion_activated helpers
+  morning_motion_activated_helper_input: !input morning_motion_activated_helper
+  day_motion_activated_helper_input: !input day_motion_activated_helper
+  evening_motion_activated_helper_input: !input evening_motion_activated_helper
+  night_motion_activated_helper_input: !input night_motion_activated_helper
+  
+  # Materialize auto_off helpers
+  morning_auto_off_helper: !input morning_auto_off_helper
+  day_auto_off_helper: !input day_auto_off_helper
+  evening_auto_off_helper: !input evening_auto_off_helper
+  night_auto_off_helper: !input night_auto_off_helper
+  morning_auto_off_default: !input morning_auto_off_default
+  day_auto_off_default: !input day_auto_off_default
+  evening_auto_off_default: !input evening_auto_off_default
+  night_auto_off_default: !input night_auto_off_default
+  
+  room_key_var: !input room_key
+  target_lights_var: !input target_lights
+
+  default_s1: "06:00:00"
+  default_s2: "09:00:00"
+  default_s3: "17:00:00"
+  default_s4: "22:00:00"
+
+  use_custom: >-
+    {{ custom_schedule_enabled_input is not none and
+       custom_schedule_enabled_input != '' and
+       is_state(custom_schedule_enabled_input, 'on') }}
+
+  s1_str: >-
+    {% set v = states(custom_s1_start_input) if use_custom else default_s1 %}
+    {% if v in ['unknown','unavailable',''] %}{{ default_s1 }}{% else %}{{ v }}{% endif %}
+  s2_str: >-
+    {% set v = states(custom_s2_start_input) if use_custom else default_s2 %}
+    {% if v in ['unknown','unavailable',''] %}{{ default_s2 }}{% else %}{{ v }}{% endif %}
+  s3_str: >-
+    {% set v = states(custom_s3_start_input) if use_custom else default_s3 %}
+    {% if v in ['unknown','unavailable',''] %}{{ default_s3 }}{% else %}{{ v }}{% endif %}
+  s4_str: >-
+    {% set v = states(custom_s4_start_input) if use_custom else default_s4 %}
+    {% if v in ['unknown','unavailable',''] %}{{ default_s4 }}{% else %}{{ v }}{% endif %}
+
+  now_ts: "{{ as_timestamp(now()) }}"
+  s1: "{{ as_timestamp(today_at(s1_str)) }}"
+  s2: "{{ as_timestamp(today_at(s2_str)) }}"
+  s3: "{{ as_timestamp(today_at(s3_str)) }}"
+  s4: "{{ as_timestamp(today_at(s4_str)) }}"
+
+  slot: >-
+    {% if now_ts >= s1 and now_ts < s2 %}morning
+    {% elif now_ts >= s2 and now_ts < s3 %}day
+    {% elif now_ts >= s3 and now_ts < s4 %}evening
+    {% else %}night{% endif %}
+
+  # Check motion_activated helpers (per-time-window), fallback to blueprint inputs, then default to True
+  motion_activated_morning: >-
+    {% if morning_motion_activated_helper_input %}
+      {{ is_state(morning_motion_activated_helper_input, 'on') }}
+    {% else %}
+      {% set helper = 'input_boolean.motion_activated_' ~ room_key_var ~ '_morning' %}
+      {{ is_state(helper, 'on') if states(helper) not in ['unknown', 'unavailable'] else true }}
+    {% endif %}
+  motion_activated_day: >-
+    {% if day_motion_activated_helper_input %}
+      {{ is_state(day_motion_activated_helper_input, 'on') }}
+    {% else %}
+      {% set helper = 'input_boolean.motion_activated_' ~ room_key_var ~ '_day' %}
+      {{ is_state(helper, 'on') if states(helper) not in ['unknown', 'unavailable'] else true }}
+    {% endif %}
+  motion_activated_evening: >-
+    {% if evening_motion_activated_helper_input %}
+      {{ is_state(evening_motion_activated_helper_input, 'on') }}
+    {% else %}
+      {% set helper = 'input_boolean.motion_activated_' ~ room_key_var ~ '_evening' %}
+      {{ is_state(helper, 'on') if states(helper) not in ['unknown', 'unavailable'] else true }}
+    {% endif %}
+  motion_activated_night: >-
+    {% if night_motion_activated_helper_input %}
+      {{ is_state(night_motion_activated_helper_input, 'on') }}
+    {% else %}
+      {% set helper = 'input_boolean.motion_activated_' ~ room_key_var ~ '_night' %}
+      {{ is_state(helper, 'on') if states(helper) not in ['unknown', 'unavailable'] else true }}
+    {% endif %}
+
+  morning_auto_off_mins: >-
+    {% if morning_auto_off_helper %}
+      {{ states(morning_auto_off_helper) | int(0) }}
+    {% else %}
+      {% set helper = 'input_number.motion_auto_off_' ~ room_key_var ~ '_morning' %}
+      {% set val = states(helper) %}
+      {% if val not in ['unknown', 'unavailable', ''] %}
+        {{ val | int(15) }}
+      {% else %}
+        {{ morning_auto_off_default | int(15) }}
+      {% endif %}
+    {% endif %}
+  day_auto_off_mins: >-
+    {% if day_auto_off_helper %}
+      {{ states(day_auto_off_helper) | int(0) }}
+    {% else %}
+      {% set helper = 'input_number.motion_auto_off_' ~ room_key_var ~ '_day' %}
+      {% set val = states(helper) %}
+      {% if val not in ['unknown', 'unavailable', ''] %}
+        {{ val | int(15) }}
+      {% else %}
+        {{ day_auto_off_default | int(15) }}
+      {% endif %}
+    {% endif %}
+  evening_auto_off_mins: >-
+    {% if evening_auto_off_helper %}
+      {{ states(evening_auto_off_helper) | int(0) }}
+    {% else %}
+      {% set helper = 'input_number.motion_auto_off_' ~ room_key_var ~ '_evening' %}
+      {% set val = states(helper) %}
+      {% if val not in ['unknown', 'unavailable', ''] %}
+        {{ val | int(15) }}
+      {% else %}
+        {{ evening_auto_off_default | int(15) }}
+      {% endif %}
+    {% endif %}
+  night_auto_off_mins: >-
+    {% if night_auto_off_helper %}
+      {{ states(night_auto_off_helper) | int(0) }}
+    {% else %}
+      {% set helper = 'input_number.motion_auto_off_' ~ room_key_var ~ '_night' %}
+      {% set val = states(helper) %}
+      {% if val not in ['unknown', 'unavailable', ''] %}
+        {{ val | int(15) }}
+      {% else %}
+        {{ night_auto_off_default | int(15) }}
+      {% endif %}
+    {% endif %}
+
+  motion_activated_current: >-
+    {% set map = {
+      'morning': motion_activated_morning,
+      'day': motion_activated_day,
+      'evening': motion_activated_evening,
+      'night': motion_activated_night
+    } %}
+    {{ map[slot] }}
+  auto_off_current_mins: >-
+    {% set map = {
+      'morning': morning_auto_off_mins,
+      'day': day_auto_off_mins,
+      'evening': evening_auto_off_mins,
+      'night': night_auto_off_mins
+    } %}
+    {{ map[slot] | int(0) }}
+
+trigger:
+  - platform: "state"
+    entity_id: !input motion_sensor  # yamllint disable-line quoted-strings
+    to: "on"
+    id: "motion_on"
+
+  - platform: "state"
+    entity_id: !input motion_sensor  # yamllint disable-line quoted-strings
+    to: "off"
+    id: "motion_off"
+
+condition: []
+
+action:
+  - choose:
+      - conditions:
+          - condition: "trigger"
+            id: "motion_on"
+          - condition: "state"
+            entity_id: !input motion_enabled  # yamllint disable-line quoted-strings
+            state: "on"
+          - condition: "template"
+            value_template: "{{ motion_activated_current | bool }}"
+        sequence:
+          - variables:
+              _fb_var: >-
+                {% if target_lights_var is mapping and 'entity_id' in target_lights_var %}
+                  {{ target_lights_var.entity_id }}
+                {% elif target_lights_var is mapping %}
+                  {{ '' }}
+                {% else %}
+                  {{ target_lights_var }}
+                {% endif %}
+          - service: "script.scheduled_light_on"
+            data_template:
+              fallback_lights: "{{ _fb_var }}"
+              timer_mode: false
+              auto_on: true
+              custom_schedule_enabled: "{{ custom_schedule_enabled_input if custom_schedule_enabled_input and custom_schedule_enabled_input != '' and custom_schedule_enabled_input is not none else '' }}"
+              custom_s1_start: "{{ custom_s1_start_input if custom_s1_start_input and custom_s1_start_input != '' and custom_s1_start_input is not none else '' }}"
+              custom_s2_start: "{{ custom_s2_start_input if custom_s2_start_input and custom_s2_start_input != '' and custom_s2_start_input is not none else '' }}"
+              custom_s3_start: "{{ custom_s3_start_input if custom_s3_start_input and custom_s3_start_input != '' and custom_s3_start_input is not none else '' }}"
+              custom_s4_start: "{{ custom_s4_start_input if custom_s4_start_input and custom_s4_start_input != '' and custom_s4_start_input is not none else '' }}"
+
+      - conditions:
+          - condition: "trigger"
+            id: "motion_off"
+          - condition: "state"
+            entity_id: !input motion_enabled  # yamllint disable-line quoted-strings
+            state: "on"
+          - condition: "template"
+            value_template: "{{ motion_activated_current | bool }}"
+        sequence:
+          - if:
+              - condition: "template"
+                value_template: "{{ auto_off_current_mins | int(0) > 0 }}"
+            then:
+              - delay:
+                  minutes: "{{ auto_off_current_mins | int(0) }}"
+              - condition: "state"
+                entity_id: !input motion_sensor  # yamllint disable-line quoted-strings
+                state: "off"
+              - service: "light.turn_off"
+                target: !input target_lights

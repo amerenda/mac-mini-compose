@@ -1,0 +1,45 @@
+# Template for input_select helpers per room
+# Usage:
+#   jinja2 input_select_template.yaml.j2 -D room=bedroom > input_select/bedroom.yaml
+
+{{ room }}_morning_scene:
+  name: {{ room|replace('_',' ')|title }} Morning scene
+  options:
+    - scene.{{ room }}_morning
+    - scene.{{ room }}_day
+    - scene.{{ room }}_evening
+    - scene.{{ room }}_night
+  initial: scene.{{ room }}_morning
+{{ room }}_day_scene:
+  name: {{ room|replace('_',' ')|title }} Day scene
+  options:
+    - scene.{{ room }}_day
+    - scene.{{ room }}_morning
+    - scene.{{ room }}_evening
+    - scene.{{ room }}_night
+  initial: scene.{{ room }}_day
+{{ room }}_evening_scene:
+  name: {{ room|replace('_',' ')|title }} Evening scene
+  options:
+    - scene.{{ room }}_evening
+    - scene.{{ room }}_day
+    - scene.{{ room }}_morning
+    - scene.{{ room }}_night
+  initial: scene.{{ room }}_evening
+{{ room }}_night_scene:
+  name: {{ room|replace('_',' ')|title }} Night scene
+  options:
+    - scene.{{ room }}_night
+    - scene.{{ room }}_evening
+    - scene.{{ room }}_day
+    - scene.{{ room }}_morning
+  initial: scene.{{ room }}_night
+
+{{ room }}_scene_cycle:
+  name: {{ room|replace('_',' ')|title }} Scene Cycle
+  options:
+    - morning
+    - day
+    - evening
+    - night
+  initial: morning

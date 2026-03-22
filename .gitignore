@@ -1,0 +1,14 @@
+# Secrets — never commit
+.env
+bind9/keys/key.conf
+
+# Docker volumes (local data)
+data/
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~

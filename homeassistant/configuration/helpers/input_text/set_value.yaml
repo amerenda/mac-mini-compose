@@ -1,0 +1,5 @@
+# Global input_text helper for set_value automation
+set_value:
+  name: "Set Value"
+  initial: ""
+  max: 255

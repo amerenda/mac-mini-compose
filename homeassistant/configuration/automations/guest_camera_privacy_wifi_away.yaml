@@ -1,0 +1,9 @@
+alias: "Guest - Camera Privacy (WiFi Disconnected)"
+mode: "restart"
+triggers:
+  - trigger: "state"
+    entity_id:
+      - "group.guests"
+    from: "home"
+actions:
+  - action: script.manage_camera_privacy

@@ -1,0 +1,478 @@
+blueprint:
+  name: "Room - Switch Control (Hue Dimmer, scheduled scenes)"
+  description: >
+    Map Hue 4-button dimmer actions to room lighting. Defaults use scheduled_light_on
+    for ON/toggle and provide brightness adjustments, scene cycling, and all-off.
+    Optional input_select helpers (one per press type) can override actions via dashboard.
+    Uses hue_event triggers via hue_event_id.
+  domain: "automation"
+
+  input:
+    target_lights:
+      name: "Target lights (group or list)"
+      selector:
+        target:
+          entity:
+            domain: "light"
+
+    hue_event_id:
+      name: "Hue event ID (for hue_event compatibility)"
+      description: "Example: living_room_switch_button"
+      selector:
+        text: {}
+
+    # ---- Optional schedule passthrough for scheduled_light_on
+    custom_schedule_enabled:
+      name: "(Optional) Custom schedule enabled boolean"
+      default:
+      selector:
+        entity:
+          domain: "input_boolean"
+    custom_s1_start:
+      name: "(Optional) Morning start (time-only)"
+      default:
+      selector:
+        entity:
+          domain: "input_datetime"
+    custom_s2_start:
+      name: "(Optional) Day start (time-only)"
+      default:
+      selector:
+        entity:
+          domain: "input_datetime"
+    custom_s3_start:
+      name: "(Optional) Evening start (time-only)"
+      default:
+      selector:
+        entity:
+          domain: "input_datetime"
+    custom_s4_start:
+      name: "(Optional) Night start (time-only)"
+      default:
+      selector:
+        entity:
+          domain: "input_datetime"
+
+    # ---- Optional scene cycle memory helper
+    scene_cycle_helper:
+      name: "(Optional) Scene cycle helper (input_select)"
+      description: >
+        Stores the CURRENT slot; cycles morning→day→evening→night.
+        Defaults to input_select.<light_entity_name>_scene_cycle
+      default: ""
+      selector:
+        entity:
+          domain: "input_select"
+
+    # ---- Optional brightness helpers
+    brightness_step_helper:
+      name: "(Optional) Brightness step helper (input_number, %)"
+      description: "e.g. input_number.<room>_brightness_step_pct"
+      default:
+      selector:
+        entity:
+          domain: "input_number"
+    min_brightness_helper:
+      name: "(Optional) Min brightness helper (input_number, %)"
+      description: "e.g. input_number.<room>_min_brightness_pct"
+      default:
+      selector:
+        entity:
+          domain: "input_number"
+    max_brightness_helper:
+      name: "(Optional) Max brightness helper (input_number, %)"
+      description: "e.g. input_number.<room>_max_brightness_pct"
+      default:
+      selector:
+        entity:
+          domain: "input_number"
+
+    # ---- Static brightness fallback values
+    brightness_step_pct:
+      name: "Fallback brightness step (%)"
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 50
+          unit_of_measurement: "%"
+          mode: "slider"
+
+    # ---- Optional per-button override helpers
+    btn1_short_action_helper:
+      name: "(Optional) Button 1 Short action (input_select)"
+      default:
+      selector:
+        entity:
+          domain: "input_select"
+    btn1_long_action_helper:
+      name: "(Optional) Button 1 Long action (input_select)"
+      default:
+      selector:
+        entity:
+          domain: "input_select"
+    btn2_short_action_helper:
+      name: "(Optional) Button 2 Short action (input_select)"
+      default:
+      selector:
+        entity:
+          domain: "input_select"
+    btn2_long_action_helper:
+      name: "(Optional) Button 2 Long action (input_select)"
+      default:
+      selector:
+        entity:
+          domain: "input_select"
+    btn3_short_action_helper:
+      name: "(Optional) Button 3 Short action (input_select)"
+      default:
+      selector:
+        entity:
+          domain: "input_select"
+    btn3_long_action_helper:
+      name: "(Optional) Button 3 Long action (input_select)"
+      default:
+      selector:
+        entity:
+          domain: "input_select"
+    btn4_short_action_helper:
+      name: "(Optional) Button 4 Short action (input_select)"
+      default:
+      selector:
+        entity:
+          domain: "input_select"
+    btn4_long_action_helper:
+      name: "(Optional) Button 4 Long action (input_select)"
+      default:
+      selector:
+        entity:
+          domain: "input_select"
+
+mode: "restart"
+max_exceeded: "silent"
+
+variables:
+  # Materialize all optional inputs so they're available in templates
+  btn1_short_action_helper: !input btn1_short_action_helper
+  btn1_long_action_helper: !input btn1_long_action_helper
+  btn2_short_action_helper: !input btn2_short_action_helper
+  btn2_long_action_helper: !input btn2_long_action_helper
+  btn3_short_action_helper: !input btn3_short_action_helper
+  btn3_long_action_helper: !input btn3_long_action_helper
+  btn4_short_action_helper: !input btn4_short_action_helper
+  btn4_long_action_helper: !input btn4_long_action_helper
+
+  brightness_step_helper: !input brightness_step_helper
+  min_brightness_helper: !input min_brightness_helper
+  max_brightness_helper: !input max_brightness_helper
+  brightness_step_pct: !input brightness_step_pct
+
+  scene_cycle_helper_input: !input scene_cycle_helper
+  custom_schedule_enabled: !input custom_schedule_enabled
+  custom_s1_start: !input custom_s1_start
+  custom_s2_start: !input custom_s2_start
+  custom_s3_start: !input custom_s3_start
+  custom_s4_start: !input custom_s4_start
+
+  # materialize inputs so we can reference them in templates/logs
+  target_lights_input: !input target_lights
+
+  # Extract entity name from target_lights for scene naming
+  _target_lights_raw: >-
+    {{ target_lights_input.entity_id if target_lights_input.entity_id is defined else target_lights_input }}
+  _target_lights_list: >-
+    {% if _target_lights_raw is string and _target_lights_raw != '' %}
+      {{ [_target_lights_raw] }}
+    {% elif _target_lights_raw is sequence and _target_lights_raw is not string %}
+      {{ _target_lights_raw | list }}
+    {% else %}
+      {{ [] }}
+    {% endif %}
+  _first_light_entity: "{{ _target_lights_list[0] if _target_lights_list|length > 0 else '' }}"
+  entity_name: >-
+    {% set entity = _first_light_entity %}
+    {% if entity is string and entity|length >= 6 and entity[:6] == 'light.' %}
+      {{ entity[6:] }}
+    {% else %}
+      {{ entity }}
+    {% endif %}
+  scene_cycle_helper: >-
+    {% if scene_cycle_helper_input and scene_cycle_helper_input != '' %}
+      {{ scene_cycle_helper_input }}
+    {% else %}
+      input_select.{{ entity_name }}_scene_cycle
+    {% endif %}
+
+  custom_schedule_enabled_input: !input custom_schedule_enabled
+  custom_s1_start_input: !input custom_s1_start
+  custom_s2_start_input: !input custom_s2_start
+  custom_s3_start_input: !input custom_s3_start
+  custom_s4_start_input: !input custom_s4_start
+
+  # ---- Resolve per-button actions (helper overrides if provided; else defaults)
+  btn1_short_action: >-
+    {{ states(btn1_short_action_helper) if btn1_short_action_helper else 'toggle' }}
+  btn1_long_action: >-
+    {{ states(btn1_long_action_helper) if btn1_long_action_helper else 'turn_off_home' }}
+
+  btn2_short_action: >-
+    {{ states(btn2_short_action_helper) if btn2_short_action_helper else 'brightness_up' }}
+  btn2_long_action: >-
+    {{ states(btn2_long_action_helper) if btn2_long_action_helper else 'brightness_max' }}
+
+  btn3_short_action: >-
+    {{ states(btn3_short_action_helper) if btn3_short_action_helper else 'brightness_down' }}
+  btn3_long_action: >-
+    {{ states(btn3_long_action_helper) if btn3_long_action_helper else 'brightness_min' }}
+
+  btn4_short_action: >-
+    {{ states(btn4_short_action_helper) if btn4_short_action_helper else 'scene_cycle' }}
+  btn4_long_action: >-
+    {{ states(btn4_long_action_helper) if btn4_long_action_helper else 'default_scene' }}
+
+  # ---- Resolve brightness from helpers, with safe fallbacks
+  _step_raw: >-
+    {% if brightness_step_helper %}{{ states(brightness_step_helper) }}{% else %}{{ '' }}{% endif %}
+  _min_raw: >-
+    {% if min_brightness_helper %}{{ states(min_brightness_helper) }}{% else %}{{ '' }}{% endif %}
+  _max_raw: >-
+    {% if max_brightness_helper %}{{ states(max_brightness_helper) }}{% else %}{{ '' }}{% endif %}
+
+  brightness_step_pct_resolved: >-
+    {% set v = _step_raw %}
+    {{ (v | int(10)) if v not in ['unknown','unavailable','', None] else (brightness_step_pct | int) }}
+
+  min_brightness_pct_resolved: >-
+    {% set v = _min_raw %}
+    {{ (v | int(1)) if v not in ['unknown','unavailable','', None] else 1 }}
+
+  max_brightness_pct_resolved: >-
+    {% set v = _max_raw %}
+    {{ (v | int(100)) if v not in ['unknown','unavailable','', None] else 100 }}
+
+  # ---- Time window / slot calc
+  default_s1: "06:00:00"
+  default_s2: "09:00:00"
+  default_s3: "17:00:00"
+  default_s4: "22:00:00"
+
+  use_custom: >-
+    {{ custom_schedule_enabled_input is not none and
+       custom_schedule_enabled_input != '' and
+       is_state(custom_schedule_enabled_input, 'on') }}
+
+  s1_str: >-
+    {% set v = states(custom_s1_start_input) if use_custom else default_s1 %}
+    {% if v in ['unknown','unavailable',''] %}{{ default_s1 }}{% else %}{{ v }}{% endif %}
+  s2_str: >-
+    {% set v = states(custom_s2_start_input) if use_custom else default_s2 %}
+    {% if v in ['unknown','unavailable',''] %}{{ default_s2 }}{% else %}{{ v }}{% endif %}
+  s3_str: >-
+    {% set v = states(custom_s3_start_input) if use_custom else default_s3 %}
+    {% if v in ['unknown','unavailable',''] %}{{ default_s3 }}{% else %}{{ v }}{% endif %}
+  s4_str: >-
+    {% set v = states(custom_s4_start_input) if use_custom else default_s4 %}
+    {% if v in ['unknown','unavailable',''] %}{{ default_s4 }}{% else %}{{ v }}{% endif %}
+
+  now_ts: "{{ as_timestamp(now()) }}"
+  s1: "{{ as_timestamp(today_at(s1_str)) }}"
+  s2: "{{ as_timestamp(today_at(s2_str)) }}"
+  s3: "{{ as_timestamp(today_at(s3_str)) }}"
+  s4: "{{ as_timestamp(today_at(s4_str)) }}"
+
+  current_slot: >-
+    {% if now_ts >= s1 and now_ts < s2 %}morning
+    {% elif now_ts >= s2 and now_ts < s3 %}day
+    {% elif now_ts >= s3 and now_ts < s4 %}evening
+    {% else %}night{% endif %}
+
+trigger:
+  # Event-based triggers (Philips Hue v2 "hue_event")
+  - platform: "event"
+    event_type: "hue_event"
+    event_data:
+      id: !input hue_event_id
+      type: "initial_press"
+      subtype: 1
+    id: e1_short
+  - platform: "event"
+    event_type: "hue_event"
+    event_data:
+      id: !input hue_event_id
+      type: "long_press"
+      subtype: 1
+    id: e1_long
+
+  - platform: "event"
+    event_type: "hue_event"
+    event_data:
+      id: !input hue_event_id
+      type: "initial_press"
+      subtype: 2
+    id: e2_short
+  - platform: "event"
+    event_type: "hue_event"
+    event_data:
+      id: !input hue_event_id
+      type: "long_press"
+      subtype: 2
+    id: e2_long
+
+  - platform: "event"
+    event_type: "hue_event"
+    event_data:
+      id: !input hue_event_id
+      type: "initial_press"
+      subtype: 3
+    id: e3_short
+  - platform: "event"
+    event_type: "hue_event"
+    event_data:
+      id: !input hue_event_id
+      type: "long_press"
+      subtype: 3
+    id: e3_long
+
+  - platform: "event"
+    event_type: "hue_event"
+    event_data:
+      id: !input hue_event_id
+      type: "short_release"
+      subtype: 4
+    id: e4_short
+  - platform: "event"
+    event_type: "hue_event"
+    event_data:
+      id: !input hue_event_id
+      type: "long_press"
+      subtype: 4
+    id: e4_long
+
+action:
+  # First: debug log so we SEE if the trigger actually fired
+  - service: "logbook.log"
+    data:
+      name: "room_switch_control"
+      message: >-
+        TRIGGER_RECEIVED: id={{ trigger.id }} for {{ target_lights_input }}.
+        timestamp={{ now().isoformat() }}
+        entity_name: {{ entity_name }}.
+
+  # Resolve which logical action to run for this trigger
+  - variables:
+      action_key: >-
+        {% set id = trigger.id %}
+        {% if id == 'e1_short' %}{{ btn1_short_action }}
+        {% elif id == 'e1_long' %}{{ btn1_long_action }}
+        {% elif id == 'e2_short' %}{{ btn2_short_action }}
+        {% elif id == 'e2_long' %}{{ btn2_long_action }}
+        {% elif id == 'e3_short' %}{{ btn3_short_action }}
+        {% elif id == 'e3_long' %}{{ btn3_long_action }}
+        {% elif id == 'e4_short' %}{{ btn4_short_action }}
+        {% elif id == 'e4_long' %}{{ btn4_long_action }}
+        {% else %}unknown{% endif %}
+
+  - service: "logbook.log"
+    data:
+      name: "room_switch_control"
+      message: >-
+        action_key={{ action_key }}
+
+  - choose:
+      # --- toggle -> call room_toggle with only the supported args
+      - conditions: "{{ action_key == 'toggle' }}"
+        sequence:
+          - service: "script.room_toggle"
+            data:
+              target_lights: >-
+                {{ target_lights_input.entity_id if target_lights_input.entity_id is defined else target_lights_input }}
+              custom_schedule_enabled: "{{ custom_schedule_enabled }}"
+              custom_s1_start: "{{ custom_s1_start }}"
+              custom_s2_start: "{{ custom_s2_start }}"
+              custom_s3_start: "{{ custom_s3_start }}"
+              custom_s4_start: "{{ custom_s4_start }}"
+
+      # --- scheduled_on/default_scene -> directly call scheduled_light_on with schedule overrides
+      - conditions: "{{ action_key == 'scheduled_on' or action_key == 'default_scene' }}"
+        sequence:
+          - service: "script.scheduled_light_on"
+            data:
+              custom_schedule_enabled: "{{ custom_schedule_enabled_input }}"
+              custom_s1_start: "{{ custom_s1_start_input }}"
+              custom_s2_start: "{{ custom_s2_start_input }}"
+              custom_s3_start: "{{ custom_s3_start_input }}"
+              custom_s4_start: "{{ custom_s4_start_input }}"
+              fallback_lights: >-
+                {{ target_lights_input.entity_id if target_lights_input.entity_id is defined else target_lights_input }}
+
+      - conditions: "{{ action_key == 'all_off' }}"
+        sequence:
+          - service: "light.turn_off"
+            target: !input target_lights
+
+      - conditions: "{{ action_key == 'brightness_up' }}"
+        sequence:
+          - service: "light.turn_on"
+            target: !input target_lights
+            data:
+              brightness_step_pct: "{{ brightness_step_pct_resolved | int }}"
+
+      - conditions: "{{ action_key == 'brightness_down' }}"
+        sequence:
+          - service: "light.turn_on"
+            target: !input target_lights
+            data:
+              brightness_step_pct: "{{ 0 - (brightness_step_pct_resolved | int) }}"
+
+      - conditions: "{{ action_key == 'brightness_min' }}"
+        sequence:
+          - service: "light.turn_on"
+            target: !input target_lights
+            data:
+              brightness_pct: "{{ min_brightness_pct_resolved | int }}"
+
+      - conditions: "{{ action_key == 'brightness_max' }}"
+        sequence:
+          - service: "light.turn_on"
+            target: !input target_lights
+            data:
+              brightness_pct: "{{ max_brightness_pct_resolved | int }}"
+
+      - conditions: "{{ action_key == 'scene_cycle' }}"
+        sequence:
+          - variables:
+              order: ['morning', 'day', 'evening', 'night']
+              cur_slot: >-
+                {% if scene_cycle_helper %}
+                  {{ states(scene_cycle_helper) | default(current_slot) }}
+                {% else %}
+                  {{ current_slot }}
+                {% endif %}
+              idx: "{{ order.index(cur_slot) if cur_slot in order else 0 }}"
+              next_slot: "{{ order[(idx + 1) % order | length] }}"
+              scene_to_activate: "scene.{{ entity_name }}_{{ next_slot }}"
+          - service: "logbook.log"
+            data:
+              name: "scene_cycle DEBUG"
+              message: >-
+                helper={{ scene_cycle_helper }}, cur_slot={{ cur_slot }},
+                next_slot={{ next_slot }}, scene={{ scene_to_activate }}
+          - if:
+              - condition: template
+                value_template: "{{ scene_cycle_helper is not none and scene_cycle_helper != '' }}"
+            then:
+              - service: "input_select.select_option"
+                target:
+                  entity_id: "{{ scene_cycle_helper }}"
+                data:
+                  option: "{{ next_slot }}"
+          - service: "scene.turn_on"
+            target:
+              entity_id: "{{ scene_to_activate }}"
+
+      - conditions: "{{ action_key == 'turn_off_home' }}"
+        sequence:
+          - service: "light.turn_off"
+            target:
+              entity_id: light.home
+

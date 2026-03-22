@@ -1,0 +1,7 @@
+alias: "System - Monitor Camera Privacy"
+mode: "single"
+triggers:
+  - trigger: "time_pattern"
+    minutes: "/1"
+actions:
+  - action: script.manage_camera_privacy

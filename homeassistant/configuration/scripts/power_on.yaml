@@ -1,0 +1,240 @@
+scheduled_light_on:
+  alias: "Scheduled Light On (safe)"
+  mode: "restart"
+  fields:
+    custom_schedule_enabled: { required: false }
+    custom_s1_start: { required: false }
+    custom_s2_start: { required: false }
+    custom_s3_start: { required: false }
+    custom_s4_start: { required: false }
+    transition: { required: false }
+    fallback_lights: { required: false }
+    timer_mode: { required: false, default: false }
+    auto_on: { required: false, default: false }
+  sequence:
+    - variables:
+        default_s1: "06:00:00"
+        default_s2: "09:00:00"
+        default_s3: "17:00:00"
+        default_s4: "22:00:00"
+
+        use_custom: >-
+          {{ (custom_schedule_enabled is defined) and is_state(custom_schedule_enabled, 'on') }}
+
+        s1_str: >-
+          {% set v = states(custom_s1_start | default('')) if use_custom else default_s1 %}
+          {{ default_s1 if v in ['unknown','unavailable','', None] else v }}
+        s2_str: >-
+          {% set v = states(custom_s2_start | default('')) if use_custom else default_s2 %}
+          {{ default_s2 if v in ['unknown','unavailable','', None] else v }}
+        s3_str: >-
+          {% set v = states(custom_s3_start | default('')) if use_custom else default_s3 %}
+          {{ default_s3 if v in ['unknown','unavailable','', None] else v }}
+        s4_str: >-
+          {% set v = states(custom_s4_start | default('')) if use_custom else default_s4 %}
+          {{ default_s4 if v in ['unknown','unavailable','', None] else v }}
+
+        now_ts: "{{ as_timestamp(now()) }}"
+        s1: "{{ as_timestamp(today_at(s1_str)) }}"
+        s2: "{{ as_timestamp(today_at(s2_str)) }}"
+        s3: "{{ as_timestamp(today_at(s3_str)) }}"
+        s4: "{{ as_timestamp(today_at(s4_str)) }}"
+
+        slot: >-
+          {% if now_ts >= s1 and now_ts < s2 %}morning
+          {% elif now_ts >= s2 and now_ts < s3 %}day
+          {% elif now_ts >= s3 and now_ts < s4 %}evening
+          {% else %}night{% endif %}
+
+        # Extract entity name from fallback_lights for scene naming
+        _fb_entity_raw: "{{ fallback_lights | default('') }}"
+        _fb_entity: >-
+          {% set fb = _fb_entity_raw %}
+          {% if fb is mapping and 'entity_id' in fb %}
+            {{ fb.entity_id }}
+          {% elif fb is mapping %}
+            {{ '' }}
+          {% elif fb is string %}
+            {{ fb }}
+          {% else %}
+            {{ '' }}
+          {% endif %}
+        _entity_name: >-
+          {% set entity = _fb_entity %}
+          {% if entity is string and entity != '' and entity|length >= 6 and entity[:6] == 'light.' %}
+            {{ entity[6:] }}
+          {% else %}
+            {{ entity }}
+          {% endif %}
+
+        _override_select: "{{ 'input_select.' ~ _entity_name ~ '_' ~ slot ~ '_scene' }}"
+        _override_val: >-
+          {% set val = states(_override_select) if _entity_name and _entity_name != '' else '' %}
+          {{ '' if val in ['unknown','unavailable','', None] else val }}
+
+        default_scene_entity_id: "scene.{{ _entity_name }}_{{ slot }}"
+        scene_to_activate: "{{ _override_val if _override_val else default_scene_entity_id }}"
+        scene_exists: >-
+          {{ scene_to_activate in (states.scene | map(attribute='entity_id') | list) if scene_to_activate else false }}
+        
+        scene_cycle_helper: >-
+          {% if _entity_name and _entity_name != '' %}
+            input_select.{{ _entity_name }}_scene_cycle
+          {% else %}
+            ''
+          {% endif %}
+
+        all_lights: "{{ states.light | map(attribute='entity_id') | list }}"
+        dynamic_fallback: >-
+          {% set fb = _fb_entity %}
+          {% if fb and fb != '' %}
+            {{ fb }}
+          {% else %}
+            {{ '' }}
+          {% endif %}
+        
+        # Check if lights are on (for timer mode)
+        timer_mode_active: "{{ timer_mode | default(false) | bool }}"
+        lights_on_check: >-
+          {% if timer_mode_active %}
+            {% if dynamic_fallback %}
+              {% set fb_entity = dynamic_fallback %}
+              {% if fb_entity is string and fb_entity != '' %}
+                {% set expanded = expand(fb_entity) %}
+                {{ expanded | selectattr('state','eq','on') | list | count > 0 }}
+              {% else %}
+                {{ false }}
+              {% endif %}
+            {% else %}
+              {{ false }}
+            {% endif %}
+          {% else %}
+            {{ true }}
+          {% endif %}
+    
+    # Debug logging
+    - service: "logbook.log"
+      data:
+        name: "scheduled_light_on"
+        message: >-
+          SCRIPT_START: timestamp={{ now().isoformat() }},
+          timer_mode={{ timer_mode | default('NOT_SET') }}, 
+          fallback_lights={{ fallback_lights | default('NOT_SET') }}, 
+          scene={{ scene_to_activate }}, scene_exists={{ scene_exists }}, 
+          lights_on_check={{ lights_on_check }}
+    
+    - choose:
+        - conditions: "{{ scene_exists and lights_on_check | bool }}"
+          sequence:
+            - service: "logbook.log"
+              data:
+                name: "scheduled_light_on"
+                message: >-
+                  ACTIVATING SCENE: {{ scene_to_activate }} 
+                  (scene_exists={{ scene_exists }}, lights_on_check={{ lights_on_check }})
+            - parallel:
+                - service: "scene.turn_on"
+                  data:
+                    transition: "{{ transition | default(0) }}"
+                  target:
+                    entity_id: "{{ scene_to_activate }}"
+                - if:
+                    - condition: template
+                      value_template: "{{ scene_cycle_helper != '' }}"
+                  then:
+                    - service: "input_select.select_option"
+                      target:
+                        entity_id: "{{ scene_cycle_helper }}"
+                      data:
+                        option: "{{ slot }}"
+            - service: "logbook.log"
+              data:
+                name: "scheduled_light_on"
+                message: >-
+                  Scene {{ scene_to_activate }} activated successfully
+        - conditions: "{{ scene_exists and not lights_on_check | bool }}"
+          sequence:
+            - choose:
+                - conditions: "{{ timer_mode_active and (auto_on | default(false) | bool) }}"
+                  sequence:
+                    - service: "logbook.log"
+                      data:
+                        name: "scheduled_light_on"
+                        message: >-
+                          Lights are off but auto_on=True - turning on lights first, then applying scene
+                          (fallback_lights={{ dynamic_fallback }})
+                    - service: "light.turn_on"
+                      target:
+                        entity_id: "{{ dynamic_fallback }}"
+                    - service: "logbook.log"
+                      data:
+                        name: "scheduled_light_on"
+                        message: "Lights turned on, now applying scene {{ scene_to_activate }}"
+                    - service: "scene.turn_on"
+                      data:
+                        transition: "{{ transition | default(0) }}"
+                      target:
+                        entity_id: "{{ scene_to_activate }}"
+                    - if:
+                        - condition: template
+                          value_template: "{{ scene_cycle_helper != '' }}"
+                      then:
+                        - service: "input_select.select_option"
+                          target:
+                            entity_id: "{{ scene_cycle_helper }}"
+                          data:
+                            option: "{{ slot }}"
+                    - service: "logbook.log"
+                      data:
+                        name: "scheduled_light_on"
+                        message: >-
+                          Scene {{ scene_to_activate }} activated successfully (auto_on enabled)
+                - conditions: []
+                  sequence:
+                    - service: "logbook.log"
+                      data:
+                        name: "scheduled_light_on"
+                        message: >-
+                          SKIPPED: Scene '{{ scene_to_activate }}' - lights are off 
+                          (lights_on_check={{ lights_on_check }}, auto_on={{ auto_on | default(false) }})
+                    - service: "logbook.log"
+                      data:
+                        name: "scheduled_light_on"
+                        message: "Timer mode: Scene '{{ scene_to_activate }}' skipped - lights are off and auto_on is disabled"
+      default:
+        - service: "logbook.log"
+          data:
+            name: "scheduled_light_on"
+            message: >-
+              Scene '{{ scene_to_activate }}' does NOT exist 
+              (scene_exists={{ scene_exists }})
+        - choose:
+            - conditions: "{{ timer_mode_active }}"
+              sequence:
+                - service: "logbook.log"
+                  data:
+                    name: "scheduled_light_on"
+                    message: >-
+                      Timer mode: Scene missing and timer mode enabled - no action taken
+                - service: "logbook.log"
+                  data:
+                    name: "scheduled_light_on"
+                    message: "Timer mode: Scene '{{ scene_to_activate }}' missing and timer mode enabled - no action taken"
+            - conditions: []
+              sequence:
+                - choose:
+                    - conditions: "{{ dynamic_fallback != '' }}"
+                      sequence:
+                        - service: "light.turn_on"
+                          target:
+                            entity_id: "{{ dynamic_fallback }}"
+                        - service: "logbook.log"
+                          data:
+                            name: "scheduled_light_on"
+                            message: "Scene '{{ scene_to_activate }}' missing; used '{{ dynamic_fallback }}'"
+                            entity_id: "{{ dynamic_fallback }}"
+                  default:
+                    - service: "logbook.log"
+                      data:
+                        name: "scheduled_light_on"
+                        message: "Scene '{{ scene_to_activate }}' missing; no fallback light entity available"

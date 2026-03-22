@@ -1,0 +1,6 @@
+# Global input_text helper for intruder detection event location
+intruder_image_location:
+  name: "Intruder Image Location"
+  initial: ""
+  max: 50
+

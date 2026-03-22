@@ -1,0 +1,45 @@
+# Template for input_boolean helpers per room
+# Usage:
+#   jinja2 input_boolean_template.yaml.j2 -D room=bedroom > input_boolean/bedroom.yaml
+
+kitchen_custom_schedule:
+  name: Kitchen - Use custom schedule
+kitchen_morning_custom_time:
+  name: Kitchen - Use custom Morning time
+kitchen_day_custom_time:
+  name: Kitchen - Use custom Day time
+kitchen_evening_custom_time:
+  name: Kitchen - Use custom Evening time
+kitchen_night_custom_time:
+  name: Kitchen - Use custom Night time
+kitchen_motion_enabled:
+  name: Kitchen - Motion Control Enabled
+kitchen_timer_enabled:
+  name: Kitchen - Timer Control Enabled
+
+enable_kitchen_morning:
+  name: Kitchen - Timer Morning Enabled
+enable_kitchen_day:
+  name: Kitchen - Timer Day Enabled
+enable_kitchen_evening:
+  name: Kitchen - Timer Evening Enabled
+enable_kitchen_night:
+  name: Kitchen - Timer Night Enabled
+
+auto_on_kitchen_morning:
+  name: Kitchen - Timer Morning Auto-on
+auto_on_kitchen_day:
+  name: Kitchen - Timer Day Auto-on
+auto_on_kitchen_evening:
+  name: Kitchen - Timer Evening Auto-on
+auto_on_kitchen_night:
+  name: Kitchen - Timer Night Auto-on
+
+motion_activated_kitchen_morning:
+  name: Kitchen - Motion Morning Activated
+motion_activated_kitchen_day:
+  name: Kitchen - Motion Day Activated
+motion_activated_kitchen_evening:
+  name: Kitchen - Motion Evening Activated
+motion_activated_kitchen_night:
+  name: Kitchen - Motion Night Activated

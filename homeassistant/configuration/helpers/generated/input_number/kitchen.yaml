@@ -1,0 +1,83 @@
+# Template for input_number helpers per room
+# Usage:
+#   jinja2 input_number_template.yaml.j2 -D room=bedroom > input_number/bedroom.yaml
+
+kitchen_brightness_step_pct:
+  name: Kitchen Brightness step (%)
+  min: 1
+  max: 50
+  step: 1
+  unit_of_measurement: "%"
+  initial: 10
+kitchen_min_brightness_pct:
+  name: Kitchen Min brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 1
+kitchen_max_brightness_pct:
+  name: Kitchen Max brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 100
+
+kitchen_morning_auto_off:
+  name: Kitchen Morning auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 5
+kitchen_day_auto_off:
+  name: Kitchen Day auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 10
+kitchen_evening_auto_off:
+  name: Kitchen Evening auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+kitchen_night_auto_off:
+  name: Kitchen Night auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 30
+
+motion_auto_off_kitchen_morning:
+  name: Kitchen - Motion Morning Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_kitchen_day:
+  name: Kitchen - Motion Day Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_kitchen_evening:
+  name: Kitchen - Motion Evening Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_kitchen_night:
+  name: Kitchen - Motion Night Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15

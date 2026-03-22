@@ -1,0 +1,415 @@
+views:
+  - title: Room Schedule Viewer
+    path: room-schedule-viewer
+    cards:
+      - type: vertical-stack
+        cards:
+          # Room selector dropdown
+          - type: entities
+            title: Select Room
+            entities:
+              - entity: input_select.room_selector
+                name: Room
+
+      # Active Scene Status Card
+      - type: markdown
+        title: Current Status
+        content: |
+          {% set room = states('input_select.room_selector') %}
+          {% if room and room != 'unknown' and room != 'unavailable' %}
+            {% set morning_custom = states('input_boolean.' ~ room ~ '_morning_custom_time') %}
+            {% set day_custom = states('input_boolean.' ~ room ~ '_day_custom_time') %}
+            {% set evening_custom = states('input_boolean.' ~ room ~ '_evening_custom_time') %}
+            {% set night_custom = states('input_boolean.' ~ room ~ '_night_custom_time') %}
+            {% set s1 = states('input_datetime.' ~ room ~ '_s1_start') if morning_custom == 'on' else '06:00:00' %}
+            {% set s2 = states('input_datetime.' ~ room ~ '_s2_start') if day_custom == 'on' else '09:00:00' %}
+            {% set s3 = states('input_datetime.' ~ room ~ '_s3_start') if evening_custom == 'on' else '17:00:00' %}
+            {% set s4 = states('input_datetime.' ~ room ~ '_s4_start') if night_custom == 'on' else '22:00:00' %}
+            {% set now_ts = as_timestamp(now()) %}
+            {% set s1_ts = as_timestamp(today_at(s1)) %}
+            {% set s2_ts = as_timestamp(today_at(s2)) %}
+            {% set s3_ts = as_timestamp(today_at(s3)) %}
+            {% set s4_ts = as_timestamp(today_at(s4)) %}
+            {% if now_ts >= s1_ts and now_ts < s2_ts %}
+              {% set scheduled_slot = 'morning' %}
+              {% set next_transition = s2[:5] %}
+              {% set next_slot = 'day' %}
+            {% elif now_ts >= s2_ts and now_ts < s3_ts %}
+              {% set scheduled_slot = 'day' %}
+              {% set next_transition = s3[:5] %}
+              {% set next_slot = 'evening' %}
+            {% elif now_ts >= s3_ts and now_ts < s4_ts %}
+              {% set scheduled_slot = 'evening' %}
+              {% set next_transition = s4[:5] %}
+              {% set next_slot = 'night' %}
+            {% else %}
+              {% set scheduled_slot = 'night' %}
+              {% set next_transition = s1[:5] %}
+              {% set next_slot = 'morning' %}
+            {% endif %}
+            {% set scene_cycle_helper = 'input_select.' ~ room ~ '_scene_cycle' %}
+            {% set scene_cycle = states(scene_cycle_helper) %}
+            {% if scene_cycle and scene_cycle != 'unknown' and scene_cycle != 'unavailable' and scene_cycle in ['morning', 'day', 'evening', 'night'] %}
+              {% if scene_cycle != scheduled_slot %}
+                {% set current_slot = scene_cycle %}
+                {% set is_manual_override = true %}
+              {% else %}
+                {% set current_slot = scheduled_slot %}
+                {% set is_manual_override = false %}
+              {% endif %}
+            {% else %}
+              {% set current_slot = scheduled_slot %}
+              {% set is_manual_override = false %}
+            {% endif %}
+            
+            ### **{{ current_slot|title }} Scene Active**
+            
+            {% if is_manual_override %}
+              *Manual override active*
+            {% else %}
+              *Scheduled scene*
+            {% endif %}
+            
+            Next transition: **{{ next_transition }}** → {{ next_slot|title }}
+          {% else %}
+            Please select a room above.
+          {% endif %}
+
+      # Manual Scene Control Buttons - Conditional cards per room
+      - type: conditional
+        conditions:
+          - entity: input_select.room_selector
+            state: bathroom
+        card:
+          type: horizontal-stack
+          cards:
+                - type: button
+                  name: Morning
+                  icon: mdi:weather-sunset-up
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.bathroom_morning
+                      helper_entity: input_select.bathroom_scene_cycle
+                      slot_name: morning
+                  show_state: false
+                - type: button
+                  name: Day
+                  icon: mdi:weather-sunny
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.bathroom_day
+                      helper_entity: input_select.bathroom_scene_cycle
+                      slot_name: day
+                  show_state: false
+                - type: button
+                  name: Evening
+                  icon: mdi:weather-sunset-down
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.bathroom_evening
+                      helper_entity: input_select.bathroom_scene_cycle
+                      slot_name: evening
+                  show_state: false
+                - type: button
+                  name: Night
+                  icon: mdi:weather-night
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.bathroom_night
+                      helper_entity: input_select.bathroom_scene_cycle
+                      slot_name: night
+                  show_state: false
+
+      - type: conditional
+        conditions:
+          - entity: input_select.room_selector
+            state: bedroom
+        card:
+          type: horizontal-stack
+          cards:
+                - type: button
+                  name: Morning
+                  icon: mdi:weather-sunset-up
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.bedroom_morning
+                      helper_entity: input_select.bedroom_scene_cycle
+                      slot_name: morning
+                  show_state: false
+                - type: button
+                  name: Day
+                  icon: mdi:weather-sunny
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.bedroom_day
+                      helper_entity: input_select.bedroom_scene_cycle
+                      slot_name: day
+                  show_state: false
+                - type: button
+                  name: Evening
+                  icon: mdi:weather-sunset-down
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.bedroom_evening
+                      helper_entity: input_select.bedroom_scene_cycle
+                      slot_name: evening
+                  show_state: false
+                - type: button
+                  name: Night
+                  icon: mdi:weather-night
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.bedroom_night
+                      helper_entity: input_select.bedroom_scene_cycle
+                      slot_name: night
+                  show_state: false
+
+      - type: conditional
+        conditions:
+          - entity: input_select.room_selector
+            state: hallway
+        card:
+          type: horizontal-stack
+          cards:
+                - type: button
+                  name: Morning
+                  icon: mdi:weather-sunset-up
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.hallway_morning
+                      helper_entity: input_select.hallway_scene_cycle
+                      slot_name: morning
+                  show_state: false
+                - type: button
+                  name: Day
+                  icon: mdi:weather-sunny
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.hallway_day
+                      helper_entity: input_select.hallway_scene_cycle
+                      slot_name: day
+                  show_state: false
+                - type: button
+                  name: Evening
+                  icon: mdi:weather-sunset-down
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.hallway_evening
+                      helper_entity: input_select.hallway_scene_cycle
+                      slot_name: evening
+                  show_state: false
+                - type: button
+                  name: Night
+                  icon: mdi:weather-night
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.hallway_night
+                      helper_entity: input_select.hallway_scene_cycle
+                      slot_name: night
+                  show_state: false
+
+      - type: conditional
+        conditions:
+          - entity: input_select.room_selector
+            state: kitchen
+        card:
+          type: horizontal-stack
+          cards:
+                - type: button
+                  name: Morning
+                  icon: mdi:weather-sunset-up
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.kitchen_morning
+                      helper_entity: input_select.kitchen_scene_cycle
+                      slot_name: morning
+                  show_state: false
+                - type: button
+                  name: Day
+                  icon: mdi:weather-sunny
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.kitchen_day
+                      helper_entity: input_select.kitchen_scene_cycle
+                      slot_name: day
+                  show_state: false
+                - type: button
+                  name: Evening
+                  icon: mdi:weather-sunset-down
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.kitchen_evening
+                      helper_entity: input_select.kitchen_scene_cycle
+                      slot_name: evening
+                  show_state: false
+                - type: button
+                  name: Night
+                  icon: mdi:weather-night
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.kitchen_night
+                      helper_entity: input_select.kitchen_scene_cycle
+                      slot_name: night
+                  show_state: false
+
+      - type: conditional
+        conditions:
+          - entity: input_select.room_selector
+            state: living_room
+        card:
+          type: horizontal-stack
+          cards:
+                - type: button
+                  name: Morning
+                  icon: mdi:weather-sunset-up
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.living_room_morning
+                      helper_entity: input_select.living_room_scene_cycle
+                      slot_name: morning
+                  show_state: false
+                - type: button
+                  name: Day
+                  icon: mdi:weather-sunny
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.living_room_day
+                      helper_entity: input_select.living_room_scene_cycle
+                      slot_name: day
+                  show_state: false
+                - type: button
+                  name: Evening
+                  icon: mdi:weather-sunset-down
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.living_room_evening
+                      helper_entity: input_select.living_room_scene_cycle
+                      slot_name: evening
+                  show_state: false
+                - type: button
+                  name: Night
+                  icon: mdi:weather-night
+                  tap_action:
+                    action: call-service
+                    service: script.activate_scene_with_helper
+                    service_data:
+                      scene_entity: scene.living_room_night
+                      helper_entity: input_select.living_room_scene_cycle
+                      slot_name: night
+                  show_state: false
+
+      # Schedule Display
+      - type: markdown
+        title: Schedule
+        content: |
+          {% set room = states('input_select.room_selector') %}
+          {% if room and room != 'unknown' and room != 'unavailable' %}
+            {% set morning_custom = states('input_boolean.' ~ room ~ '_morning_custom_time') %}
+            {% set day_custom = states('input_boolean.' ~ room ~ '_day_custom_time') %}
+            {% set evening_custom = states('input_boolean.' ~ room ~ '_evening_custom_time') %}
+            {% set night_custom = states('input_boolean.' ~ room ~ '_night_custom_time') %}
+            {% if morning_custom == 'on' %}
+              {% set s1_raw = states('input_datetime.' ~ room ~ '_s1_start') %}
+              {% set s1 = s1_raw.split(' ')[-1][:5] if ' ' in s1_raw else (s1_raw[:5] if s1_raw|length >= 5 else '06:00') %}
+            {% else %}
+              {% set s1 = '06:00' %}
+            {% endif %}
+            {% if day_custom == 'on' %}
+              {% set s2_raw = states('input_datetime.' ~ room ~ '_s2_start') %}
+              {% set s2 = s2_raw.split(' ')[-1][:5] if ' ' in s2_raw else (s2_raw[:5] if s2_raw|length >= 5 else '09:00') %}
+            {% else %}
+              {% set s2 = '09:00' %}
+            {% endif %}
+            {% if evening_custom == 'on' %}
+              {% set s3_raw = states('input_datetime.' ~ room ~ '_s3_start') %}
+              {% set s3 = s3_raw.split(' ')[-1][:5] if ' ' in s3_raw else (s3_raw[:5] if s3_raw|length >= 5 else '17:00') %}
+            {% else %}
+              {% set s3 = '17:00' %}
+            {% endif %}
+            {% if night_custom == 'on' %}
+              {% set s4_raw = states('input_datetime.' ~ room ~ '_s4_start') %}
+              {% set s4 = s4_raw.split(' ')[-1][:5] if ' ' in s4_raw else (s4_raw[:5] if s4_raw|length >= 5 else '22:00') %}
+            {% else %}
+              {% set s4 = '22:00' %}
+            {% endif %}
+            
+            {% set morning_override = states('input_select.' ~ room ~ '_morning_scene') %}
+            {% set day_override = states('input_select.' ~ room ~ '_day_scene') %}
+            {% set evening_override = states('input_select.' ~ room ~ '_evening_scene') %}
+            {% set night_override = states('input_select.' ~ room ~ '_night_scene') %}
+            
+            {% set morning_scene = morning_override if morning_override not in ['unknown', 'unavailable', ''] else 'scene.' ~ room ~ '_morning' %}
+            {% set day_scene = day_override if day_override not in ['unknown', 'unavailable', ''] else 'scene.' ~ room ~ '_day' %}
+            {% set evening_scene = evening_override if evening_override not in ['unknown', 'unavailable', ''] else 'scene.' ~ room ~ '_evening' %}
+            {% set night_scene = night_override if night_override not in ['unknown', 'unavailable', ''] else 'scene.' ~ room ~ '_night' %}
+            
+            {% set morning_enabled = states('input_boolean.enable_' ~ room ~ '_morning') %}
+            {% set day_enabled = states('input_boolean.enable_' ~ room ~ '_day') %}
+            {% set evening_enabled = states('input_boolean.enable_' ~ room ~ '_evening') %}
+            {% set night_enabled = states('input_boolean.enable_' ~ room ~ '_night') %}
+            
+            {% set morning_auto_on = states('input_boolean.auto_on_' ~ room ~ '_morning') %}
+            {% set day_auto_on = states('input_boolean.auto_on_' ~ room ~ '_day') %}
+            {% set evening_auto_on = states('input_boolean.auto_on_' ~ room ~ '_evening') %}
+            {% set night_auto_on = states('input_boolean.auto_on_' ~ room ~ '_night') %}
+            
+            {% set morning_motion = states('input_boolean.motion_activated_' ~ room ~ '_morning') %}
+            {% set day_motion = states('input_boolean.motion_activated_' ~ room ~ '_day') %}
+            {% set evening_motion = states('input_boolean.motion_activated_' ~ room ~ '_evening') %}
+            {% set night_motion = states('input_boolean.motion_activated_' ~ room ~ '_night') %}
+            
+            | Time Slot | Scene | Activation Time | Timer Enabled | Auto-On | Motion Activated |
+            |-----------|-------|----------------|---------------|---------|------------------|
+            | Morning | `{{ morning_scene }}` | {{ s1 }} | {% if morning_enabled == 'on' %}✓{% else %}✗{% endif %} | {% if morning_auto_on == 'on' %}✓{% else %}✗{% endif %} | {% if morning_motion == 'on' %}✓{% else %}✗{% endif %} |
+            | Day | `{{ day_scene }}` | {{ s2 }} | {% if day_enabled == 'on' %}✓{% else %}✗{% endif %} | {% if day_auto_on == 'on' %}✓{% else %}✗{% endif %} | {% if day_motion == 'on' %}✓{% else %}✗{% endif %} |
+            | Evening | `{{ evening_scene }}` | {{ s3 }} | {% if evening_enabled == 'on' %}✓{% else %}✗{% endif %} | {% if evening_auto_on == 'on' %}✓{% else %}✗{% endif %} | {% if evening_motion == 'on' %}✓{% else %}✗{% endif %} |
+            | Night | `{{ night_scene }}` | {{ s4 }} | {% if night_enabled == 'on' %}✓{% else %}✗{% endif %} | {% if night_auto_on == 'on' %}✓{% else %}✗{% endif %} | {% if night_motion == 'on' %}✓{% else %}✗{% endif %} |
+            
+            {% set any_custom = morning_custom == 'on' or day_custom == 'on' or evening_custom == 'on' or night_custom == 'on' %}
+            {% if any_custom %}
+              *Custom schedule enabled*
+            {% else %}
+              *Default schedule (06:00, 09:00, 17:00, 22:00)*
+            {% endif %}
+          {% else %}
+            Please select a room above.
+          {% endif %}
+

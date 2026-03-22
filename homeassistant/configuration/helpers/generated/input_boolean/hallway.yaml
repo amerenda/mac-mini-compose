@@ -1,0 +1,45 @@
+# Template for input_boolean helpers per room
+# Usage:
+#   jinja2 input_boolean_template.yaml.j2 -D room=bedroom > input_boolean/bedroom.yaml
+
+hallway_custom_schedule:
+  name: Hallway - Use custom schedule
+hallway_morning_custom_time:
+  name: Hallway - Use custom Morning time
+hallway_day_custom_time:
+  name: Hallway - Use custom Day time
+hallway_evening_custom_time:
+  name: Hallway - Use custom Evening time
+hallway_night_custom_time:
+  name: Hallway - Use custom Night time
+hallway_motion_enabled:
+  name: Hallway - Motion Control Enabled
+hallway_timer_enabled:
+  name: Hallway - Timer Control Enabled
+
+enable_hallway_morning:
+  name: Hallway - Timer Morning Enabled
+enable_hallway_day:
+  name: Hallway - Timer Day Enabled
+enable_hallway_evening:
+  name: Hallway - Timer Evening Enabled
+enable_hallway_night:
+  name: Hallway - Timer Night Enabled
+
+auto_on_hallway_morning:
+  name: Hallway - Timer Morning Auto-on
+auto_on_hallway_day:
+  name: Hallway - Timer Day Auto-on
+auto_on_hallway_evening:
+  name: Hallway - Timer Evening Auto-on
+auto_on_hallway_night:
+  name: Hallway - Timer Night Auto-on
+
+motion_activated_hallway_morning:
+  name: Hallway - Motion Morning Activated
+motion_activated_hallway_day:
+  name: Hallway - Motion Day Activated
+motion_activated_hallway_evening:
+  name: Hallway - Motion Evening Activated
+motion_activated_hallway_night:
+  name: Hallway - Motion Night Activated

@@ -1,0 +1,6 @@
+# Global input_text helper for intruder detection event timestamp
+intruder_image_timestamp:
+  name: "Intruder Image Timestamp"
+  initial: ""
+  max: 20
+

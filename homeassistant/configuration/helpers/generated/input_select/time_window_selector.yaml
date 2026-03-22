@@ -1,0 +1,9 @@
+time_window_selector:
+  name: Time Window Selector
+  options:
+    - morning
+    - day
+    - evening
+    - night
+  initial: morning
+

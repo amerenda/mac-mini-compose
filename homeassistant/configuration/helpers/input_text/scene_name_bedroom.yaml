@@ -1,0 +1,5 @@
+scene_name_bedroom:
+  name: "Bedroom Scene Name"
+  initial: ""
+  max: 100
+

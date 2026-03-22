@@ -1,0 +1,20 @@
+# Template for input_datetime helpers per room
+# Usage:
+#   jinja2 input_datetime_template.yaml.j2 -D room=bedroom > input_datetime/bedroom.yaml
+
+kitchen_s1_start:
+  name: Kitchen Morning start
+  has_time: true
+  has_date: false
+kitchen_s2_start:
+  name: Kitchen Day start
+  has_time: true
+  has_date: false
+kitchen_s3_start:
+  name: Kitchen Evening start
+  has_time: true
+  has_date: false
+kitchen_s4_start:
+  name: Kitchen Night start
+  has_time: true
+  has_date: false

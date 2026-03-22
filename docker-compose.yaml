@@ -1,0 +1,172 @@
+services:
+  # ============================================================
+  # BIND9 — Authoritative DNS (primary)
+  # Zones: amer.home, merenda.home.arpa, reverse DNS
+  # ExternalDNS writes here via RFC2136 + TSIG
+  # ============================================================
+  bind9:
+    image: ubuntu/bind9:latest
+    container_name: bind9
+    restart: unless-stopped
+    ports:
+      - "10.100.20.30:53:53/tcp"
+      - "10.100.20.30:53:53/udp"
+    volumes:
+      - ./bind9/named.conf:/etc/bind/named.conf:ro
+      - ./bind9/keys:/etc/bind/keys:ro
+      - bind9-cache:/var/cache/bind
+      - ./bind9/zones:/var/lib/bind:ro
+    healthcheck:
+      test: ["CMD", "dig", "@127.0.0.1", "amer.home", "SOA", "+short"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - default
+
+  # ============================================================
+  # Pihole — Ad-blocking DNS resolver
+  # Upstream: BIND9 for .amer.home, cloudflared DoH for external
+  # ============================================================
+  pihole:
+    image: pihole/pihole:latest
+    container_name: pihole
+    restart: unless-stopped
+    depends_on:
+      bind9:
+        condition: service_healthy
+    ports:
+      - "10.100.20.31:53:53/tcp"
+      - "10.100.20.31:53:53/udp"
+      - "10.100.20.31:80:80/tcp"
+    environment:
+      TZ: "America/New_York"
+      WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
+      DNSMASQ_LISTENING: "all"
+      PIHOLE_DNS_: "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4"
+      FTLCONF_LOCAL_IPV4: "10.100.20.31"
+      FTLCONF_dns_cache_size: "10000"
+      CACHE_QUERY_MINIMUM_TTL: "0"
+      CACHE_QUERY_MAXIMUM_TTL: "300"
+    volumes:
+      - pihole-data:/etc/pihole
+      - pihole-dnsmasq:/etc/dnsmasq.d
+      - ./pihole/dnsmasq/05-custom.conf:/etc/dnsmasq.d/05-custom.conf:ro
+      - ./pihole/allowlist.txt:/etc/pihole/allowlist.txt:ro
+    healthcheck:
+      test: ["CMD", "dig", "@127.0.0.1", "google.com", "+short"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - default
+
+  # ============================================================
+  # Cloudflared — DNS over HTTPS sidecar for Pihole
+  # ============================================================
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: proxy-dns --port 5053 --upstream https://1.1.1.1/dns-query --upstream https://1.0.0.1/dns-query
+    networks:
+      - default
+
+  # ============================================================
+  # Home Assistant — Smart home hub
+  # Uses host networking for mDNS/SSDP device discovery
+  # Zigbee via ser2net on rpi5-1 (socket://rpi5-1.amer.home:3333)
+  # ============================================================
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:2026.1.2
+    container_name: homeassistant
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      pihole:
+        condition: service_healthy
+    environment:
+      TZ: "America/New_York"
+    volumes:
+      - ha-config:/config
+      # Git-tracked configuration (read-only bind mounts)
+      - ./homeassistant/configuration/automations:/config/automations:ro
+      - ./homeassistant/configuration/blueprints/automation:/config/blueprints/automation/_defaults:ro
+      - ./homeassistant/configuration/helpers/generated/input_boolean:/config/helpers/input_boolean:ro
+      - ./homeassistant/configuration/helpers/generated/input_datetime:/config/helpers/input_datetime:ro
+      - ./homeassistant/configuration/helpers/generated/input_select:/config/helpers/input_select:ro
+      - ./homeassistant/configuration/helpers/generated/input_number:/config/helpers/input_number:ro
+      - ./homeassistant/configuration/helpers/generated/input_text:/config/helpers/input_text:ro
+      - ./homeassistant/configuration/dashboards:/config/dashboards/views:ro
+      - ./homeassistant/configuration/scripts:/config/scripts:ro
+      - ./homeassistant/configuration/groups.yaml:/config/groups.yaml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123/api/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # ============================================================
+  # Whisper — Speech-to-text for HA voice assistant
+  # Uses Wyoming protocol on port 10300
+  # Note: For Metal/Neural Engine acceleration, run whisper.cpp
+  # natively instead (see README). This container uses CPU only.
+  # ============================================================
+  whisper:
+    image: rhasspy/wyoming-faster-whisper:latest
+    container_name: whisper
+    restart: unless-stopped
+    ports:
+      - "10300:10300"
+    command: --model medium.en --language en --device cpu
+    volumes:
+      - whisper-models:/data
+    healthcheck:
+      test: ["CMD-SHELL", "echo | nc -w1 localhost 10300 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
+  # Monitoring exporters — scraped by Prometheus on k3s
+  # ============================================================
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /:/host:ro,rslave
+    pid: host
+
+  pihole-exporter:
+    image: ekofr/pihole-exporter:latest
+    container_name: pihole-exporter
+    restart: unless-stopped
+    depends_on:
+      pihole:
+        condition: service_healthy
+    ports:
+      - "9617:9617"
+    environment:
+      PIHOLE_HOSTNAME: "pihole"
+      PIHOLE_PASSWORD: "${PIHOLE_WEBPASSWORD}"
+      PORT: "9617"
+    networks:
+      - default
+
+volumes:
+  bind9-cache:
+  pihole-data:
+  pihole-dnsmasq:
+  ha-config:
+  whisper-models:
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,13 @@
+guests:
+  name: Guests
+  entities:
+    - device_tracker.brayan_iphone
+    - device_tracker.eirill_iphone
+    - device_tracker.pixel_9_pro_xl_2 # alex phone for testing
+  all: false
+
+members:
+  name: Members
+  entities:
+    - person.alex_merenda
+  all: false

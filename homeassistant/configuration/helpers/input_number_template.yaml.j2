@@ -1,0 +1,83 @@
+# Template for input_number helpers per room
+# Usage:
+#   jinja2 input_number_template.yaml.j2 -D room=bedroom > input_number/bedroom.yaml
+
+{{ room }}_brightness_step_pct:
+  name: {{ room|replace('_',' ')|title }} Brightness step (%)
+  min: 1
+  max: 50
+  step: 1
+  unit_of_measurement: "%"
+  initial: 10
+{{ room }}_min_brightness_pct:
+  name: {{ room|replace('_',' ')|title }} Min brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 1
+{{ room }}_max_brightness_pct:
+  name: {{ room|replace('_',' ')|title }} Max brightness (%)
+  min: 1
+  max: 100
+  step: 1
+  unit_of_measurement: "%"
+  initial: 100
+
+{{ room }}_morning_auto_off:
+  name: {{ room|replace('_',' ')|title }} Morning auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 5
+{{ room }}_day_auto_off:
+  name: {{ room|replace('_',' ')|title }} Day auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 10
+{{ room }}_evening_auto_off:
+  name: {{ room|replace('_',' ')|title }} Evening auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+{{ room }}_night_auto_off:
+  name: {{ room|replace('_',' ')|title }} Night auto-off (min)
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: "min"
+  initial: 30
+
+motion_auto_off_{{ room }}_morning:
+  name: {{ room|replace('_',' ')|title }} - Motion Morning Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_{{ room }}_day:
+  name: {{ room|replace('_',' ')|title }} - Motion Day Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_{{ room }}_evening:
+  name: {{ room|replace('_',' ')|title }} - Motion Evening Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
+motion_auto_off_{{ room }}_night:
+  name: {{ room|replace('_',' ')|title }} - Motion Night Auto-off Timeout
+  min: 0
+  max: 240
+  step: 1
+  unit_of_measurement: "min"
+  initial: 15
