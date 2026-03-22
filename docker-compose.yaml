@@ -1,17 +1,14 @@
 services:
   # ============================================================
   # BIND9 — Authoritative DNS (primary)
-  # Zones: amer.home, merenda.home.arpa, reverse DNS
-  # ExternalDNS writes here via RFC2136 + TSIG
-  # IP: 10.100.20.18 (Mac Mini primary)
+  # Listens on 10.100.20.18:8053 (non-standard port, internal use)
+  # Pi-hole forwards .amer.home queries here
   # ============================================================
   bind9:
     image: ubuntu/bind9:latest
     container_name: bind9
     restart: unless-stopped
-    ports:
-      - "10.100.20.18:53:53/tcp"
-      - "10.100.20.18:53:53/udp"
+    network_mode: host
     volumes:
       - ./bind9/named.conf:/etc/bind/named.conf:ro
       - ./bind9/keys:/etc/bind/keys:ro
@@ -19,8 +16,8 @@ services:
 
   # ============================================================
   # Pihole — Ad-blocking DNS resolver
-  # Upstream: BIND9 for .amer.home, Cloudflare for external
-  # IP: 10.100.20.3 (alias on Mac Mini)
+  # Listens on 10.100.20.18:53 (LAN-facing)
+  # Upstream: BIND9 on localhost:8053 for .amer.home, 1.1.1.1 for external
   # ============================================================
   pihole:
     image: pihole/pihole:latest
@@ -32,15 +29,15 @@ services:
       - 1.1.1.1
       - 8.8.8.8
     ports:
-      - "10.100.20.3:53:53/tcp"
-      - "10.100.20.3:53:53/udp"
-      - "10.100.20.3:80:80/tcp"
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
     environment:
       TZ: "America/New_York"
       WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
       DNSMASQ_LISTENING: "all"
       PIHOLE_DNS_: "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4"
-      FTLCONF_LOCAL_IPV4: "10.100.20.3"
+      FTLCONF_LOCAL_IPV4: "10.100.20.18"
       FTLCONF_dns_cache_size: "10000"
       CACHE_QUERY_MINIMUM_TTL: "0"
       CACHE_QUERY_MAXIMUM_TTL: "300"
@@ -58,7 +55,6 @@ services:
   # ============================================================
   # Home Assistant — Smart home hub
   # Uses host networking for mDNS/SSDP device discovery
-  # Zigbee via ser2net on rpi5-1 (socket://rpi5-1.amer.home:3333)
   # ============================================================
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:2026.1.2
@@ -89,7 +85,7 @@ services:
       retries: 5
       start_period: 120s
 
-  # Whisper disabled — rhasspy/wyoming-faster-whisper image not available for ARM.
+  # Whisper disabled — image not available for ARM.
   # TODO: Use whisper.cpp natively on Mac Mini for Metal acceleration.
 
   # ============================================================
