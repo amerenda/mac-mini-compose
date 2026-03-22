@@ -13,8 +13,7 @@ services:
     volumes:
       - ./bind9/named.conf:/etc/bind/named.conf:ro
       - ./bind9/keys:/etc/bind/keys:ro
-      - bind9-cache:/var/cache/bind
-      - ./bind9/zones:/var/lib/bind:ro
+      - ./bind9/zones:/var/cache/bind
     healthcheck:
       test: ["CMD", "dig", "@127.0.0.1", "amer.home", "SOA", "+short"]
       interval: 30s
@@ -161,7 +160,6 @@ services:
       - default
 
 volumes:
-  bind9-cache:
   pihole-data:
   pihole-dnsmasq:
   ha-config:

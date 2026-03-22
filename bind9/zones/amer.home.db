@@ -1,0 +1,5 @@
+$TTL 3600
+@   IN SOA ns1.amer.home. hostmaster.amer.home. (2025100401 60 30 604800 60)
+    IN NS ns1.amer.home.
+ns1   IN A 10.100.20.18
+media IN A 10.100.20.25

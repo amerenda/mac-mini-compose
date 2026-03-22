@@ -1,0 +1,5 @@
+$TTL 3600
+@   IN SOA ns1.merenda.home.arpa. hostmaster.merenda.home.arpa. (2025100401 60 30 604800 60)
+    IN NS ns1.merenda.home.arpa.
+30  IN PTR macmini.amer.home.
+241 IN PTR ns1.merenda.home.arpa.
