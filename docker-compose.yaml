@@ -9,8 +9,8 @@ services:
     container_name: bind9
     restart: unless-stopped
     ports:
-      - "5353:5353/tcp"
-      - "5353:5353/udp"
+      - "5353:53/tcp"
+      - "5353:53/udp"
     networks:
       default:
         ipv4_address: 172.20.0.10
@@ -34,8 +34,8 @@ services:
       - 1.1.1.1
       - 8.8.8.8
     ports:
-      - "5335:53/tcp"
-      - "5335:53/udp"
+      - "53:53/tcp"
+      - "53:53/udp"
       - "80:80/tcp"
     environment:
       TZ: "America/New_York"
