@@ -57,8 +57,6 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-    networks:
-      - default
 
   # NOTE: Cloudflared DNS proxy was removed (deprecated since 2026.2.0).
   # Pi-hole uses 1.1.1.1 and 8.8.8.8 directly as upstream DNS.
