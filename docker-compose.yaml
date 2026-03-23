@@ -30,13 +30,7 @@ services:
     restart: unless-stopped
     depends_on:
       - bind9
-    dns:
-      - 1.1.1.1
-      - 8.8.8.8
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "80:80/tcp"
+    network_mode: host
     environment:
       TZ: "America/New_York"
       WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
