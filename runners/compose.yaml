@@ -2,8 +2,10 @@ x-runner-common: &runner-common
   image: myoung34/github-runner:latest
   restart: unless-stopped
   env_file: ./compose.env
+  entrypoint: ["/bin/bash", "-c", "export APP_PRIVATE_KEY=$(cat /run/secrets/github-app-arc-private-key); exec /entrypoint.sh"]
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
+    - ./secrets:/run/secrets:ro
   labels:
     komodo.skip:
 
