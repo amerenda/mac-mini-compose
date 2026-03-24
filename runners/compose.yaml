@@ -2,11 +2,10 @@ x-runner-common: &runner-common
   image: myoung34/github-runner:latest
   restart: unless-stopped
   env_file: ./compose.env
-  entrypoint: ["/entrypoint-wrapper.sh"]
+  entrypoint: ["/run/secrets/entrypoint-wrapper.sh"]
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - /Users/alex/.config/runner-secrets:/run/secrets:ro
-    - /Users/alex/mac-mini-compose/runners/entrypoint-wrapper.sh:/entrypoint-wrapper.sh:ro
   labels:
     komodo.skip:
 
