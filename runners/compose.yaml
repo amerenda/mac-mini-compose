@@ -2,10 +2,11 @@ x-runner-common: &runner-common
   image: myoung34/github-runner:latest
   restart: unless-stopped
   env_file: ./compose.env
-  entrypoint: ["/bin/bash", "-c", "export APP_ID=$(cat /run/secrets/github-app-arc-id); export APP_PRIVATE_KEY=$(cat /run/secrets/github-app-arc-private-key); export DOCKERHUB_TOKEN=$(cat /run/secrets/docker-hub-k3s-runner-api-key); export GITOPS_PAT=$(cat /run/secrets/github-pat-k3s-dean-gitops); exec /entrypoint.sh ./bin/Runner.Listener run --startuptype service"]
+  entrypoint: ["/entrypoint-wrapper.sh"]
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - /Users/alex/.config/runner-secrets:/run/secrets:ro
+    - /Users/alex/mac-mini-compose/runners/entrypoint-wrapper.sh:/entrypoint-wrapper.sh:ro
   labels:
     komodo.skip:
 
