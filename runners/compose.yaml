@@ -34,3 +34,11 @@ services:
       REPO_URL: https://github.com/amerenda/llm-manager
       RUNNER_NAME: mini-llm-manager
       LABELS: self-hosted,linux,arm64,docker,mac-mini
+
+  runner-llm-agents:
+    <<: *runner-common
+    container_name: runner-llm-agents
+    environment:
+      REPO_URL: https://github.com/amerenda/llm-agents
+      RUNNER_NAME: mini-llm-agents
+      LABELS: self-hosted,linux,arm64,docker,mac-mini
