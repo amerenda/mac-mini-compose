@@ -1,0 +1,33 @@
+x-runner-common: &runner-common
+  image: myoung34/github-runner:latest
+  restart: unless-stopped
+  env_file: ./compose.env
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  labels:
+    komodo.skip:
+
+services:
+  runner-k3s-runners:
+    <<: *runner-common
+    container_name: runner-k3s-runners
+    environment:
+      REPO_URL: https://github.com/amerenda/k3s-runners
+      RUNNER_NAME: mini-k3s-runners
+      LABELS: self-hosted,linux,arm64,docker,mac-mini
+
+  runner-ecdysis:
+    <<: *runner-common
+    container_name: runner-ecdysis
+    environment:
+      REPO_URL: https://github.com/amerenda/ecdysis
+      RUNNER_NAME: mini-ecdysis
+      LABELS: self-hosted,linux,arm64,docker,mac-mini
+
+  runner-llm-manager:
+    <<: *runner-common
+    container_name: runner-llm-manager
+    environment:
+      REPO_URL: https://github.com/amerenda/llm-manager
+      RUNNER_NAME: mini-llm-manager
+      LABELS: self-hosted,linux,arm64,docker,mac-mini
