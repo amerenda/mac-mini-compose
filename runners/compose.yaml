@@ -5,7 +5,7 @@ x-runner-common: &runner-common
   entrypoint: ["/bin/bash", "-c", "export APP_PRIVATE_KEY=$(cat /run/secrets/github-app-arc-private-key); exec /entrypoint.sh"]
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
-    - /etc/komodo/runner-secrets:/run/secrets:ro
+    - /Users/alex/.config/runner-secrets:/run/secrets:ro
   labels:
     komodo.skip:
 
