@@ -2,7 +2,7 @@ x-runner-common: &runner-common
   image: myoung34/github-runner:latest
   restart: unless-stopped
   env_file: ./compose.env
-  entrypoint: ["/bin/bash", "-c", "export APP_ID=$(cat /run/secrets/github-app-arc-id); export APP_PRIVATE_KEY=$(cat /run/secrets/github-app-arc-private-key); exec /entrypoint.sh"]
+  entrypoint: ["/bin/bash", "-c", "export APP_ID=$(cat /run/secrets/github-app-arc-id); export APP_PRIVATE_KEY=$(cat /run/secrets/github-app-arc-private-key); exec /entrypoint.sh ./bin/Runner.Listener run --startuptype service"]
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - /Users/alex/.config/runner-secrets:/run/secrets:ro
