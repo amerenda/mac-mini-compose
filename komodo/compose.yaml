@@ -42,18 +42,17 @@ services:
       - ./secrets:/run/secrets:ro
 
   periphery:
-    image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile.periphery
     labels:
       komodo.skip:
     restart: unless-stopped
     env_file: ./compose.env
-    environment:
-      BWS_ACCESS_TOKEN_FILE: /run/secrets/bws-access-token
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /proc:/proc
       - /etc/komodo:/etc/komodo
-      - /usr/local/bin/bws:/usr/local/bin/bws:ro
       - /Users/alex/.bws-secret:/run/secrets/bws-access-token:ro
 
 volumes:

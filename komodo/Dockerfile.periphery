@@ -1,0 +1,12 @@
+FROM ghcr.io/moghtech/komodo-periphery:2
+
+# Install bws CLI (Bitwarden Secrets Manager) for pre_deploy secret injection
+RUN apt-get update && apt-get install -y --no-install-recommends curl unzip ca-certificates \
+    && curl -fsSL -o /tmp/bws.zip \
+       "https://github.com/bitwarden/sdk-sm/releases/download/bws-v2.0.0/bws-aarch64-unknown-linux-gnu-2.0.0.zip" \
+    && unzip /tmp/bws.zip -d /usr/local/bin/ \
+    && chmod +x /usr/local/bin/bws \
+    && rm /tmp/bws.zip \
+    && apt-get purge -y unzip \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
