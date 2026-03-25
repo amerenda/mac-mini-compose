@@ -1,55 +1,53 @@
 services:
   # ============================================================
   # BIND9 — Authoritative DNS (primary)
-  # Internal only on port 5353 — Pi-hole forwards .amer.home here
-  # ExternalDNS writes here via RFC2136 + TSIG on host port 5353
+  # Disabled — not migrated yet. Uncomment when ready.
   # ============================================================
-  bind9:
-    image: ubuntu/bind9:latest
-    container_name: bind9
-    restart: unless-stopped
-    ports:
-      - "5353:53/tcp"
-      - "5353:53/udp"
-    networks:
-      default:
-        ipv4_address: 172.20.0.10
-    volumes:
-      - ./bind9/named.conf:/etc/bind/named.conf:ro
-      - ./bind9/keys:/etc/bind/keys:ro
-      - ./bind9/zones:/var/cache/bind
+  # bind9:
+  #   image: ubuntu/bind9:latest
+  #   container_name: bind9
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5353:53/tcp"
+  #     - "5353:53/udp"
+  #   networks:
+  #     default:
+  #       ipv4_address: 172.20.0.10
+  #   volumes:
+  #     - ./bind9/named.conf:/etc/bind/named.conf:ro
+  #     - ./bind9/keys:/etc/bind/keys:ro
+  #     - ./bind9/zones:/var/cache/bind
 
   # ============================================================
   # Pihole — Ad-blocking DNS resolver
-  # Listens on host port 53 (LAN-facing)
-  # Upstream: BIND9 on host.docker.internal:5353 for .amer.home
+  # Disabled — not migrated yet. Uncomment when ready.
   # ============================================================
-  pihole:
-    image: pihole/pihole:latest
-    container_name: pihole
-    restart: unless-stopped
-    depends_on:
-      - bind9
-    network_mode: host
-    environment:
-      TZ: "America/New_York"
-      WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
-      DNSMASQ_LISTENING: "all"
-      PIHOLE_DNS_: "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4"
-      FTLCONF_LOCAL_IPV4: "10.100.20.18"
-      FTLCONF_dns_cache_size: "10000"
-      CACHE_QUERY_MINIMUM_TTL: "0"
-      CACHE_QUERY_MAXIMUM_TTL: "300"
-    volumes:
-      - pihole-data:/etc/pihole
-      - pihole-dnsmasq:/etc/dnsmasq.d
-      - ./pihole/dnsmasq/05-custom.conf:/etc/dnsmasq.d/05-custom.conf:ro
-      - ./pihole/allowlist.txt:/etc/pihole/allowlist.txt:ro
-    healthcheck:
-      test: ["CMD", "dig", "@127.0.0.1", "google.com", "+short"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+  # pihole:
+  #   image: pihole/pihole:latest
+  #   container_name: pihole
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - bind9
+  #   network_mode: host
+  #   environment:
+  #     TZ: "America/New_York"
+  #     WEBPASSWORD: "${PIHOLE_WEBPASSWORD}"
+  #     DNSMASQ_LISTENING: "all"
+  #     PIHOLE_DNS_: "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4"
+  #     FTLCONF_LOCAL_IPV4: "10.100.20.18"
+  #     FTLCONF_dns_cache_size: "10000"
+  #     CACHE_QUERY_MINIMUM_TTL: "0"
+  #     CACHE_QUERY_MAXIMUM_TTL: "300"
+  #   volumes:
+  #     - pihole-data:/etc/pihole
+  #     - pihole-dnsmasq:/etc/dnsmasq.d
+  #     - ./pihole/dnsmasq/05-custom.conf:/etc/dnsmasq.d/05-custom.conf:ro
+  #     - ./pihole/allowlist.txt:/etc/pihole/allowlist.txt:ro
+  #   healthcheck:
+  #     test: ["CMD", "dig", "@127.0.0.1", "google.com", "+short"]
+  #     interval: 30s
+  #     timeout: 5s
+  #     retries: 3
 
   # ============================================================
   # Home Assistant — Smart home hub
@@ -60,9 +58,6 @@ services:
     container_name: homeassistant
     restart: unless-stopped
     network_mode: host
-    depends_on:
-      pihole:
-        condition: service_healthy
     environment:
       TZ: "America/New_York"
     volumes:
@@ -78,7 +73,7 @@ services:
       - ./homeassistant/configuration/scripts:/config/scripts:ro
       - ./homeassistant/configuration/groups.yaml:/config/groups.yaml:ro
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8123/api/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8123/manifest.json"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -103,23 +98,23 @@ services:
       - /:/host:ro,rslave
     pid: host
 
-  pihole-exporter:
-    image: ekofr/pihole-exporter:latest
-    container_name: pihole-exporter
-    restart: unless-stopped
-    depends_on:
-      pihole:
-        condition: service_healthy
-    ports:
-      - "9617:9617"
-    environment:
-      PIHOLE_HOSTNAME: "pihole"
-      PIHOLE_PASSWORD: "${PIHOLE_WEBPASSWORD}"
-      PORT: "9617"
+  # pihole-exporter:
+  #   image: ekofr/pihole-exporter:latest
+  #   container_name: pihole-exporter
+  #   restart: unless-stopped
+  #   depends_on:
+  #     pihole:
+  #       condition: service_healthy
+  #   ports:
+  #     - "9617:9617"
+  #   environment:
+  #     PIHOLE_HOSTNAME: "pihole"
+  #     PIHOLE_PASSWORD: "${PIHOLE_WEBPASSWORD}"
+  #     PORT: "9617"
 
 volumes:
-  pihole-data:
-  pihole-dnsmasq:
+  # pihole-data:
+  # pihole-dnsmasq:
   ha-config:
 
 networks:
