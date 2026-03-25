@@ -1,0 +1,13 @@
+# Komodo Resource Sync — self-referential sync definition
+# After creating the initial ResourceSync in Komodo UI pointing to this repo,
+# all future changes to resource-sync/*.toml are picked up automatically.
+
+[[resource_sync]]
+name = "mac-mini-compose"
+description = "GitOps sync for mac-mini-compose stacks"
+tags = ["mac-mini"]
+[resource_sync.config]
+repo = "amerenda/mac-mini-compose"
+branch = "main"
+resource_path = ["resource-sync/stacks.toml"]
+git_account = "amerenda"

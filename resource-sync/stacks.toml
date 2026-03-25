@@ -1,0 +1,30 @@
+# Komodo Resource Sync — Stack definitions
+# These are synced automatically by Komodo when changes are pushed to main.
+
+[[stack]]
+name = "services"
+description = "Core services: Home Assistant, Pi-hole, BIND9, exporters"
+tags = ["mac-mini"]
+deploy = true
+[stack.config]
+server = "mac-mini-m4"
+repo = "amerenda/mac-mini-compose"
+branch = "main"
+file_paths = ["docker-compose.yaml"]
+env_file_path = ".env"
+run_directory = "/Users/alex/mac-mini-compose"
+git_account = "amerenda"
+
+[[stack]]
+name = "runners"
+description = "GitHub Actions runners (k3s-runners, ecdysis, llm-manager, llm-agents)"
+tags = ["mac-mini"]
+deploy = true
+[stack.config]
+server = "mac-mini-m4"
+repo = "amerenda/mac-mini-compose"
+branch = "main"
+file_paths = ["runners/compose.yaml"]
+env_file_path = "runners/compose.env"
+run_directory = "/Users/alex/mac-mini-compose"
+git_account = "amerenda"
