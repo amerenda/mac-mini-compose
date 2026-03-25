@@ -1,5 +1,6 @@
 # Komodo Resource Sync — Stack definitions
 # These are synced automatically by Komodo when changes are pushed to main.
+# Secrets use [[VARIABLE]] interpolation — define secrets in Komodo UI (Settings → Variables).
 
 [[stack]]
 name = "services"
@@ -11,9 +12,10 @@ server = "mac-mini-m4"
 repo = "amerenda/mac-mini-compose"
 branch = "main"
 file_paths = ["docker-compose.yaml"]
-env_file_path = ".env"
-run_directory = "/Users/alex/mac-mini-compose"
 git_account = "amerenda"
+environment = """
+PIHOLE_WEBPASSWORD = [[PIHOLE_WEBPASSWORD]]
+"""
 
 [[stack]]
 name = "runners"
@@ -25,6 +27,10 @@ server = "mac-mini-m4"
 repo = "amerenda/mac-mini-compose"
 branch = "main"
 file_paths = ["runners/compose.yaml"]
-env_file_path = "runners/compose.env"
-run_directory = "/Users/alex/mac-mini-compose"
 git_account = "amerenda"
+environment = """
+DOCKERHUB_USERNAME = amerenda
+RUNNER_SCOPE = repo
+RUNNER_WORKDIR = /_work
+RANDOM_RUNNER_SUFFIX = false
+"""
