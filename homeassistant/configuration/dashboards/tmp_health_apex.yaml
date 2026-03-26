@@ -23,13 +23,11 @@ views:
             name: HRV
             icon: mdi:heart-flash
 
-      - type: "custom:apexcharts-card"
+      - type: custom:apexcharts-card
         header:
           title: Heart Rate
           show: true
         graph_span: 24h
-        span:
-          end: now
         series:
           - entity: sensor.pixel_9_pro_xl_heart_rate
             name: Heart Rate
@@ -39,42 +37,17 @@ views:
             name: Resting HR
             color: "#3498db"
             stroke_width: 2
-        apex_config:
-          chart:
-            toolbar:
-              show: true
-              tools:
-                zoom: true
-                zoomin: true
-                zoomout: true
-                pan: true
-                reset: true
-                selection: true
-          xaxis:
-            type: datetime
 
-      - type: "custom:apexcharts-card"
+      - type: custom:apexcharts-card
         header:
           title: Heart Rate Variability
           show: true
         graph_span: 7d
-        span:
-          end: now
         series:
           - entity: sensor.pixel_9_pro_xl_heart_rate_variability
             name: HRV
             color: "#9b59b6"
             stroke_width: 2
-        apex_config:
-          chart:
-            toolbar:
-              show: true
-              tools:
-                zoom: true
-                zoomin: true
-                zoomout: true
-                pan: true
-                reset: true
 
       # ── Activity ──
       - type: heading
@@ -100,13 +73,11 @@ views:
             name: Floors
             icon: mdi:stairs-up
 
-      - type: "custom:apexcharts-card"
+      - type: custom:apexcharts-card
         header:
           title: Daily Steps
           show: true
         graph_span: 7d
-        span:
-          end: now
         series:
           - entity: sensor.alex_m_steps
             name: Steps
@@ -115,10 +86,6 @@ views:
             group_by:
               func: max
               duration: 1d
-        apex_config:
-          chart:
-            toolbar:
-              show: true
 
       - type: horizontal-stack
         cards:
@@ -139,13 +106,11 @@ views:
             name: Sedentary
             icon: mdi:seat
 
-      - type: "custom:apexcharts-card"
+      - type: custom:apexcharts-card
         header:
           title: Calories
           show: true
         graph_span: 7d
-        span:
-          end: now
         series:
           - entity: sensor.alex_m_activity_calories
             name: Active
@@ -155,10 +120,6 @@ views:
             name: Total
             color: "#f39c12"
             stroke_width: 2
-        apex_config:
-          chart:
-            toolbar:
-              show: true
 
       - type: entity
         entity: sensor.pixel_9_pro_xl_detected_activity

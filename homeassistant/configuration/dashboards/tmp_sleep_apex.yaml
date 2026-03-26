@@ -61,13 +61,11 @@ views:
         heading: Trends
         heading_style: title
 
-      - type: "custom:apexcharts-card"
+      - type: custom:apexcharts-card
         header:
           title: Sleep Duration
           show: true
         graph_span: 7d
-        span:
-          end: now
         series:
           - entity: sensor.alex_m_sleep_minutes_asleep
             name: Minutes Asleep
@@ -76,95 +74,44 @@ views:
             group_by:
               func: max
               duration: 1d
-        apex_config:
-          chart:
-            toolbar:
-              show: true
-              tools:
-                zoom: true
-                zoomin: true
-                zoomout: true
-                pan: true
-                reset: true
 
-      - type: "custom:apexcharts-card"
+      - type: custom:apexcharts-card
         header:
           title: Sleep Efficiency
           show: true
         graph_span: 7d
-        span:
-          end: now
+        yaxis:
+          - min: 0
+            max: 100
         series:
           - entity: sensor.alex_m_sleep_efficiency
             name: Efficiency %
             color: "#2ecc71"
             stroke_width: 2
-        yaxis:
-          - min: 0
-            max: 100
-        apex_config:
-          chart:
-            toolbar:
-              show: true
-
-      - type: "custom:apexcharts-card"
-        header:
-          title: Bedtime
-          show: true
-        graph_span: 7d
-        span:
-          end: now
-        series:
-          - entity: sensor.alex_m_sleep_start_time
-            name: Bedtime
-            color: "#8e44ad"
-            stroke_width: 2
-        apex_config:
-          chart:
-            toolbar:
-              show: true
 
       # ── Night Vitals ──
       - type: heading
         heading: Night Vitals
         heading_style: title
 
-      - type: "custom:apexcharts-card"
+      - type: custom:apexcharts-card
         header:
           title: Night Heart Rate
           show: true
         graph_span: 12h
-        span:
-          end: now
         series:
           - entity: sensor.pixel_9_pro_xl_heart_rate
             name: Heart Rate
             color: "#e74c3c"
             stroke_width: 2
-        apex_config:
-          chart:
-            toolbar:
-              show: true
-              tools:
-                zoom: true
-                zoomin: true
-                zoomout: true
-                pan: true
-                reset: true
 
-      - type: "custom:apexcharts-card"
+      - type: custom:apexcharts-card
         header:
           title: HRV (higher = better recovery)
           show: true
         graph_span: 7d
-        span:
-          end: now
         series:
           - entity: sensor.pixel_9_pro_xl_heart_rate_variability
             name: HRV
             color: "#9b59b6"
             stroke_width: 2
-        apex_config:
-          chart:
-            toolbar:
-              show: true
