@@ -97,8 +97,38 @@ services:
       retries: 5
       start_period: 120s
 
-  # Whisper disabled — image not available for ARM.
-  # TODO: Use whisper.cpp natively on Mac Mini for Metal acceleration.
+  # ============================================================
+  # Voice Pipeline — Wyoming protocol services for HA Assist
+  # Ollama runs natively on macOS for Metal GPU acceleration
+  # (not in Docker — Docker on Mac has no GPU access)
+  # ============================================================
+  whisper:
+    image: rhasspy/wyoming-faster-whisper
+    container_name: whisper
+    restart: unless-stopped
+    ports:
+      - "10300:10300"
+    volumes:
+      - whisper-data:/data
+    command: --model tiny-int8 --language en --beam-size 1
+
+  piper:
+    image: rhasspy/wyoming-piper
+    container_name: piper
+    restart: unless-stopped
+    ports:
+      - "10200:10200"
+    volumes:
+      - piper-data:/data
+    command: --voice en_US-lessac-medium
+
+  openwakeword:
+    image: rhasspy/wyoming-openwakeword
+    container_name: openwakeword
+    restart: unless-stopped
+    ports:
+      - "10400:10400"
+    command: --preload-model ok_nabu
 
   # ============================================================
   # Monitoring exporters — scraped by Prometheus on k3s
@@ -134,6 +164,8 @@ volumes:
   # pihole-data:
   # pihole-dnsmasq:
   ha-config:
+  whisper-data:
+  piper-data:
 
 networks:
   default:

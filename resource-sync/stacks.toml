@@ -13,6 +13,7 @@ repo = "amerenda/mac-mini-compose"
 branch = "main"
 file_paths = ["docker-compose.yaml"]
 git_account = "amerenda"
+ignore_services = ["hacs-init"]
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
