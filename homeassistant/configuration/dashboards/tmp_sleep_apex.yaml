@@ -66,6 +66,8 @@ views:
           title: Sleep Duration
           show: true
         graph_span: 7d
+        span:
+          end: now
         series:
           - entity: sensor.alex_m_sleep_minutes_asleep
             name: Minutes Asleep
@@ -74,12 +76,39 @@ views:
             group_by:
               func: max
               duration: 1d
+        apex_config:
+          chart:
+            toolbar:
+              show: true
+              tools:
+                download: false
+                selection: true
+                zoom: true
+                zoomin: true
+                zoomout: true
+                pan: true
+                reset: true
+                customIcons:
+                  - icon: <span>3d</span>
+                    title: 3 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 3*24*60*60*1000, Date.now()) }
+                  - icon: <span>7d</span>
+                    title: 7 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 7*24*60*60*1000, Date.now()) }
+                  - icon: <span>30d</span>
+                    title: 30 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 30*24*60*60*1000, Date.now()) }
 
       - type: custom:apexcharts-card
         header:
           title: Sleep Efficiency
           show: true
         graph_span: 7d
+        span:
+          end: now
         yaxis:
           - min: 0
             max: 100
@@ -88,6 +117,31 @@ views:
             name: Efficiency %
             color: "#2ecc71"
             stroke_width: 2
+        apex_config:
+          chart:
+            toolbar:
+              show: true
+              tools:
+                download: false
+                selection: true
+                zoom: true
+                zoomin: true
+                zoomout: true
+                pan: true
+                reset: true
+                customIcons:
+                  - icon: <span>3d</span>
+                    title: 3 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 3*24*60*60*1000, Date.now()) }
+                  - icon: <span>7d</span>
+                    title: 7 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 7*24*60*60*1000, Date.now()) }
+                  - icon: <span>30d</span>
+                    title: 30 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 30*24*60*60*1000, Date.now()) }
 
       # ── Night Vitals ──
       - type: heading
@@ -99,19 +153,77 @@ views:
           title: Night Heart Rate
           show: true
         graph_span: 12h
+        span:
+          end: now
         series:
           - entity: sensor.pixel_9_pro_xl_heart_rate
             name: Heart Rate
             color: "#e74c3c"
             stroke_width: 2
+        apex_config:
+          chart:
+            toolbar:
+              show: true
+              tools:
+                download: false
+                selection: true
+                zoom: true
+                zoomin: true
+                zoomout: true
+                pan: true
+                reset: true
+                customIcons:
+                  - icon: <span>6h</span>
+                    title: 6 hours
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 6*60*60*1000, Date.now()) }
+                  - icon: <span>12h</span>
+                    title: 12 hours
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 12*60*60*1000, Date.now()) }
+                  - icon: <span>1d</span>
+                    title: 1 day
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 24*60*60*1000, Date.now()) }
 
       - type: custom:apexcharts-card
         header:
           title: HRV (higher = better recovery)
           show: true
         graph_span: 7d
+        span:
+          end: now
         series:
           - entity: sensor.pixel_9_pro_xl_heart_rate_variability
             name: HRV
             color: "#9b59b6"
             stroke_width: 2
+        apex_config:
+          chart:
+            toolbar:
+              show: true
+              tools:
+                download: false
+                selection: true
+                zoom: true
+                zoomin: true
+                zoomout: true
+                pan: true
+                reset: true
+                customIcons:
+                  - icon: <span>1d</span>
+                    title: 1 day
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 24*60*60*1000, Date.now()) }
+                  - icon: <span>3d</span>
+                    title: 3 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 3*24*60*60*1000, Date.now()) }
+                  - icon: <span>7d</span>
+                    title: 7 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 7*24*60*60*1000, Date.now()) }
+                  - icon: <span>30d</span>
+                    title: 30 days
+                    click: >
+                      function(chart) { chart.zoomX(Date.now() - 30*24*60*60*1000, Date.now()) }
