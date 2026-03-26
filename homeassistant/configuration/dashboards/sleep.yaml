@@ -1,0 +1,87 @@
+views:
+  - title: Sleep
+    path: sleep
+    icon: mdi:sleep
+    cards:
+      # ── Current Sleep State ──
+      - type: heading
+        heading: Sleep
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_sleep_segment
+            name: Sleep Stage
+            icon: mdi:sleep
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_sleep_confidence
+            name: Confidence
+            icon: mdi:percent-circle
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_sleep_duration
+            name: Duration
+            icon: mdi:clock-outline
+
+      # ── Sleep Duration Trend ──
+      - type: heading
+        heading: Sleep Duration
+        heading_style: subtitle
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_9_pro_xl_sleep_duration
+            name: Sleep Duration
+        hours_to_show: 168
+
+      # ── Sleep Stages ──
+      - type: heading
+        heading: Sleep Stages
+        heading_style: subtitle
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_9_pro_xl_sleep_segment
+            name: Sleep Stage
+        hours_to_show: 24
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_9_pro_xl_sleep_confidence
+            name: Sleep Confidence
+        hours_to_show: 168
+
+      # ── Night Heart Rate ──
+      - type: heading
+        heading: Night Vitals
+        heading_style: subtitle
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_watch_3_heart_rate
+            name: Heart Rate
+          - entity: sensor.pixel_9_pro_xl_oxygen_saturation
+            name: SpO2
+        hours_to_show: 12
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_9_pro_xl_heart_rate_variability
+            name: HRV (higher = better recovery)
+        hours_to_show: 168
+
+      # ── Watch Status ──
+      - type: heading
+        heading: Watch
+        heading_style: subtitle
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_watch_3_battery_level
+            name: Battery
+            icon: mdi:watch
+          - type: entity
+            entity: binary_sensor.pixel_watch_3_on_body_sensor
+            name: On Wrist
+            icon: mdi:watch-variant

@@ -1,0 +1,132 @@
+views:
+  - title: Health
+    path: health
+    icon: mdi:heart-pulse
+    cards:
+      # ── Heart Rate ──
+      - type: heading
+        heading: Heart Rate
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_watch_3_heart_rate
+            name: Current HR
+            icon: mdi:heart-pulse
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_resting_heart_rate
+            name: Resting HR
+            icon: mdi:heart
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_heart_rate_variability
+            name: HRV
+            icon: mdi:heart-flash
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_oxygen_saturation
+            name: SpO2
+            icon: mdi:water-percent
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_watch_3_heart_rate
+            name: Heart Rate
+          - entity: sensor.pixel_9_pro_xl_resting_heart_rate
+            name: Resting HR
+        hours_to_show: 24
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_9_pro_xl_heart_rate_variability
+            name: HRV
+        hours_to_show: 168
+
+      # ── Activity ──
+      - type: heading
+        heading: Activity
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_daily_steps
+            name: Steps
+            icon: mdi:shoe-print
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_daily_distance
+            name: Distance
+            icon: mdi:map-marker-distance
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_active_calories_burned
+            name: Active Cal
+            icon: mdi:fire
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_daily_floors
+            name: Floors
+            icon: mdi:stairs-up
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_9_pro_xl_daily_steps
+            name: Steps
+        hours_to_show: 168
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_9_pro_xl_active_calories_burned
+            name: Active Calories
+          - entity: sensor.pixel_9_pro_xl_total_calories_burned
+            name: Total Calories
+        hours_to_show: 168
+
+      - type: entity
+        entity: sensor.pixel_9_pro_xl_detected_activity
+        name: Current Activity
+        icon: mdi:run
+
+      - type: entity
+        entity: sensor.pixel_watch_3_activity_state
+        name: Watch Activity State
+        icon: mdi:watch
+
+      # ── Body ──
+      - type: heading
+        heading: Body
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_weight
+            name: Weight
+            icon: mdi:scale-bathroom
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_body_fat
+            name: Body Fat
+            icon: mdi:percent
+
+      - type: history-graph
+        entities:
+          - entity: sensor.pixel_9_pro_xl_weight
+            name: Weight
+        hours_to_show: 720
+
+      # ── Device Status ──
+      - type: heading
+        heading: Devices
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_battery_level
+            name: Phone
+            icon: mdi:cellphone
+          - type: entity
+            entity: sensor.pixel_watch_3_battery_level
+            name: Watch
+            icon: mdi:watch
+          - type: entity
+            entity: binary_sensor.pixel_watch_3_on_body_sensor
+            name: On Wrist
+            icon: mdi:watch-variant
