@@ -63,14 +63,14 @@ services:
     command: >
       sh -c '
       MARKER=/config/custom_components/hacs/.version
-      && if [ -f "$MARKER" ] && [ "$(cat $MARKER)" = "$HACS_VERSION" ]; then echo "HACS $HACS_VERSION already installed"; exit 0; fi
+      && if [ -f "$$MARKER" ] && [ "$$(cat $$MARKER)" = "$$HACS_VERSION" ]; then echo "HACS $$HACS_VERSION already installed"; exit 0; fi
       && apk add --no-cache wget unzip
-      && wget -qO /tmp/hacs.zip "https://github.com/hacs/integration/releases/download/$HACS_VERSION/hacs.zip"
+      && wget -qO /tmp/hacs.zip "https://github.com/hacs/integration/releases/download/$$HACS_VERSION/hacs.zip"
       && rm -rf /config/custom_components/hacs
       && mkdir -p /config/custom_components/hacs
       && unzip -o /tmp/hacs.zip -d /config/custom_components/hacs
-      && echo "$HACS_VERSION" > "$MARKER"
-      && echo "HACS $HACS_VERSION installed"'
+      && echo "$$HACS_VERSION" > "$$MARKER"
+      && echo "HACS $$HACS_VERSION installed"'
     labels:
       komodo.skip:
 
