@@ -1,0 +1,160 @@
+views:
+  - title: Health (mini-graph)
+    path: tmp-health-mini
+    icon: mdi:heart-pulse
+    cards:
+      # ── Heart Rate ──
+      - type: heading
+        heading: Heart Rate
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_heart_rate
+            name: Heart Rate
+            icon: mdi:heart-pulse
+          - type: entity
+            entity: sensor.alex_m_resting_heart_rate
+            name: Resting HR
+            icon: mdi:heart
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_heart_rate_variability
+            name: HRV
+            icon: mdi:heart-flash
+
+      - type: "custom:mini-graph-card"
+        entities:
+          - entity: sensor.pixel_9_pro_xl_heart_rate
+            name: Heart Rate
+            color: "#e74c3c"
+          - entity: sensor.alex_m_resting_heart_rate
+            name: Resting HR
+            color: "#3498db"
+        hours_to_show: 24
+        points_per_hour: 4
+        line_width: 2
+        show:
+          labels: true
+          points: false
+          legend: true
+
+      - type: "custom:mini-graph-card"
+        entities:
+          - entity: sensor.pixel_9_pro_xl_heart_rate_variability
+            name: HRV
+            color: "#9b59b6"
+        hours_to_show: 168
+        points_per_hour: 1
+        line_width: 2
+        show:
+          labels: true
+          points: false
+
+      # ── Activity ──
+      - type: heading
+        heading: Activity
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_steps
+            name: Steps
+            icon: mdi:shoe-print
+          - type: entity
+            entity: sensor.alex_m_distance
+            name: Distance
+            icon: mdi:map-marker-distance
+          - type: entity
+            entity: sensor.alex_m_activity_calories
+            name: Active Cal
+            icon: mdi:fire
+          - type: entity
+            entity: sensor.alex_m_floors
+            name: Floors
+            icon: mdi:stairs-up
+
+      - type: "custom:mini-graph-card"
+        entities:
+          - entity: sensor.alex_m_steps
+            name: Steps
+            color: "#2ecc71"
+        hours_to_show: 168
+        points_per_hour: 0.5
+        line_width: 2
+        show:
+          labels: true
+          points: false
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_minutes_very_active
+            name: Very Active
+            icon: mdi:run-fast
+          - type: entity
+            entity: sensor.alex_m_minutes_fairly_active
+            name: Fairly Active
+            icon: mdi:run
+          - type: entity
+            entity: sensor.alex_m_minutes_lightly_active
+            name: Lightly Active
+            icon: mdi:walk
+          - type: entity
+            entity: sensor.alex_m_minutes_sedentary
+            name: Sedentary
+            icon: mdi:seat
+
+      - type: "custom:mini-graph-card"
+        entities:
+          - entity: sensor.alex_m_activity_calories
+            name: Active Calories
+            color: "#e67e22"
+          - entity: sensor.alex_m_calories
+            name: Total Calories
+            color: "#f39c12"
+        hours_to_show: 168
+        points_per_hour: 0.5
+        line_width: 2
+        show:
+          labels: true
+          points: false
+          legend: true
+
+      - type: entity
+        entity: sensor.pixel_9_pro_xl_detected_activity
+        name: Current Activity
+        icon: mdi:run
+
+      # ── Nutrition ──
+      - type: heading
+        heading: Nutrition
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_calories_in
+            name: Calories In
+            icon: mdi:food-apple
+          - type: entity
+            entity: sensor.alex_m_water
+            name: Water
+            icon: mdi:cup-water
+
+      # ── Devices ──
+      - type: heading
+        heading: Devices
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_battery_level
+            name: Phone
+            icon: mdi:cellphone
+          - type: entity
+            entity: sensor.google_pixel_watch_3_battery_level
+            name: Watch
+            icon: mdi:watch

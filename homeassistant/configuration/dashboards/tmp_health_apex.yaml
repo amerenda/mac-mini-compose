@@ -1,0 +1,198 @@
+views:
+  - title: Health (apex)
+    path: tmp-health-apex
+    icon: mdi:heart-pulse
+    cards:
+      # ── Heart Rate ──
+      - type: heading
+        heading: Heart Rate
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_heart_rate
+            name: Heart Rate
+            icon: mdi:heart-pulse
+          - type: entity
+            entity: sensor.alex_m_resting_heart_rate
+            name: Resting HR
+            icon: mdi:heart
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_heart_rate_variability
+            name: HRV
+            icon: mdi:heart-flash
+
+      - type: "custom:apexcharts-card"
+        header:
+          title: Heart Rate
+          show: true
+        graph_span: 24h
+        span:
+          end: now
+        series:
+          - entity: sensor.pixel_9_pro_xl_heart_rate
+            name: Heart Rate
+            color: "#e74c3c"
+            stroke_width: 2
+          - entity: sensor.alex_m_resting_heart_rate
+            name: Resting HR
+            color: "#3498db"
+            stroke_width: 2
+        apex_config:
+          chart:
+            toolbar:
+              show: true
+              tools:
+                zoom: true
+                zoomin: true
+                zoomout: true
+                pan: true
+                reset: true
+                selection: true
+          xaxis:
+            type: datetime
+
+      - type: "custom:apexcharts-card"
+        header:
+          title: Heart Rate Variability
+          show: true
+        graph_span: 7d
+        span:
+          end: now
+        series:
+          - entity: sensor.pixel_9_pro_xl_heart_rate_variability
+            name: HRV
+            color: "#9b59b6"
+            stroke_width: 2
+        apex_config:
+          chart:
+            toolbar:
+              show: true
+              tools:
+                zoom: true
+                zoomin: true
+                zoomout: true
+                pan: true
+                reset: true
+
+      # ── Activity ──
+      - type: heading
+        heading: Activity
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_steps
+            name: Steps
+            icon: mdi:shoe-print
+          - type: entity
+            entity: sensor.alex_m_distance
+            name: Distance
+            icon: mdi:map-marker-distance
+          - type: entity
+            entity: sensor.alex_m_activity_calories
+            name: Active Cal
+            icon: mdi:fire
+          - type: entity
+            entity: sensor.alex_m_floors
+            name: Floors
+            icon: mdi:stairs-up
+
+      - type: "custom:apexcharts-card"
+        header:
+          title: Daily Steps
+          show: true
+        graph_span: 7d
+        span:
+          end: now
+        series:
+          - entity: sensor.alex_m_steps
+            name: Steps
+            color: "#2ecc71"
+            type: column
+            group_by:
+              func: max
+              duration: 1d
+        apex_config:
+          chart:
+            toolbar:
+              show: true
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_minutes_very_active
+            name: Very Active
+            icon: mdi:run-fast
+          - type: entity
+            entity: sensor.alex_m_minutes_fairly_active
+            name: Fairly Active
+            icon: mdi:run
+          - type: entity
+            entity: sensor.alex_m_minutes_lightly_active
+            name: Lightly Active
+            icon: mdi:walk
+          - type: entity
+            entity: sensor.alex_m_minutes_sedentary
+            name: Sedentary
+            icon: mdi:seat
+
+      - type: "custom:apexcharts-card"
+        header:
+          title: Calories
+          show: true
+        graph_span: 7d
+        span:
+          end: now
+        series:
+          - entity: sensor.alex_m_activity_calories
+            name: Active
+            color: "#e67e22"
+            stroke_width: 2
+          - entity: sensor.alex_m_calories
+            name: Total
+            color: "#f39c12"
+            stroke_width: 2
+        apex_config:
+          chart:
+            toolbar:
+              show: true
+
+      - type: entity
+        entity: sensor.pixel_9_pro_xl_detected_activity
+        name: Current Activity
+        icon: mdi:run
+
+      # ── Nutrition ──
+      - type: heading
+        heading: Nutrition
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_calories_in
+            name: Calories In
+            icon: mdi:food-apple
+          - type: entity
+            entity: sensor.alex_m_water
+            name: Water
+            icon: mdi:cup-water
+
+      # ── Devices ──
+      - type: heading
+        heading: Devices
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.pixel_9_pro_xl_battery_level
+            name: Phone
+            icon: mdi:cellphone
+          - type: entity
+            entity: sensor.google_pixel_watch_3_battery_level
+            name: Watch
+            icon: mdi:watch
