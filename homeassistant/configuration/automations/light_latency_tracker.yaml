@@ -28,8 +28,7 @@ action:
   # Wait for any light entity to change state
   - wait_for_trigger:
       - platform: state
-        entity_id: all
-        to: null
+        entity_id: "{{ states.light | map(attribute='entity_id') | list }}"
     timeout:
       seconds: 5
     continue_on_timeout: true
