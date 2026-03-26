@@ -3,58 +3,92 @@ views:
     path: sleep
     icon: mdi:sleep
     cards:
-      # ── Current Sleep State ──
+      # ── Last Night ──
       - type: heading
-        heading: Sleep
+        heading: Last Night
         heading_style: title
 
       - type: horizontal-stack
         cards:
           - type: entity
-            entity: sensor.pixel_9_pro_xl_sleep_segment
-            name: Sleep Stage
+            entity: sensor.alex_m_sleep_minutes_asleep
+            name: Asleep
             icon: mdi:sleep
           - type: entity
-            entity: sensor.pixel_9_pro_xl_sleep_confidence
-            name: Confidence
+            entity: sensor.alex_m_sleep_efficiency
+            name: Efficiency
             icon: mdi:percent-circle
           - type: entity
-            entity: sensor.pixel_9_pro_xl_sleep_duration
-            name: Duration
-            icon: mdi:clock-outline
+            entity: sensor.alex_m_sleep_start_time
+            name: Bedtime
+            icon: mdi:bed-clock
+          - type: entity
+            entity: sensor.alex_m_awakenings_count
+            name: Awakenings
+            icon: mdi:eye-open
 
-      # ── Sleep Duration Trend ──
-      - type: heading
-        heading: Sleep Duration
-        heading_style: subtitle
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_sleep_time_in_bed
+            name: Time in Bed
+            icon: mdi:bed
+          - type: entity
+            entity: sensor.alex_m_sleep_minutes_awake
+            name: Awake
+            icon: mdi:eye-outline
+          - type: entity
+            entity: sensor.alex_m_sleep_minutes_to_fall_asleep
+            name: Fell Asleep
+            icon: mdi:timer-sand
+          - type: entity
+            entity: sensor.alex_m_minutes_after_wakeup
+            name: After Wakeup
+            icon: mdi:weather-sunset-up
 
-      - type: history-graph
-        entities:
-          - entity: sensor.pixel_9_pro_xl_sleep_duration
-            name: Sleep Duration
-        hours_to_show: 168
-
-      # ── Sleep Stages ──
+      # ── Sleep Stage (Companion) ──
       - type: heading
         heading: Sleep Stages
         heading_style: subtitle
+
+      - type: entity
+        entity: sensor.pixel_9_pro_xl_sleep_segment
+        name: Current Sleep Stage
+        icon: mdi:sleep
 
       - type: history-graph
         entities:
           - entity: sensor.pixel_9_pro_xl_sleep_segment
             name: Sleep Stage
-        hours_to_show: 24
+        hours_to_show: 12
+
+      # ── Trends ──
+      - type: heading
+        heading: Trends
+        heading_style: title
 
       - type: history-graph
         entities:
-          - entity: sensor.pixel_9_pro_xl_sleep_confidence
-            name: Sleep Confidence
+          - entity: sensor.alex_m_sleep_minutes_asleep
+            name: Minutes Asleep
         hours_to_show: 168
 
-      # ── Night Heart Rate ──
+      - type: history-graph
+        entities:
+          - entity: sensor.alex_m_sleep_efficiency
+            name: Sleep Efficiency %
+        hours_to_show: 168
+
+      - type: history-graph
+        entities:
+          - entity: sensor.alex_m_sleep_start_time
+            name: Bedtime
+        hours_to_show: 168
+
+      # ── Night Vitals ──
       - type: heading
         heading: Night Vitals
-        heading_style: subtitle
+        heading_style: title
 
       - type: history-graph
         entities:
@@ -69,19 +103,3 @@ views:
           - entity: sensor.pixel_9_pro_xl_heart_rate_variability
             name: HRV (higher = better recovery)
         hours_to_show: 168
-
-      # ── Watch Status ──
-      - type: heading
-        heading: Watch
-        heading_style: subtitle
-
-      - type: horizontal-stack
-        cards:
-          - type: entity
-            entity: sensor.pixel_watch_3_battery_level
-            name: Battery
-            icon: mdi:watch
-          - type: entity
-            entity: binary_sensor.pixel_watch_3_on_body_sensor
-            name: On Wrist
-            icon: mdi:watch-variant

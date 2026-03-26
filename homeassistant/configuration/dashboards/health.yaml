@@ -15,7 +15,7 @@ views:
             name: Current HR
             icon: mdi:heart-pulse
           - type: entity
-            entity: sensor.pixel_9_pro_xl_resting_heart_rate
+            entity: sensor.alex_m_resting_heart_rate
             name: Resting HR
             icon: mdi:heart
           - type: entity
@@ -31,7 +31,7 @@ views:
         entities:
           - entity: sensor.pixel_watch_3_heart_rate
             name: Heart Rate
-          - entity: sensor.pixel_9_pro_xl_resting_heart_rate
+          - entity: sensor.alex_m_resting_heart_rate
             name: Resting HR
         hours_to_show: 24
 
@@ -49,33 +49,52 @@ views:
       - type: horizontal-stack
         cards:
           - type: entity
-            entity: sensor.pixel_9_pro_xl_daily_steps
+            entity: sensor.alex_m_steps
             name: Steps
             icon: mdi:shoe-print
           - type: entity
-            entity: sensor.pixel_9_pro_xl_daily_distance
+            entity: sensor.alex_m_distance
             name: Distance
             icon: mdi:map-marker-distance
           - type: entity
-            entity: sensor.pixel_9_pro_xl_active_calories_burned
+            entity: sensor.alex_m_activity_calories
             name: Active Cal
             icon: mdi:fire
           - type: entity
-            entity: sensor.pixel_9_pro_xl_daily_floors
+            entity: sensor.alex_m_floors
             name: Floors
             icon: mdi:stairs-up
 
       - type: history-graph
         entities:
-          - entity: sensor.pixel_9_pro_xl_daily_steps
+          - entity: sensor.alex_m_steps
             name: Steps
         hours_to_show: 168
 
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_minutes_very_active
+            name: Very Active
+            icon: mdi:run-fast
+          - type: entity
+            entity: sensor.alex_m_minutes_fairly_active
+            name: Fairly Active
+            icon: mdi:run
+          - type: entity
+            entity: sensor.alex_m_minutes_lightly_active
+            name: Lightly Active
+            icon: mdi:walk
+          - type: entity
+            entity: sensor.alex_m_minutes_sedentary
+            name: Sedentary
+            icon: mdi:seat
+
       - type: history-graph
         entities:
-          - entity: sensor.pixel_9_pro_xl_active_calories_burned
+          - entity: sensor.alex_m_activity_calories
             name: Active Calories
-          - entity: sensor.pixel_9_pro_xl_total_calories_burned
+          - entity: sensor.alex_m_calories
             name: Total Calories
         hours_to_show: 168
 
@@ -83,11 +102,6 @@ views:
         entity: sensor.pixel_9_pro_xl_detected_activity
         name: Current Activity
         icon: mdi:run
-
-      - type: entity
-        entity: sensor.pixel_watch_3_activity_state
-        name: Watch Activity State
-        icon: mdi:watch
 
       # ── Body ──
       - type: heading
@@ -97,7 +111,7 @@ views:
       - type: horizontal-stack
         cards:
           - type: entity
-            entity: sensor.pixel_9_pro_xl_weight
+            entity: sensor.alex_m_weight
             name: Weight
             icon: mdi:scale-bathroom
           - type: entity
@@ -107,11 +121,27 @@ views:
 
       - type: history-graph
         entities:
-          - entity: sensor.pixel_9_pro_xl_weight
+          - entity: sensor.alex_m_weight
             name: Weight
         hours_to_show: 720
 
-      # ── Device Status ──
+      # ── Nutrition / Hydration ──
+      - type: heading
+        heading: Nutrition
+        heading_style: title
+
+      - type: horizontal-stack
+        cards:
+          - type: entity
+            entity: sensor.alex_m_calories_in
+            name: Calories In
+            icon: mdi:food-apple
+          - type: entity
+            entity: sensor.alex_m_water
+            name: Water
+            icon: mdi:cup-water
+
+      # ── Devices ──
       - type: heading
         heading: Devices
         heading_style: title
@@ -126,6 +156,10 @@ views:
             entity: sensor.pixel_watch_3_battery_level
             name: Watch
             icon: mdi:watch
+          - type: entity
+            entity: sensor.google_pixel_watch_3_battery_level
+            name: Watch (Fitbit)
+            icon: mdi:watch-variant
           - type: entity
             entity: binary_sensor.pixel_watch_3_on_body_sensor
             name: On Wrist
