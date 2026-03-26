@@ -54,7 +54,7 @@ services:
   # Uses host networking for mDNS/SSDP device discovery
   # ============================================================
   homeassistant:
-    image: ghcr.io/home-assistant/home-assistant:2026.1.2
+    image: ghcr.io/home-assistant/home-assistant:2026.3.4
     container_name: homeassistant
     restart: unless-stopped
     network_mode: host
@@ -62,16 +62,6 @@ services:
       TZ: "America/New_York"
     volumes:
       - ha-config:/config
-      - ./homeassistant/configuration/automations:/config/automations:ro
-      - ./homeassistant/configuration/blueprints/automation:/config/blueprints/automation/_defaults:ro
-      - ./homeassistant/configuration/helpers/generated/input_boolean:/config/helpers/input_boolean:ro
-      - ./homeassistant/configuration/helpers/generated/input_datetime:/config/helpers/input_datetime:ro
-      - ./homeassistant/configuration/helpers/generated/input_select:/config/helpers/input_select:ro
-      - ./homeassistant/configuration/helpers/generated/input_number:/config/helpers/input_number:ro
-      - ./homeassistant/configuration/helpers/generated/input_text:/config/helpers/input_text:ro
-      - ./homeassistant/configuration/dashboards:/config/dashboards/views:ro
-      - ./homeassistant/configuration/scripts:/config/scripts:ro
-      - ./homeassistant/configuration/groups.yaml:/config/groups.yaml:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8123/manifest.json"]
       interval: 30s
