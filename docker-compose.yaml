@@ -103,7 +103,7 @@ services:
   # (not in Docker — Docker on Mac has no GPU access)
   # ============================================================
   whisper:
-    image: rhasspy/wyoming-faster-whisper
+    image: rhasspy/wyoming-whisper
     container_name: whisper
     restart: unless-stopped
     ports:
