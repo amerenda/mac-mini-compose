@@ -27,3 +27,7 @@ sl_bathroom_smooth_transition:
 sl_bathroom_override:
   name: "SL: Bathroom — Override Active"
   icon: mdi:lightbulb-alert
+
+sl_bathroom_override_scenes:
+  name: "SL: Bathroom — Override Window Scenes"
+  icon: mdi:palette-outline

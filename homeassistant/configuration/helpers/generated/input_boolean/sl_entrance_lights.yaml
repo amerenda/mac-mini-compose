@@ -27,3 +27,7 @@ sl_entrance_lights_smooth_transition:
 sl_entrance_lights_override:
   name: "SL: Entrance Lights — Override Active"
   icon: mdi:lightbulb-alert
+
+sl_entrance_lights_override_scenes:
+  name: "SL: Entrance Lights — Override Window Scenes"
+  icon: mdi:palette-outline

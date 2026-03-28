@@ -27,3 +27,7 @@ sl_hallway_smooth_transition:
 sl_hallway_override:
   name: "SL: Hallway — Override Active"
   icon: mdi:lightbulb-alert
+
+sl_hallway_override_scenes:
+  name: "SL: Hallway — Override Window Scenes"
+  icon: mdi:palette-outline

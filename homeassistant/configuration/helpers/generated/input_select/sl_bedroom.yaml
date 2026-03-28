@@ -1,0 +1,31 @@
+# Smart Lighting v2 — Bedroom scene overrides
+# Options are populated dynamically by the sl_sync_scenes automation
+
+sl_bedroom_morning_scene:
+  name: "SL: Bedroom — Morning Scene"
+  options:
+    - scene.bedroom_morning
+  initial: scene.bedroom_morning
+  icon: mdi:palette
+
+sl_bedroom_day_scene:
+  name: "SL: Bedroom — Day Scene"
+  options:
+    - scene.bedroom_day
+  initial: scene.bedroom_day
+  icon: mdi:palette
+
+sl_bedroom_evening_scene:
+  name: "SL: Bedroom — Evening Scene"
+  options:
+    - scene.bedroom_evening
+  initial: scene.bedroom_evening
+  icon: mdi:palette
+
+sl_bedroom_night_scene:
+  name: "SL: Bedroom — Night Scene"
+  options:
+    - scene.bedroom_night
+  initial: scene.bedroom_night
+  icon: mdi:palette
+

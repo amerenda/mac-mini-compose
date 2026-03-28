@@ -1,0 +1,62 @@
+# Smart Lighting v2 — Sync available scenes to room override dropdowns
+# Runs on startup and whenever a scene entity is added/removed.
+# Finds all scenes matching scene.<room>_* and updates input_select options.
+alias: "SL: Sync Scene Options"
+id: sl_sync_scenes
+trigger:
+  - platform: homeassistant
+    event: start
+  - platform: event
+    event_type: entity_registry_updated
+    event_data:
+      action: create
+  - platform: event
+    event_type: entity_registry_updated
+    event_data:
+      action: remove
+condition: []
+action:
+  - variables:
+      rooms:
+        - bathroom
+        - bedroom
+        - entrance_lights
+        - hallway
+        - kitchen
+        - living_room
+  - repeat:
+      for_each: "{{ rooms }}"
+      sequence:
+        - variables:
+            room: "{{ repeat.item }}"
+            room_scenes: >
+              {{ states.scene
+                 | selectattr('entity_id', 'match', 'scene\.' ~ room ~ '_')
+                 | map(attribute='entity_id')
+                 | sort
+                 | list }}
+        - if:
+            - condition: template
+              value_template: "{{ room_scenes | length > 0 }}"
+          then:
+            - service: input_select.set_options
+              target:
+                entity_id: "input_select.sl_{{ room }}_morning_scene"
+              data:
+                options: "{{ room_scenes }}"
+            - service: input_select.set_options
+              target:
+                entity_id: "input_select.sl_{{ room }}_day_scene"
+              data:
+                options: "{{ room_scenes }}"
+            - service: input_select.set_options
+              target:
+                entity_id: "input_select.sl_{{ room }}_evening_scene"
+              data:
+                options: "{{ room_scenes }}"
+            - service: input_select.set_options
+              target:
+                entity_id: "input_select.sl_{{ room }}_night_scene"
+              data:
+                options: "{{ room_scenes }}"
+mode: single

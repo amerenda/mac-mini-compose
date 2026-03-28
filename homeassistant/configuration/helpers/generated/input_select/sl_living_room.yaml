@@ -1,0 +1,31 @@
+# Smart Lighting v2 — Living Room scene overrides
+# Options are populated dynamically by the sl_sync_scenes automation
+
+sl_living_room_morning_scene:
+  name: "SL: Living Room — Morning Scene"
+  options:
+    - scene.living_room_morning
+  initial: scene.living_room_morning
+  icon: mdi:palette
+
+sl_living_room_day_scene:
+  name: "SL: Living Room — Day Scene"
+  options:
+    - scene.living_room_day
+  initial: scene.living_room_day
+  icon: mdi:palette
+
+sl_living_room_evening_scene:
+  name: "SL: Living Room — Evening Scene"
+  options:
+    - scene.living_room_evening
+  initial: scene.living_room_evening
+  icon: mdi:palette
+
+sl_living_room_night_scene:
+  name: "SL: Living Room — Night Scene"
+  options:
+    - scene.living_room_night
+  initial: scene.living_room_night
+  icon: mdi:palette
+

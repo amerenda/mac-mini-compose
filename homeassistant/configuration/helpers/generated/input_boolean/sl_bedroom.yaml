@@ -27,3 +27,7 @@ sl_bedroom_smooth_transition:
 sl_bedroom_override:
   name: "SL: Bedroom — Override Active"
   icon: mdi:lightbulb-alert
+
+sl_bedroom_override_scenes:
+  name: "SL: Bedroom — Override Window Scenes"
+  icon: mdi:palette-outline

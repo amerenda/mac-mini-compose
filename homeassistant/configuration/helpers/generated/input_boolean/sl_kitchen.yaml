@@ -27,3 +27,7 @@ sl_kitchen_smooth_transition:
 sl_kitchen_override:
   name: "SL: Kitchen — Override Active"
   icon: mdi:lightbulb-alert
+
+sl_kitchen_override_scenes:
+  name: "SL: Kitchen — Override Window Scenes"
+  icon: mdi:palette-outline

@@ -1,0 +1,31 @@
+# Smart Lighting v2 — Hallway scene overrides
+# Options are populated dynamically by the sl_sync_scenes automation
+
+sl_hallway_morning_scene:
+  name: "SL: Hallway — Morning Scene"
+  options:
+    - scene.hallway_morning
+  initial: scene.hallway_morning
+  icon: mdi:palette
+
+sl_hallway_day_scene:
+  name: "SL: Hallway — Day Scene"
+  options:
+    - scene.hallway_day
+  initial: scene.hallway_day
+  icon: mdi:palette
+
+sl_hallway_evening_scene:
+  name: "SL: Hallway — Evening Scene"
+  options:
+    - scene.hallway_evening
+  initial: scene.hallway_evening
+  icon: mdi:palette
+
+sl_hallway_night_scene:
+  name: "SL: Hallway — Night Scene"
+  options:
+    - scene.hallway_night
+  initial: scene.hallway_night
+  icon: mdi:palette
+

@@ -118,6 +118,38 @@ views:
               name: Transition Duration (min)
             - entity: input_boolean.sl_bathroom_override
               name: Override Active
+            - type: section
+              label: Scene Overrides
+            - entity: input_boolean.sl_bathroom_override_scenes
+              name: Override Window Scenes
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_bathroom_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_bathroom_morning_scene
+                name: Morning Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_bathroom_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_bathroom_day_scene
+                name: Day Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_bathroom_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_bathroom_evening_scene
+                name: Evening Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_bathroom_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_bathroom_night_scene
+                name: Night Scene
 
       # ── Room Settings: Bedroom ─────────────────────────────
       - type: conditional
@@ -150,6 +182,38 @@ views:
               name: Transition Duration (min)
             - entity: input_boolean.sl_bedroom_override
               name: Override Active
+            - type: section
+              label: Scene Overrides
+            - entity: input_boolean.sl_bedroom_override_scenes
+              name: Override Window Scenes
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_bedroom_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_bedroom_morning_scene
+                name: Morning Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_bedroom_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_bedroom_day_scene
+                name: Day Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_bedroom_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_bedroom_evening_scene
+                name: Evening Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_bedroom_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_bedroom_night_scene
+                name: Night Scene
 
       # ── Room Settings: Entrance ────────────────────────────
       - type: conditional
@@ -182,6 +246,38 @@ views:
               name: Transition Duration (min)
             - entity: input_boolean.sl_entrance_lights_override
               name: Override Active
+            - type: section
+              label: Scene Overrides
+            - entity: input_boolean.sl_entrance_lights_override_scenes
+              name: Override Window Scenes
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_entrance_lights_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_entrance_lights_morning_scene
+                name: Morning Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_entrance_lights_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_entrance_lights_day_scene
+                name: Day Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_entrance_lights_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_entrance_lights_evening_scene
+                name: Evening Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_entrance_lights_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_entrance_lights_night_scene
+                name: Night Scene
 
       # ── Room Settings: Hallway ─────────────────────────────
       - type: conditional
@@ -214,6 +310,38 @@ views:
               name: Transition Duration (min)
             - entity: input_boolean.sl_hallway_override
               name: Override Active
+            - type: section
+              label: Scene Overrides
+            - entity: input_boolean.sl_hallway_override_scenes
+              name: Override Window Scenes
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_hallway_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_hallway_morning_scene
+                name: Morning Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_hallway_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_hallway_day_scene
+                name: Day Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_hallway_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_hallway_evening_scene
+                name: Evening Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_hallway_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_hallway_night_scene
+                name: Night Scene
 
       # ── Room Settings: Kitchen ─────────────────────────────
       - type: conditional
@@ -246,6 +374,38 @@ views:
               name: Transition Duration (min)
             - entity: input_boolean.sl_kitchen_override
               name: Override Active
+            - type: section
+              label: Scene Overrides
+            - entity: input_boolean.sl_kitchen_override_scenes
+              name: Override Window Scenes
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_kitchen_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_kitchen_morning_scene
+                name: Morning Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_kitchen_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_kitchen_day_scene
+                name: Day Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_kitchen_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_kitchen_evening_scene
+                name: Evening Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_kitchen_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_kitchen_night_scene
+                name: Night Scene
 
       # ── Room Settings: Living Room ─────────────────────────
       - type: conditional
@@ -278,3 +438,35 @@ views:
               name: Transition Duration (min)
             - entity: input_boolean.sl_living_room_override
               name: Override Active
+            - type: section
+              label: Scene Overrides
+            - entity: input_boolean.sl_living_room_override_scenes
+              name: Override Window Scenes
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_living_room_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_living_room_morning_scene
+                name: Morning Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_living_room_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_living_room_day_scene
+                name: Day Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_living_room_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_living_room_evening_scene
+                name: Evening Scene
+            - type: conditional
+              conditions:
+                - entity: input_boolean.sl_living_room_override_scenes
+                  state: "on"
+              row:
+                entity: input_select.sl_living_room_night_scene
+                name: Night Scene

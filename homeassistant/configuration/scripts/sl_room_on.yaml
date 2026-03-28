@@ -39,11 +39,14 @@ sl_room_on:
     - condition: template
       value_template: "{{ not is_state(room_override, 'on') }}"
 
-    # Check house mode
+    # Determine scene to activate
     - variables:
         house_mode: "{{ states('input_select.sl_house_mode') }}"
         window: "{{ states('sensor.sl_current_window') }}"
-        scene_entity: "scene.{{ room }}_{{ window }}"
+        use_custom_scene: "{{ is_state('input_boolean.sl_' ~ room ~ '_override_scenes', 'on') }}"
+        custom_scene: "{{ states('input_select.sl_' ~ room ~ '_' ~ window ~ '_scene') if use_custom_scene else '' }}"
+        default_scene: "scene.{{ room }}_{{ window }}"
+        scene_entity: "{{ custom_scene if use_custom_scene and custom_scene not in ['unknown', 'unavailable', ''] else default_scene }}"
         scene_exists: "{{ scene_entity in (states.scene | map(attribute='entity_id') | list) }}"
 
     - choose:
