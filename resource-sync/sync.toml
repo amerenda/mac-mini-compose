@@ -11,4 +11,3 @@ repo = "amerenda/mac-mini-compose"
 branch = "main"
 resource_path = ["resource-sync/stacks.toml"]
 git_account = "amerenda"
-refresh = "5-min"
