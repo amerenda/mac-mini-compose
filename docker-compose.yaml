@@ -90,6 +90,7 @@ services:
       TZ: "America/New_York"
     volumes:
       - ha-config:/config
+      - ./homeassistant/configuration/configuration.yaml:/config/configuration.yaml:ro
       - ./homeassistant/configuration/automations:/config/automations:ro
       - ./homeassistant/configuration/blueprints/automation:/config/blueprints/automation/_defaults:ro
       - ./homeassistant/configuration/scripts:/config/scripts:ro
