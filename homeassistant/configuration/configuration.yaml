@@ -21,6 +21,10 @@ input_select:   !include_dir_merge_named helpers/input_select/
 input_number:   !include_dir_merge_named helpers/input_number/
 input_text:     !include_dir_merge_named helpers/input_text/
 
+
+# Timers (smart lighting motion auto-off)
+timer: !include_dir_merge_named helpers/timer/
+
 # Packages (loads your generated per-room helpers under packages/helpers/generated/)
 homeassistant:
   packages: !include_dir_named packages
@@ -104,6 +108,12 @@ lovelace:
       icon: mdi:sleep
       show_in_sidebar: true
       filename: dashboards/views/tmp_sleep_apex.yaml
+    smart-lighting-dashboard:
+      mode: yaml
+      title: Smart Lighting
+      icon: mdi:lightbulb-auto
+      show_in_sidebar: true
+      filename: dashboards/views/smart_lighting.yaml
 
 # HTTP reverse proxy
 http:
