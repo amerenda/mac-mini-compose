@@ -1,0 +1,29 @@
+# Smart Lighting v2 — Bathroom toggles
+
+sl_bathroom_motion_morning:
+  name: "SL: Bathroom — Motion (Morning)"
+  icon: mdi:motion-sensor
+
+sl_bathroom_motion_day:
+  name: "SL: Bathroom — Motion (Day)"
+  icon: mdi:motion-sensor
+
+sl_bathroom_motion_evening:
+  name: "SL: Bathroom — Motion (Evening)"
+  icon: mdi:motion-sensor
+
+sl_bathroom_motion_night:
+  name: "SL: Bathroom — Motion (Night)"
+  icon: mdi:motion-sensor
+
+sl_bathroom_auto_transition:
+  name: "SL: Bathroom — Auto Transition"
+  icon: mdi:transition-masked
+
+sl_bathroom_smooth_transition:
+  name: "SL: Bathroom — Smooth Transition"
+  icon: mdi:blur-linear
+
+sl_bathroom_override:
+  name: "SL: Bathroom — Override Active"
+  icon: mdi:lightbulb-alert

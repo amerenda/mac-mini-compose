@@ -1,0 +1,18 @@
+# Smart Lighting v2 — Living Room motion auto-off
+alias: "SL: Living Room — Motion Off"
+id: sl_living_room_motion_off
+trigger:
+  - platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.sl_living_room_motion_off
+condition:
+  - condition: state
+    entity_id: input_boolean.sl_enabled
+    state: "on"
+action:
+  - service: script.sl_room_off
+    data:
+      room: living_room
+mode: single
+enabled: false

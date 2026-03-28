@@ -1,0 +1,18 @@
+# Smart Lighting v2 — Bathroom state-change trigger
+alias: "SL: Bathroom — Light On"
+id: sl_bathroom_light_on
+trigger:
+  - platform: state
+    entity_id: light.bathroom
+    to: "on"
+condition:
+  - condition: state
+    entity_id: input_boolean.sl_enabled
+    state: "on"
+action:
+  - delay:
+      milliseconds: 500
+  - service: script.sl_room_on
+    data:
+      room: bathroom
+mode: restart

@@ -1,0 +1,29 @@
+# Smart Lighting v2 — Living Room toggles
+
+sl_living_room_motion_morning:
+  name: "SL: Living Room — Motion (Morning)"
+  icon: mdi:motion-sensor
+
+sl_living_room_motion_day:
+  name: "SL: Living Room — Motion (Day)"
+  icon: mdi:motion-sensor
+
+sl_living_room_motion_evening:
+  name: "SL: Living Room — Motion (Evening)"
+  icon: mdi:motion-sensor
+
+sl_living_room_motion_night:
+  name: "SL: Living Room — Motion (Night)"
+  icon: mdi:motion-sensor
+
+sl_living_room_auto_transition:
+  name: "SL: Living Room — Auto Transition"
+  icon: mdi:transition-masked
+
+sl_living_room_smooth_transition:
+  name: "SL: Living Room — Smooth Transition"
+  icon: mdi:blur-linear
+
+sl_living_room_override:
+  name: "SL: Living Room — Override Active"
+  icon: mdi:lightbulb-alert

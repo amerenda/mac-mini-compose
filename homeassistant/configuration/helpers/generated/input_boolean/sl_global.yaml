@@ -1,0 +1,29 @@
+# Smart Lighting v2 — Global toggles
+
+# Master toggle — enables/disables the entire v2 system
+sl_enabled:
+  name: "SL: Smart Lighting Enabled"
+  icon: mdi:lightbulb-auto
+
+# Weekend day configuration
+sl_weekend_monday:
+  name: "SL: Monday is Weekend"
+  icon: mdi:calendar
+sl_weekend_tuesday:
+  name: "SL: Tuesday is Weekend"
+  icon: mdi:calendar
+sl_weekend_wednesday:
+  name: "SL: Wednesday is Weekend"
+  icon: mdi:calendar
+sl_weekend_thursday:
+  name: "SL: Thursday is Weekend"
+  icon: mdi:calendar
+sl_weekend_friday:
+  name: "SL: Friday is Weekend"
+  icon: mdi:calendar
+sl_weekend_saturday:
+  name: "SL: Saturday is Weekend"
+  icon: mdi:calendar
+sl_weekend_sunday:
+  name: "SL: Sunday is Weekend"
+  icon: mdi:calendar

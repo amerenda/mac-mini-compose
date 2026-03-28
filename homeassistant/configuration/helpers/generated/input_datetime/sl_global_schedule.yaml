@@ -1,0 +1,58 @@
+# Smart Lighting v2 — Global schedule boundaries
+# Weekday schedule
+sl_morning_start_weekday:
+  name: "SL: Morning Start (Weekday)"
+  has_date: false
+  has_time: true
+  initial: "06:00:00"
+  icon: mdi:weather-sunset-up
+
+sl_day_start_weekday:
+  name: "SL: Day Start (Weekday)"
+  has_date: false
+  has_time: true
+  initial: "09:00:00"
+  icon: mdi:weather-sunny
+
+sl_evening_start_weekday:
+  name: "SL: Evening Start (Weekday)"
+  has_date: false
+  has_time: true
+  initial: "17:00:00"
+  icon: mdi:weather-sunset-down
+
+sl_night_start_weekday:
+  name: "SL: Night Start (Weekday)"
+  has_date: false
+  has_time: true
+  initial: "22:00:00"
+  icon: mdi:weather-night
+
+# Weekend schedule
+sl_morning_start_weekend:
+  name: "SL: Morning Start (Weekend)"
+  has_date: false
+  has_time: true
+  initial: "08:00:00"
+  icon: mdi:weather-sunset-up
+
+sl_day_start_weekend:
+  name: "SL: Day Start (Weekend)"
+  has_date: false
+  has_time: true
+  initial: "10:00:00"
+  icon: mdi:weather-sunny
+
+sl_evening_start_weekend:
+  name: "SL: Evening Start (Weekend)"
+  has_date: false
+  has_time: true
+  initial: "18:00:00"
+  icon: mdi:weather-sunset-down
+
+sl_night_start_weekend:
+  name: "SL: Night Start (Weekend)"
+  has_date: false
+  has_time: true
+  initial: "23:00:00"
+  icon: mdi:weather-night

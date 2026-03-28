@@ -1,0 +1,29 @@
+# Smart Lighting v2 — Bedroom toggles
+
+sl_bedroom_motion_morning:
+  name: "SL: Bedroom — Motion (Morning)"
+  icon: mdi:motion-sensor
+
+sl_bedroom_motion_day:
+  name: "SL: Bedroom — Motion (Day)"
+  icon: mdi:motion-sensor
+
+sl_bedroom_motion_evening:
+  name: "SL: Bedroom — Motion (Evening)"
+  icon: mdi:motion-sensor
+
+sl_bedroom_motion_night:
+  name: "SL: Bedroom — Motion (Night)"
+  icon: mdi:motion-sensor
+
+sl_bedroom_auto_transition:
+  name: "SL: Bedroom — Auto Transition"
+  icon: mdi:transition-masked
+
+sl_bedroom_smooth_transition:
+  name: "SL: Bedroom — Smooth Transition"
+  icon: mdi:blur-linear
+
+sl_bedroom_override:
+  name: "SL: Bedroom — Override Active"
+  icon: mdi:lightbulb-alert

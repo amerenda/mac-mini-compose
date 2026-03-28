@@ -1,0 +1,31 @@
+# Smart Lighting v2 — Motion auto-off timers
+
+sl_bathroom_motion_off:
+  name: "SL: Bathroom — Motion Off Timer"
+  duration: "00:05:00"
+  icon: mdi:timer-off-outline
+
+sl_bedroom_motion_off:
+  name: "SL: Bedroom — Motion Off Timer"
+  duration: "00:05:00"
+  icon: mdi:timer-off-outline
+
+sl_entrance_lights_motion_off:
+  name: "SL: Entrance Lights — Motion Off Timer"
+  duration: "00:05:00"
+  icon: mdi:timer-off-outline
+
+sl_hallway_motion_off:
+  name: "SL: Hallway — Motion Off Timer"
+  duration: "00:05:00"
+  icon: mdi:timer-off-outline
+
+sl_kitchen_motion_off:
+  name: "SL: Kitchen — Motion Off Timer"
+  duration: "00:05:00"
+  icon: mdi:timer-off-outline
+
+sl_living_room_motion_off:
+  name: "SL: Living Room — Motion Off Timer"
+  duration: "00:05:00"
+  icon: mdi:timer-off-outline

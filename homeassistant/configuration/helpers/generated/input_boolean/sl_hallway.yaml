@@ -1,0 +1,29 @@
+# Smart Lighting v2 — Hallway toggles
+
+sl_hallway_motion_morning:
+  name: "SL: Hallway — Motion (Morning)"
+  icon: mdi:motion-sensor
+
+sl_hallway_motion_day:
+  name: "SL: Hallway — Motion (Day)"
+  icon: mdi:motion-sensor
+
+sl_hallway_motion_evening:
+  name: "SL: Hallway — Motion (Evening)"
+  icon: mdi:motion-sensor
+
+sl_hallway_motion_night:
+  name: "SL: Hallway — Motion (Night)"
+  icon: mdi:motion-sensor
+
+sl_hallway_auto_transition:
+  name: "SL: Hallway — Auto Transition"
+  icon: mdi:transition-masked
+
+sl_hallway_smooth_transition:
+  name: "SL: Hallway — Smooth Transition"
+  icon: mdi:blur-linear
+
+sl_hallway_override:
+  name: "SL: Hallway — Override Active"
+  icon: mdi:lightbulb-alert

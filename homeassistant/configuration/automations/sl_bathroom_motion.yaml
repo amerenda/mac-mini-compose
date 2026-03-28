@@ -1,0 +1,28 @@
+# Smart Lighting v2 — Bathroom motion trigger
+# Stub: update entity_id when motion sensor is installed
+alias: "SL: Bathroom — Motion"
+id: sl_bathroom_motion
+trigger:
+  - platform: state
+    entity_id: binary_sensor.bathroom_motion
+    to: "on"
+condition:
+  - condition: state
+    entity_id: input_boolean.sl_enabled
+    state: "on"
+  - condition: template
+    value_template: >
+      {% set window = states('sensor.sl_current_window') %}
+      {{ is_state('input_boolean.sl_bathroom_motion_' ~ window, 'on') }}
+action:
+  - service: script.sl_room_on
+    data:
+      room: bathroom
+  - service: timer.start
+    target:
+      entity_id: timer.sl_bathroom_motion_off
+    data:
+      duration: >
+        {{ states('input_number.sl_bathroom_motion_timeout') | int * 60 }}
+mode: restart
+enabled: false

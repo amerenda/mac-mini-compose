@@ -1,0 +1,10 @@
+# Smart Lighting v2 — House mode
+sl_house_mode:
+  name: "SL: House Mode"
+  options:
+    - Home
+    - Away
+    - Sleep
+    - Guest
+  initial: Home
+  icon: mdi:home-account

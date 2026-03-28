@@ -1,0 +1,18 @@
+sl_room_off:
+  alias: "SL: Room Off"
+  description: "Turn off lights for a room and clear override"
+  mode: parallel
+  max: 10
+  fields:
+    room:
+      description: "Room identifier (e.g., living_room)"
+      required: true
+      selector:
+        text:
+  sequence:
+    - service: light.turn_off
+      target:
+        entity_id: "light.{{ room }}"
+    - service: input_boolean.turn_off
+      target:
+        entity_id: "input_boolean.sl_{{ room }}_override"

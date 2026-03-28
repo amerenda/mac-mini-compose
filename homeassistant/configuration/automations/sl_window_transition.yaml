@@ -1,0 +1,56 @@
+# Smart Lighting v2 — Auto-transition when time window changes
+alias: "SL: Window Transition"
+id: sl_window_transition
+trigger:
+  - platform: state
+    entity_id: sensor.sl_current_window
+condition:
+  - condition: state
+    entity_id: input_boolean.sl_enabled
+    state: "on"
+  - condition: template
+    value_template: >
+      {{ trigger.from_state.state != trigger.to_state.state }}
+action:
+  # Clear all override flags
+  - service: input_boolean.turn_off
+    target:
+      entity_id:
+        - input_boolean.sl_bathroom_override
+        - input_boolean.sl_bedroom_override
+        - input_boolean.sl_entrance_lights_override
+        - input_boolean.sl_hallway_override
+        - input_boolean.sl_kitchen_override
+        - input_boolean.sl_living_room_override
+
+  # Update last window tracker
+  - service: input_text.set_value
+    target:
+      entity_id: input_text.sl_last_window
+    data:
+      value: "{{ trigger.to_state.state }}"
+
+  # Re-apply scenes for rooms that are on and have auto-transition enabled
+  - variables:
+      rooms:
+        - bathroom
+        - bedroom
+        - entrance_lights
+        - hallway
+        - kitchen
+        - living_room
+  - repeat:
+      for_each: "{{ rooms }}"
+      sequence:
+        - variables:
+            room: "{{ repeat.item }}"
+            light_on: "{{ is_state('light.' ~ room, 'on') }}"
+            auto_transition: "{{ is_state('input_boolean.sl_' ~ room ~ '_auto_transition', 'on') }}"
+        - if:
+            - condition: template
+              value_template: "{{ light_on and auto_transition }}"
+          then:
+            - service: script.sl_room_on
+              data:
+                room: "{{ room }}"
+mode: single

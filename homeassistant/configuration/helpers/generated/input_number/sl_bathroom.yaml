@@ -1,0 +1,11 @@
+# Smart Lighting v2 — Bathroom settings
+
+sl_bathroom_motion_timeout:
+  name: "SL: Bathroom — Motion Timeout (min)"
+  min: 1
+  max: 60
+  step: 1
+  initial: 5
+  unit_of_measurement: min
+  icon: mdi:timer-outline
+  mode: slider

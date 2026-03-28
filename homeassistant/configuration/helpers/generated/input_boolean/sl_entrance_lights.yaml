@@ -1,0 +1,29 @@
+# Smart Lighting v2 — Entrance Lights toggles
+
+sl_entrance_lights_motion_morning:
+  name: "SL: Entrance Lights — Motion (Morning)"
+  icon: mdi:motion-sensor
+
+sl_entrance_lights_motion_day:
+  name: "SL: Entrance Lights — Motion (Day)"
+  icon: mdi:motion-sensor
+
+sl_entrance_lights_motion_evening:
+  name: "SL: Entrance Lights — Motion (Evening)"
+  icon: mdi:motion-sensor
+
+sl_entrance_lights_motion_night:
+  name: "SL: Entrance Lights — Motion (Night)"
+  icon: mdi:motion-sensor
+
+sl_entrance_lights_auto_transition:
+  name: "SL: Entrance Lights — Auto Transition"
+  icon: mdi:transition-masked
+
+sl_entrance_lights_smooth_transition:
+  name: "SL: Entrance Lights — Smooth Transition"
+  icon: mdi:blur-linear
+
+sl_entrance_lights_override:
+  name: "SL: Entrance Lights — Override Active"
+  icon: mdi:lightbulb-alert

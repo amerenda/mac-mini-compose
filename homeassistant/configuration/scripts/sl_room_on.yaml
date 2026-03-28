@@ -1,0 +1,91 @@
+sl_room_on:
+  alias: "SL: Room On"
+  description: "Activate the correct scene for a room based on current time window, schedule, and house mode"
+  mode: parallel
+  max: 10
+  fields:
+    room:
+      description: "Room identifier matching scene naming convention (e.g., living_room)"
+      required: true
+      selector:
+        text:
+    override:
+      description: "Skip scene selection (explicit brightness/color was requested)"
+      required: false
+      default: false
+      selector:
+        boolean:
+  sequence:
+    # Check master toggle
+    - condition: state
+      entity_id: input_boolean.sl_enabled
+      state: "on"
+
+    - variables:
+        room_override: "input_boolean.sl_{{ room }}_override"
+        is_override: "{{ override | default(false) | bool }}"
+
+    # If override requested, set the flag and stop
+    - if:
+        - condition: template
+          value_template: "{{ is_override }}"
+      then:
+        - service: input_boolean.turn_on
+          target:
+            entity_id: "{{ room_override }}"
+        - stop: "Override active — skipping scene selection"
+
+    # If override flag is already set for this room, skip
+    - condition: template
+      value_template: "{{ not is_state(room_override, 'on') }}"
+
+    # Check house mode
+    - variables:
+        house_mode: "{{ states('input_select.sl_house_mode') }}"
+        window: "{{ states('sensor.sl_current_window') }}"
+        scene_entity: "scene.{{ room }}_{{ window }}"
+        scene_exists: "{{ scene_entity in (states.scene | map(attribute='entity_id') | list) }}"
+
+    - choose:
+        # Away mode — don't turn on lights
+        - conditions:
+            - condition: template
+              value_template: "{{ house_mode == 'Away' }}"
+          sequence:
+            - service: light.turn_off
+              target:
+                entity_id: "light.{{ room }}"
+            - stop: "Away mode — lights off"
+
+        # Sleep mode — only rooms with motion enabled for night
+        - conditions:
+            - condition: template
+              value_template: "{{ house_mode == 'Sleep' }}"
+          sequence:
+            - condition: template
+              value_template: "{{ is_state('input_boolean.sl_' ~ room ~ '_motion_night', 'on') }}"
+            - if:
+                - condition: template
+                  value_template: "{{ scene_exists }}"
+              then:
+                - service: scene.turn_on
+                  target:
+                    entity_id: "{{ scene_entity }}"
+
+        # Home or Guest mode — normal operation
+        - conditions:
+            - condition: template
+              value_template: "{{ house_mode in ['Home', 'Guest'] }}"
+          sequence:
+            - if:
+                - condition: template
+                  value_template: "{{ scene_exists }}"
+              then:
+                - service: scene.turn_on
+                  target:
+                    entity_id: "{{ scene_entity }}"
+              else:
+                - service: system_log.write
+                  data:
+                    message: "SL: No scene found: {{ scene_entity }}"
+                    level: warning

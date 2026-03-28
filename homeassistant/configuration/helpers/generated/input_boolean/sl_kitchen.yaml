@@ -1,0 +1,29 @@
+# Smart Lighting v2 — Kitchen toggles
+
+sl_kitchen_motion_morning:
+  name: "SL: Kitchen — Motion (Morning)"
+  icon: mdi:motion-sensor
+
+sl_kitchen_motion_day:
+  name: "SL: Kitchen — Motion (Day)"
+  icon: mdi:motion-sensor
+
+sl_kitchen_motion_evening:
+  name: "SL: Kitchen — Motion (Evening)"
+  icon: mdi:motion-sensor
+
+sl_kitchen_motion_night:
+  name: "SL: Kitchen — Motion (Night)"
+  icon: mdi:motion-sensor
+
+sl_kitchen_auto_transition:
+  name: "SL: Kitchen — Auto Transition"
+  icon: mdi:transition-masked
+
+sl_kitchen_smooth_transition:
+  name: "SL: Kitchen — Smooth Transition"
+  icon: mdi:blur-linear
+
+sl_kitchen_override:
+  name: "SL: Kitchen — Override Active"
+  icon: mdi:lightbulb-alert

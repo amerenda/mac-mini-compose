@@ -1,0 +1,18 @@
+# Smart Lighting v2 — Bedroom state-change trigger
+alias: "SL: Bedroom — Light On"
+id: sl_bedroom_light_on
+trigger:
+  - platform: state
+    entity_id: light.bedroom
+    to: "on"
+condition:
+  - condition: state
+    entity_id: input_boolean.sl_enabled
+    state: "on"
+action:
+  - delay:
+      milliseconds: 500
+  - service: script.sl_room_on
+    data:
+      room: bedroom
+mode: restart
