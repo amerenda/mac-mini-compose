@@ -15,4 +15,3 @@ action:
     data:
       room: kitchen
 mode: single
-enabled: false

@@ -25,4 +25,3 @@ action:
       duration: >
         {{ states('input_number.sl_entrance_lights_motion_timeout') | int * 60 }}
 mode: restart
-enabled: false

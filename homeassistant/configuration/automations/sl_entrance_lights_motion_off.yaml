@@ -15,4 +15,3 @@ action:
     data:
       room: entrance_lights
 mode: single
-enabled: false

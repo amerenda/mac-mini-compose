@@ -15,4 +15,3 @@ action:
     data:
       room: living_room
 mode: single
-enabled: false
