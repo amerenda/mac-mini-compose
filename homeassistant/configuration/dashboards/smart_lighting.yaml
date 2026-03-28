@@ -1,28 +1,24 @@
 title: Smart Lighting
 views:
-  - title: Schedule & Settings
+  - title: Smart Lighting
     path: schedule
     icon: mdi:lightbulb-auto
     cards:
-      # ── Master Toggle & Status ──────────────────────────────
-      - type: horizontal-stack
-        cards:
-          - type: entities
-            title: Smart Lighting
-            entities:
-              - entity: input_boolean.sl_enabled
-                name: Enabled
-              - entity: sensor.sl_current_window
-                name: Current Window
-              - entity: input_select.sl_house_mode
-                name: House Mode
+      # ── Top Bar: Status & Controls ─────────────────────────
+      - type: entities
+        entities:
+          - entity: input_boolean.sl_enabled
+            name: Smart Lighting
+          - entity: sensor.sl_current_window
+            name: Current Window
+          - entity: input_select.sl_house_mode
+            name: House Mode
 
-      # ── Schedule ────────────────────────────────────────────
+      # ── Schedule (always visible) ──────────────────────────
       - type: horizontal-stack
         cards:
           - type: entities
-            title: Weekday Schedule
-            icon: mdi:briefcase
+            title: Weekday
             entities:
               - entity: input_datetime.sl_morning_start_weekday
                 name: Morning
@@ -33,8 +29,7 @@ views:
               - entity: input_datetime.sl_night_start_weekday
                 name: Night
           - type: entities
-            title: Weekend Schedule
-            icon: mdi:sofa
+            title: Weekend
             entities:
               - entity: input_datetime.sl_morning_start_weekend
                 name: Morning
@@ -45,180 +40,244 @@ views:
               - entity: input_datetime.sl_night_start_weekend
                 name: Night
 
-      # ── Weekend Days ────────────────────────────────────────
+      # ── Weekend Days (collapsible) ─────────────────────────
       - type: entities
-        title: Weekend Days
-        icon: mdi:calendar-weekend
-        columns: 4
         entities:
-          - entity: input_boolean.sl_weekend_monday
-            name: Mon
-          - entity: input_boolean.sl_weekend_tuesday
-            name: Tue
-          - entity: input_boolean.sl_weekend_wednesday
-            name: Wed
-          - entity: input_boolean.sl_weekend_thursday
-            name: Thu
-          - entity: input_boolean.sl_weekend_friday
-            name: Fri
-          - entity: input_boolean.sl_weekend_saturday
-            name: Sat
-          - entity: input_boolean.sl_weekend_sunday
-            name: Sun
+          - entity: input_boolean.sl_show_weekend_config
+            name: Configure Weekend Days
+            icon: mdi:calendar-weekend
 
-      # ── Room Settings ───────────────────────────────────────
-      - type: entities
-        title: Bathroom
-        icon: mdi:shower
-        show_header_toggle: false
-        entities:
-          - type: section
-            label: Motion Triggers
-          - entity: input_boolean.sl_bathroom_motion_morning
-            name: Morning
-          - entity: input_boolean.sl_bathroom_motion_day
-            name: Day
-          - entity: input_boolean.sl_bathroom_motion_evening
-            name: Evening
-          - entity: input_boolean.sl_bathroom_motion_night
-            name: Night
-          - type: section
-            label: Settings
-          - entity: input_number.sl_bathroom_motion_timeout
-            name: Motion Timeout
-          - entity: input_boolean.sl_bathroom_auto_transition
-            name: Auto Transition
-          - entity: input_boolean.sl_bathroom_smooth_transition
-            name: Smooth Transition
-          - entity: input_boolean.sl_bathroom_override
-            name: Override Active
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_weekend_config
+            state: "on"
+        card:
+          type: entities
+          title: Weekend Days
+          entities:
+            - entity: input_boolean.sl_weekend_monday
+              name: Monday
+            - entity: input_boolean.sl_weekend_tuesday
+              name: Tuesday
+            - entity: input_boolean.sl_weekend_wednesday
+              name: Wednesday
+            - entity: input_boolean.sl_weekend_thursday
+              name: Thursday
+            - entity: input_boolean.sl_weekend_friday
+              name: Friday
+            - entity: input_boolean.sl_weekend_saturday
+              name: Saturday
+            - entity: input_boolean.sl_weekend_sunday
+              name: Sunday
 
-      - type: entities
-        title: Bedroom
-        icon: mdi:bed
-        show_header_toggle: false
-        entities:
-          - type: section
-            label: Motion Triggers
-          - entity: input_boolean.sl_bedroom_motion_morning
-            name: Morning
-          - entity: input_boolean.sl_bedroom_motion_day
-            name: Day
-          - entity: input_boolean.sl_bedroom_motion_evening
-            name: Evening
-          - entity: input_boolean.sl_bedroom_motion_night
-            name: Night
-          - type: section
-            label: Settings
-          - entity: input_number.sl_bedroom_motion_timeout
-            name: Motion Timeout
-          - entity: input_boolean.sl_bedroom_auto_transition
-            name: Auto Transition
-          - entity: input_boolean.sl_bedroom_smooth_transition
-            name: Smooth Transition
-          - entity: input_boolean.sl_bedroom_override
-            name: Override Active
+      # ── Rooms ──────────────────────────────────────────────
 
+      # Bathroom
       - type: entities
-        title: Entrance Lights
-        icon: mdi:door
-        show_header_toggle: false
         entities:
-          - type: section
-            label: Motion Triggers
-          - entity: input_boolean.sl_entrance_lights_motion_morning
-            name: Morning
-          - entity: input_boolean.sl_entrance_lights_motion_day
-            name: Day
-          - entity: input_boolean.sl_entrance_lights_motion_evening
-            name: Evening
-          - entity: input_boolean.sl_entrance_lights_motion_night
-            name: Night
-          - type: section
-            label: Settings
-          - entity: input_number.sl_entrance_lights_motion_timeout
-            name: Motion Timeout
-          - entity: input_boolean.sl_entrance_lights_auto_transition
-            name: Auto Transition
-          - entity: input_boolean.sl_entrance_lights_smooth_transition
-            name: Smooth Transition
-          - entity: input_boolean.sl_entrance_lights_override
-            name: Override Active
+          - entity: input_boolean.sl_show_bathroom
+            name: Bathroom
+            icon: mdi:shower
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_bathroom
+            state: "on"
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Motion Triggers
+            - entity: input_boolean.sl_bathroom_motion_morning
+              name: Morning
+            - entity: input_boolean.sl_bathroom_motion_day
+              name: Day
+            - entity: input_boolean.sl_bathroom_motion_evening
+              name: Evening
+            - entity: input_boolean.sl_bathroom_motion_night
+              name: Night
+            - type: section
+              label: Settings
+            - entity: input_number.sl_bathroom_motion_timeout
+              name: Motion Timeout
+            - entity: input_boolean.sl_bathroom_auto_transition
+              name: Auto Transition
+            - entity: input_boolean.sl_bathroom_smooth_transition
+              name: Smooth Transition
+            - entity: input_boolean.sl_bathroom_override
+              name: Override Active
 
+      # Bedroom
       - type: entities
-        title: Hallway
-        icon: mdi:door-sliding
-        show_header_toggle: false
         entities:
-          - type: section
-            label: Motion Triggers
-          - entity: input_boolean.sl_hallway_motion_morning
-            name: Morning
-          - entity: input_boolean.sl_hallway_motion_day
-            name: Day
-          - entity: input_boolean.sl_hallway_motion_evening
-            name: Evening
-          - entity: input_boolean.sl_hallway_motion_night
-            name: Night
-          - type: section
-            label: Settings
-          - entity: input_number.sl_hallway_motion_timeout
-            name: Motion Timeout
-          - entity: input_boolean.sl_hallway_auto_transition
-            name: Auto Transition
-          - entity: input_boolean.sl_hallway_smooth_transition
-            name: Smooth Transition
-          - entity: input_boolean.sl_hallway_override
-            name: Override Active
+          - entity: input_boolean.sl_show_bedroom
+            name: Bedroom
+            icon: mdi:bed
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_bedroom
+            state: "on"
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Motion Triggers
+            - entity: input_boolean.sl_bedroom_motion_morning
+              name: Morning
+            - entity: input_boolean.sl_bedroom_motion_day
+              name: Day
+            - entity: input_boolean.sl_bedroom_motion_evening
+              name: Evening
+            - entity: input_boolean.sl_bedroom_motion_night
+              name: Night
+            - type: section
+              label: Settings
+            - entity: input_number.sl_bedroom_motion_timeout
+              name: Motion Timeout
+            - entity: input_boolean.sl_bedroom_auto_transition
+              name: Auto Transition
+            - entity: input_boolean.sl_bedroom_smooth_transition
+              name: Smooth Transition
+            - entity: input_boolean.sl_bedroom_override
+              name: Override Active
 
+      # Entrance Lights
       - type: entities
-        title: Kitchen
-        icon: mdi:stove
-        show_header_toggle: false
         entities:
-          - type: section
-            label: Motion Triggers
-          - entity: input_boolean.sl_kitchen_motion_morning
-            name: Morning
-          - entity: input_boolean.sl_kitchen_motion_day
-            name: Day
-          - entity: input_boolean.sl_kitchen_motion_evening
-            name: Evening
-          - entity: input_boolean.sl_kitchen_motion_night
-            name: Night
-          - type: section
-            label: Settings
-          - entity: input_number.sl_kitchen_motion_timeout
-            name: Motion Timeout
-          - entity: input_boolean.sl_kitchen_auto_transition
-            name: Auto Transition
-          - entity: input_boolean.sl_kitchen_smooth_transition
-            name: Smooth Transition
-          - entity: input_boolean.sl_kitchen_override
-            name: Override Active
+          - entity: input_boolean.sl_show_entrance_lights
+            name: Entrance
+            icon: mdi:door
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_entrance_lights
+            state: "on"
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Motion Triggers
+            - entity: input_boolean.sl_entrance_lights_motion_morning
+              name: Morning
+            - entity: input_boolean.sl_entrance_lights_motion_day
+              name: Day
+            - entity: input_boolean.sl_entrance_lights_motion_evening
+              name: Evening
+            - entity: input_boolean.sl_entrance_lights_motion_night
+              name: Night
+            - type: section
+              label: Settings
+            - entity: input_number.sl_entrance_lights_motion_timeout
+              name: Motion Timeout
+            - entity: input_boolean.sl_entrance_lights_auto_transition
+              name: Auto Transition
+            - entity: input_boolean.sl_entrance_lights_smooth_transition
+              name: Smooth Transition
+            - entity: input_boolean.sl_entrance_lights_override
+              name: Override Active
 
+      # Hallway
       - type: entities
-        title: Living Room
-        icon: mdi:sofa
-        show_header_toggle: false
         entities:
-          - type: section
-            label: Motion Triggers
-          - entity: input_boolean.sl_living_room_motion_morning
-            name: Morning
-          - entity: input_boolean.sl_living_room_motion_day
-            name: Day
-          - entity: input_boolean.sl_living_room_motion_evening
-            name: Evening
-          - entity: input_boolean.sl_living_room_motion_night
-            name: Night
-          - type: section
-            label: Settings
-          - entity: input_number.sl_living_room_motion_timeout
-            name: Motion Timeout
-          - entity: input_boolean.sl_living_room_auto_transition
-            name: Auto Transition
-          - entity: input_boolean.sl_living_room_smooth_transition
-            name: Smooth Transition
-          - entity: input_boolean.sl_living_room_override
-            name: Override Active
+          - entity: input_boolean.sl_show_hallway
+            name: Hallway
+            icon: mdi:door-sliding
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_hallway
+            state: "on"
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Motion Triggers
+            - entity: input_boolean.sl_hallway_motion_morning
+              name: Morning
+            - entity: input_boolean.sl_hallway_motion_day
+              name: Day
+            - entity: input_boolean.sl_hallway_motion_evening
+              name: Evening
+            - entity: input_boolean.sl_hallway_motion_night
+              name: Night
+            - type: section
+              label: Settings
+            - entity: input_number.sl_hallway_motion_timeout
+              name: Motion Timeout
+            - entity: input_boolean.sl_hallway_auto_transition
+              name: Auto Transition
+            - entity: input_boolean.sl_hallway_smooth_transition
+              name: Smooth Transition
+            - entity: input_boolean.sl_hallway_override
+              name: Override Active
+
+      # Kitchen
+      - type: entities
+        entities:
+          - entity: input_boolean.sl_show_kitchen
+            name: Kitchen
+            icon: mdi:stove
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_kitchen
+            state: "on"
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Motion Triggers
+            - entity: input_boolean.sl_kitchen_motion_morning
+              name: Morning
+            - entity: input_boolean.sl_kitchen_motion_day
+              name: Day
+            - entity: input_boolean.sl_kitchen_motion_evening
+              name: Evening
+            - entity: input_boolean.sl_kitchen_motion_night
+              name: Night
+            - type: section
+              label: Settings
+            - entity: input_number.sl_kitchen_motion_timeout
+              name: Motion Timeout
+            - entity: input_boolean.sl_kitchen_auto_transition
+              name: Auto Transition
+            - entity: input_boolean.sl_kitchen_smooth_transition
+              name: Smooth Transition
+            - entity: input_boolean.sl_kitchen_override
+              name: Override Active
+
+      # Living Room
+      - type: entities
+        entities:
+          - entity: input_boolean.sl_show_living_room
+            name: Living Room
+            icon: mdi:sofa
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_living_room
+            state: "on"
+        card:
+          type: entities
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Motion Triggers
+            - entity: input_boolean.sl_living_room_motion_morning
+              name: Morning
+            - entity: input_boolean.sl_living_room_motion_day
+              name: Day
+            - entity: input_boolean.sl_living_room_motion_evening
+              name: Evening
+            - entity: input_boolean.sl_living_room_motion_night
+              name: Night
+            - type: section
+              label: Settings
+            - entity: input_number.sl_living_room_motion_timeout
+              name: Motion Timeout
+            - entity: input_boolean.sl_living_room_auto_transition
+              name: Auto Transition
+            - entity: input_boolean.sl_living_room_smooth_transition
+              name: Smooth Transition
+            - entity: input_boolean.sl_living_room_override
+              name: Override Active

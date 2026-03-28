@@ -27,3 +27,26 @@ sl_weekend_saturday:
 sl_weekend_sunday:
   name: "SL: Sunday is Weekend"
   icon: mdi:calendar
+
+# Dashboard UI toggles (show/hide sections)
+sl_show_weekend_config:
+  name: "SL: Configure Weekend Days"
+  icon: mdi:calendar-edit
+sl_show_bathroom:
+  name: "SL: Bathroom Settings"
+  icon: mdi:chevron-down
+sl_show_bedroom:
+  name: "SL: Bedroom Settings"
+  icon: mdi:chevron-down
+sl_show_entrance_lights:
+  name: "SL: Entrance Settings"
+  icon: mdi:chevron-down
+sl_show_hallway:
+  name: "SL: Hallway Settings"
+  icon: mdi:chevron-down
+sl_show_kitchen:
+  name: "SL: Kitchen Settings"
+  icon: mdi:chevron-down
+sl_show_living_room:
+  name: "SL: Living Room Settings"
+  icon: mdi:chevron-down
