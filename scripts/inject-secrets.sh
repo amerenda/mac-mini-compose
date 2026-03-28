@@ -150,6 +150,55 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
+# ── Update Komodo git provider PAT ──────────────────────────────────────────
+
+log "Updating Komodo git provider PAT..."
+ADMIN_PASS=$(cat "$COMPOSE_DIR/komodo/secrets/komodo-dean-admin-password" 2>/dev/null)
+GITOPS_PAT=$(cat /etc/komodo/runner-secrets/github-pat-k3s-dean-gitops 2>/dev/null)
+
+if [[ -n "$ADMIN_PASS" ]] && [[ -n "$GITOPS_PAT" ]]; then
+    # Wait for Komodo to be reachable (may not be up yet at boot)
+    KOMODO_UP=false
+    for i in $(seq 1 30); do
+        if curl -sf http://localhost:9120 >/dev/null 2>&1; then
+            KOMODO_UP=true
+            break
+        fi
+        sleep 2
+    done
+
+    if "$KOMODO_UP"; then
+        JWT=$(curl -sf http://localhost:9120/auth/login/LoginLocalUser \
+            -H 'Content-Type: application/json' \
+            -d "{\"username\":\"admin\",\"password\":\"${ADMIN_PASS}\"}" \
+            | /opt/homebrew/bin/jq -r '.data.jwt')
+
+        if [[ -n "$JWT" ]] && [[ "$JWT" != "null" ]]; then
+            PROVIDER_ID=$(curl -sf http://localhost:9120/read/ListGitProviderAccounts \
+                -H 'Content-Type: application/json' \
+                -H "Authorization: $JWT" \
+                -d '{}' | /opt/homebrew/bin/jq -r '.[0]._id["$oid"] // empty')
+
+            if [[ -n "$PROVIDER_ID" ]]; then
+                curl -sf http://localhost:9120/write/UpdateGitProviderAccount \
+                    -H 'Content-Type: application/json' \
+                    -H "Authorization: $JWT" \
+                    -d "{\"id\":\"${PROVIDER_ID}\",\"account\":{\"domain\":\"github.com\",\"https\":true,\"username\":\"amerenda\",\"token\":\"${GITOPS_PAT}\"}}" \
+                    >/dev/null 2>&1 && log "Komodo git provider PAT updated." \
+                    || log "WARN: failed to update Komodo git provider PAT"
+            else
+                log "No git provider account found in Komodo, skipping PAT update"
+            fi
+        else
+            log "WARN: failed to authenticate with Komodo API"
+        fi
+    else
+        log "Komodo not reachable after 60s, skipping PAT update (will sync on next run)"
+    fi
+else
+    log "WARN: missing admin password or PAT, skipping Komodo PAT update"
+fi
+
 # ── Done ────────────────────────────────────────────────────────────────────
 
 if [[ "$ERRORS" -gt 0 ]]; then
