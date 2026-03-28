@@ -14,31 +14,42 @@ views:
           - entity: input_select.sl_house_mode
             name: House Mode
 
-      # ── Schedule ───────────────────────────────────────────
-      - type: horizontal-stack
-        cards:
-          - type: entities
-            title: Weekday
-            entities:
-              - entity: input_datetime.sl_morning_start_weekday
-                name: Morning
-              - entity: input_datetime.sl_day_start_weekday
-                name: Day
-              - entity: input_datetime.sl_evening_start_weekday
-                name: Evening
-              - entity: input_datetime.sl_night_start_weekday
-                name: Night
-          - type: entities
-            title: Weekend
-            entities:
-              - entity: input_datetime.sl_morning_start_weekend
-                name: Morning
-              - entity: input_datetime.sl_day_start_weekend
-                name: Day
-              - entity: input_datetime.sl_evening_start_weekend
-                name: Evening
-              - entity: input_datetime.sl_night_start_weekend
-                name: Night
+      # ── Schedule (collapsible) ─────────────────────────────
+      - type: entities
+        entities:
+          - entity: input_boolean.sl_show_schedule
+            name: Edit Schedule
+            icon: mdi:clock-edit-outline
+
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_schedule
+            state: "on"
+        card:
+          type: vertical-stack
+          cards:
+            - type: entities
+              title: Weekday Schedule
+              entities:
+                - entity: input_datetime.sl_morning_start_weekday
+                  name: Morning
+                - entity: input_datetime.sl_day_start_weekday
+                  name: Day
+                - entity: input_datetime.sl_evening_start_weekday
+                  name: Evening
+                - entity: input_datetime.sl_night_start_weekday
+                  name: Night
+            - type: entities
+              title: Weekend Schedule
+              entities:
+                - entity: input_datetime.sl_morning_start_weekend
+                  name: Morning
+                - entity: input_datetime.sl_day_start_weekend
+                  name: Day
+                - entity: input_datetime.sl_evening_start_weekend
+                  name: Evening
+                - entity: input_datetime.sl_night_start_weekend
+                  name: Night
 
       # ── Weekend Days (collapsible) ─────────────────────────
       - type: entities
@@ -83,8 +94,6 @@ views:
             state: "Bathroom"
         card:
           type: entities
-          title: Bathroom
-          icon: mdi:shower
           show_header_toggle: false
           entities:
             - type: section
@@ -115,8 +124,6 @@ views:
             state: "Bedroom"
         card:
           type: entities
-          title: Bedroom
-          icon: mdi:bed
           show_header_toggle: false
           entities:
             - type: section
@@ -147,8 +154,6 @@ views:
             state: "Entrance"
         card:
           type: entities
-          title: Entrance Lights
-          icon: mdi:door
           show_header_toggle: false
           entities:
             - type: section
@@ -179,8 +184,6 @@ views:
             state: "Hallway"
         card:
           type: entities
-          title: Hallway
-          icon: mdi:door-sliding
           show_header_toggle: false
           entities:
             - type: section
@@ -211,8 +214,6 @@ views:
             state: "Kitchen"
         card:
           type: entities
-          title: Kitchen
-          icon: mdi:stove
           show_header_toggle: false
           entities:
             - type: section
@@ -243,8 +244,6 @@ views:
             state: "Living Room"
         card:
           type: entities
-          title: Living Room
-          icon: mdi:sofa
           show_header_toggle: false
           entities:
             - type: section

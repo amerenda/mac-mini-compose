@@ -28,7 +28,10 @@ sl_weekend_sunday:
   name: "SL: Sunday is Weekend"
   icon: mdi:calendar
 
-# Dashboard UI toggle
+# Dashboard UI toggles
+sl_show_schedule:
+  name: "SL: Show Schedule"
+  icon: mdi:clock-edit-outline
 sl_show_weekend_config:
   name: "SL: Configure Weekend Days"
   icon: mdi:calendar-edit
