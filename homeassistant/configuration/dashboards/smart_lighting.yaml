@@ -114,6 +114,8 @@ views:
               name: Auto Transition
             - entity: input_boolean.sl_bathroom_smooth_transition
               name: Smooth Transition
+            - entity: input_number.sl_bathroom_smooth_transition_duration
+              name: Transition Duration (min)
             - entity: input_boolean.sl_bathroom_override
               name: Override Active
 
@@ -144,6 +146,8 @@ views:
               name: Auto Transition
             - entity: input_boolean.sl_bedroom_smooth_transition
               name: Smooth Transition
+            - entity: input_number.sl_bedroom_smooth_transition_duration
+              name: Transition Duration (min)
             - entity: input_boolean.sl_bedroom_override
               name: Override Active
 
@@ -174,6 +178,8 @@ views:
               name: Auto Transition
             - entity: input_boolean.sl_entrance_lights_smooth_transition
               name: Smooth Transition
+            - entity: input_number.sl_entrance_lights_smooth_transition_duration
+              name: Transition Duration (min)
             - entity: input_boolean.sl_entrance_lights_override
               name: Override Active
 
@@ -204,6 +210,8 @@ views:
               name: Auto Transition
             - entity: input_boolean.sl_hallway_smooth_transition
               name: Smooth Transition
+            - entity: input_number.sl_hallway_smooth_transition_duration
+              name: Transition Duration (min)
             - entity: input_boolean.sl_hallway_override
               name: Override Active
 
@@ -234,6 +242,8 @@ views:
               name: Auto Transition
             - entity: input_boolean.sl_kitchen_smooth_transition
               name: Smooth Transition
+            - entity: input_number.sl_kitchen_smooth_transition_duration
+              name: Transition Duration (min)
             - entity: input_boolean.sl_kitchen_override
               name: Override Active
 
@@ -264,5 +274,7 @@ views:
               name: Auto Transition
             - entity: input_boolean.sl_living_room_smooth_transition
               name: Smooth Transition
+            - entity: input_number.sl_living_room_smooth_transition_duration
+              name: Transition Duration (min)
             - entity: input_boolean.sl_living_room_override
               name: Override Active

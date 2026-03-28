@@ -9,3 +9,13 @@ sl_bathroom_motion_timeout:
   unit_of_measurement: min
   icon: mdi:timer-outline
   mode: box
+
+sl_bathroom_smooth_transition_duration:
+  name: "SL: Bathroom — Transition Duration (min)"
+  min: 1
+  max: 30
+  step: 1
+  initial: 10
+  unit_of_measurement: min
+  icon: mdi:timer-sand
+  mode: box
