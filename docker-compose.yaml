@@ -50,27 +50,16 @@ services:
   #     retries: 3
 
   # ============================================================
-  # HACS — one-shot install into the HA config volume
-  # To update: bump HACS_VERSION, push, redeploy.
+  # HA Init — one-shot: installs HACS + frontend cards
+  # To update: bump versions in homeassistant/scripts/ha-init.sh
   # ============================================================
   hacs-init:
     image: alpine:3
     container_name: hacs-init
-    environment:
-      HACS_VERSION: "2.0.5"
     volumes:
       - ha-config:/config
-    command: >
-      sh -c '
-      MARKER=/config/custom_components/hacs/.version
-      && if [ -f "$$MARKER" ] && [ "$$(cat $$MARKER)" = "$$HACS_VERSION" ]; then echo "HACS $$HACS_VERSION already installed"; exit 0; fi
-      && apk add --no-cache wget unzip
-      && wget -qO /tmp/hacs.zip "https://github.com/hacs/integration/releases/download/$$HACS_VERSION/hacs.zip"
-      && rm -rf /config/custom_components/hacs
-      && mkdir -p /config/custom_components/hacs
-      && unzip -o /tmp/hacs.zip -d /config/custom_components/hacs
-      && echo "$$HACS_VERSION" > "$$MARKER"
-      && echo "HACS $$HACS_VERSION installed"'
+      - ./homeassistant/scripts/ha-init.sh:/ha-init.sh:ro
+    command: ["sh", "/ha-init.sh"]
     labels:
       komodo.skip:
 
