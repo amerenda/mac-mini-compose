@@ -8,3 +8,15 @@ sl_house_mode:
     - Guest
   initial: Home
   icon: mdi:home-account
+
+sl_room_selector:
+  name: "SL: Room"
+  options:
+    - Bathroom
+    - Bedroom
+    - Entrance
+    - Hallway
+    - Kitchen
+    - Living Room
+  initial: Living Room
+  icon: mdi:floor-plan

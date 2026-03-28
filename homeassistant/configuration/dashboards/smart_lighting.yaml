@@ -4,7 +4,7 @@ views:
     path: schedule
     icon: mdi:lightbulb-auto
     cards:
-      # ── Top Bar: Status & Controls ─────────────────────────
+      # ── Top Bar ────────────────────────────────────────────
       - type: entities
         entities:
           - entity: input_boolean.sl_enabled
@@ -14,7 +14,7 @@ views:
           - entity: input_select.sl_house_mode
             name: House Mode
 
-      # ── Schedule (always visible) ──────────────────────────
+      # ── Schedule ───────────────────────────────────────────
       - type: horizontal-stack
         cards:
           - type: entities
@@ -53,7 +53,6 @@ views:
             state: "on"
         card:
           type: entities
-          title: Weekend Days
           entities:
             - entity: input_boolean.sl_weekend_monday
               name: Monday
@@ -70,20 +69,22 @@ views:
             - entity: input_boolean.sl_weekend_sunday
               name: Sunday
 
-      # ── Rooms ──────────────────────────────────────────────
-
-      # Bathroom
+      # ── Room Selector ──────────────────────────────────────
       - type: entities
+        title: Room Settings
         entities:
-          - entity: input_boolean.sl_show_bathroom
-            name: Bathroom
-            icon: mdi:shower
+          - entity: input_select.sl_room_selector
+            name: Room
+
+      # ── Room Settings: Bathroom ────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_boolean.sl_show_bathroom
-            state: "on"
+          - entity: input_select.sl_room_selector
+            state: "Bathroom"
         card:
           type: entities
+          title: Bathroom
+          icon: mdi:shower
           show_header_toggle: false
           entities:
             - type: section
@@ -99,7 +100,7 @@ views:
             - type: section
               label: Settings
             - entity: input_number.sl_bathroom_motion_timeout
-              name: Motion Timeout
+              name: Motion Timeout (min)
             - entity: input_boolean.sl_bathroom_auto_transition
               name: Auto Transition
             - entity: input_boolean.sl_bathroom_smooth_transition
@@ -107,18 +108,15 @@ views:
             - entity: input_boolean.sl_bathroom_override
               name: Override Active
 
-      # Bedroom
-      - type: entities
-        entities:
-          - entity: input_boolean.sl_show_bedroom
-            name: Bedroom
-            icon: mdi:bed
+      # ── Room Settings: Bedroom ─────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_boolean.sl_show_bedroom
-            state: "on"
+          - entity: input_select.sl_room_selector
+            state: "Bedroom"
         card:
           type: entities
+          title: Bedroom
+          icon: mdi:bed
           show_header_toggle: false
           entities:
             - type: section
@@ -134,7 +132,7 @@ views:
             - type: section
               label: Settings
             - entity: input_number.sl_bedroom_motion_timeout
-              name: Motion Timeout
+              name: Motion Timeout (min)
             - entity: input_boolean.sl_bedroom_auto_transition
               name: Auto Transition
             - entity: input_boolean.sl_bedroom_smooth_transition
@@ -142,18 +140,15 @@ views:
             - entity: input_boolean.sl_bedroom_override
               name: Override Active
 
-      # Entrance Lights
-      - type: entities
-        entities:
-          - entity: input_boolean.sl_show_entrance_lights
-            name: Entrance
-            icon: mdi:door
+      # ── Room Settings: Entrance ────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_boolean.sl_show_entrance_lights
-            state: "on"
+          - entity: input_select.sl_room_selector
+            state: "Entrance"
         card:
           type: entities
+          title: Entrance Lights
+          icon: mdi:door
           show_header_toggle: false
           entities:
             - type: section
@@ -169,7 +164,7 @@ views:
             - type: section
               label: Settings
             - entity: input_number.sl_entrance_lights_motion_timeout
-              name: Motion Timeout
+              name: Motion Timeout (min)
             - entity: input_boolean.sl_entrance_lights_auto_transition
               name: Auto Transition
             - entity: input_boolean.sl_entrance_lights_smooth_transition
@@ -177,18 +172,15 @@ views:
             - entity: input_boolean.sl_entrance_lights_override
               name: Override Active
 
-      # Hallway
-      - type: entities
-        entities:
-          - entity: input_boolean.sl_show_hallway
-            name: Hallway
-            icon: mdi:door-sliding
+      # ── Room Settings: Hallway ─────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_boolean.sl_show_hallway
-            state: "on"
+          - entity: input_select.sl_room_selector
+            state: "Hallway"
         card:
           type: entities
+          title: Hallway
+          icon: mdi:door-sliding
           show_header_toggle: false
           entities:
             - type: section
@@ -204,7 +196,7 @@ views:
             - type: section
               label: Settings
             - entity: input_number.sl_hallway_motion_timeout
-              name: Motion Timeout
+              name: Motion Timeout (min)
             - entity: input_boolean.sl_hallway_auto_transition
               name: Auto Transition
             - entity: input_boolean.sl_hallway_smooth_transition
@@ -212,18 +204,15 @@ views:
             - entity: input_boolean.sl_hallway_override
               name: Override Active
 
-      # Kitchen
-      - type: entities
-        entities:
-          - entity: input_boolean.sl_show_kitchen
-            name: Kitchen
-            icon: mdi:stove
+      # ── Room Settings: Kitchen ─────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_boolean.sl_show_kitchen
-            state: "on"
+          - entity: input_select.sl_room_selector
+            state: "Kitchen"
         card:
           type: entities
+          title: Kitchen
+          icon: mdi:stove
           show_header_toggle: false
           entities:
             - type: section
@@ -239,7 +228,7 @@ views:
             - type: section
               label: Settings
             - entity: input_number.sl_kitchen_motion_timeout
-              name: Motion Timeout
+              name: Motion Timeout (min)
             - entity: input_boolean.sl_kitchen_auto_transition
               name: Auto Transition
             - entity: input_boolean.sl_kitchen_smooth_transition
@@ -247,18 +236,15 @@ views:
             - entity: input_boolean.sl_kitchen_override
               name: Override Active
 
-      # Living Room
-      - type: entities
-        entities:
-          - entity: input_boolean.sl_show_living_room
-            name: Living Room
-            icon: mdi:sofa
+      # ── Room Settings: Living Room ─────────────────────────
       - type: conditional
         conditions:
-          - entity: input_boolean.sl_show_living_room
-            state: "on"
+          - entity: input_select.sl_room_selector
+            state: "Living Room"
         card:
           type: entities
+          title: Living Room
+          icon: mdi:sofa
           show_header_toggle: false
           entities:
             - type: section
@@ -274,7 +260,7 @@ views:
             - type: section
               label: Settings
             - entity: input_number.sl_living_room_motion_timeout
-              name: Motion Timeout
+              name: Motion Timeout (min)
             - entity: input_boolean.sl_living_room_auto_transition
               name: Auto Transition
             - entity: input_boolean.sl_living_room_smooth_transition

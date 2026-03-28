@@ -8,4 +8,4 @@ sl_entrance_lights_motion_timeout:
   initial: 5
   unit_of_measurement: min
   icon: mdi:timer-outline
-  mode: slider
+  mode: box
