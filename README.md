@@ -55,6 +55,16 @@ docker cp /path/to/ha-export/. homeassistant:/config/
 docker compose start homeassistant
 ```
 
+## Known Issues
+
+### OrbStack host networking broken after reboot (v2.0.5)
+
+OrbStack's `network_mode: host` does not correctly bridge containers to the LAN after a macOS reboot. Containers can reach the host but not other LAN devices (e.g., Hue Bridge, cameras). This breaks Home Assistant device integrations.
+
+**Workaround:** A LaunchAgent (`com.local.orbstack-lan-fix`) is installed by the Ansible playbook. It waits for OrbStack to start, tests LAN connectivity from a container, and restarts OrbStack if broken. This is a no-op if networking is already working.
+
+**Affected version:** OrbStack 2.0.5 (2000500). Remove the workaround if a future OrbStack update fixes this.
+
 ## Health Check
 
 ```bash
