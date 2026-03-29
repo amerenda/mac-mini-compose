@@ -22,7 +22,8 @@ ignore_services = ["hacs-init"]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
 PIHOLE_PW=$(bws secret get c8157be0-0195-41f3-b3c6-b37100d27645 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-echo "PIHOLE_WEBPASSWORD=$PIHOLE_PW" > .env
+AGENT_KB_PW=$(bws secret get REPLACE_WITH_BWS_UUID --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
+printf 'PIHOLE_WEBPASSWORD=%s\nAGENT_KB_PASSWORD=%s\n' "$PIHOLE_PW" "$AGENT_KB_PW" > .env
 mkdir -p bind9/keys
 BIND_KEY=$(bws secret get 9904dc3d-6dd4-4727-907e-b3700178ea19 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
 printf 'key "externaldns-key." { algorithm hmac-sha256; secret "%s"; };\n' "$BIND_KEY" > bind9/keys/key.conf

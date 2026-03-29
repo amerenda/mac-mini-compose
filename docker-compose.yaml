@@ -133,6 +133,28 @@ services:
     command: --preload-model ok_nabu
 
   # ============================================================
+  # Agent KB — PostgreSQL + pgvector for agent framework
+  # ============================================================
+  agent-kb:
+    image: pgvector/pgvector:pg16
+    container_name: agent-kb
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    volumes:
+      - agent-kb-data:/var/lib/postgresql/data
+      - ./agent-kb/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    environment:
+      POSTGRES_DB: agent_kb
+      POSTGRES_USER: agent_kb
+      POSTGRES_PASSWORD: "${AGENT_KB_PASSWORD}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agent_kb"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
   # Monitoring exporters — scraped by Prometheus on k3s
   # ============================================================
   node-exporter:
@@ -165,6 +187,7 @@ services:
 volumes:
   # pihole-data:
   # pihole-dnsmasq:
+  agent-kb-data:
   ha-config:
   whisper-data:
   piper-data:

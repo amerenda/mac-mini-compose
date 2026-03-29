@@ -42,3 +42,11 @@ services:
       REPO_URL: https://github.com/amerenda/llm-agents
       RUNNER_NAME: mini-llm-agents
       LABELS: self-hosted,linux,arm64,docker,mac-mini
+
+  runner-mycroft:
+    <<: *runner-common
+    container_name: runner-mycroft
+    environment:
+      REPO_URL: https://github.com/amerenda/mycroft
+      RUNNER_NAME: mini-mycroft
+      LABELS: self-hosted,linux,arm64,docker,mac-mini
