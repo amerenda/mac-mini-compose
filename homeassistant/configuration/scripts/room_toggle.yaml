@@ -68,7 +68,7 @@ room_toggle:
         - service: "logbook.log"
           data:
             name: "room_toggle"
-            message: "Turning ON {{ id_list[0] if id_list|length>0 else 'target_lights' }} via scheduled_light_on"
-        - service: "script.scheduled_light_on"
-          data:
-            fallback_lights: "{{ id_list[0] if id_list|length>0 else '' }}"
+            message: "Turning ON {{ id_list }} (SL v2 will apply scene)"
+        - service: "light.turn_on"
+          target:
+            entity_id: "{{ id_list }}"

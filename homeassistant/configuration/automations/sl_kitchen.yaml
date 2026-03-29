@@ -4,14 +4,13 @@ id: sl_kitchen_light_on
 trigger:
   - platform: state
     entity_id: light.kitchen
+    from: "off"
     to: "on"
 condition:
   - condition: state
     entity_id: input_boolean.sl_enabled
     state: "on"
 action:
-  - delay:
-      milliseconds: 500
   - service: script.sl_room_on
     data:
       room: kitchen
