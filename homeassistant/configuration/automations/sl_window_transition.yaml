@@ -53,4 +53,5 @@ action:
             - service: script.sl_room_on
               data:
                 room: "{{ room }}"
+                is_window_transition: true
 mode: single
