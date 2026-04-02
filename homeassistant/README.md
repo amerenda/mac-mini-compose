@@ -127,4 +127,4 @@ The Smart Lighting dashboard uses custom frontend cards, all installed automatic
 | Vertical Stack In Card | v1.0.1 | Seamless card grouping |
 | Streamline Card | v0.2.0 | Template reuse for DRY YAML (future use) |
 
-To update a card version, edit `homeassistant/scripts/ha-init.sh`, push, and redeploy.
+To update a card version, edit `homeassistant/scripts/ha-init.sh`, push, and redeploy. The host-side sync script picks up changes within 60 seconds.
