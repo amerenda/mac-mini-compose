@@ -14,7 +14,7 @@ LOG="/tmp/komodo-stack-sync.log"
 cd "$STACK_DIR"
 
 # Capture directory listing before pull
-DIRS_BEFORE=$(find . -type d | sort | md5)
+DIRS_BEFORE=$(find . -type d | sort | /sbin/md5 -q)
 
 # Fetch and reset to match remote (same as what Komodo periphery would do)
 git fetch --quiet origin main 2>/dev/null || exit 0
@@ -27,7 +27,7 @@ REMOTE=$(git rev-parse origin/main)
 git reset --hard origin/main --quiet
 
 # Capture directory listing after pull
-DIRS_AFTER=$(find . -type d | sort | md5)
+DIRS_AFTER=$(find . -type d | sort | /sbin/md5 -q)
 
 echo "$(date): synced $LOCAL -> $REMOTE" >> "$LOG"
 
