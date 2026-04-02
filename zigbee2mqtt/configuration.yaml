@@ -10,9 +10,9 @@ frontend:
   port: 8099
 
 advanced:
-  network_key: GENERATE
-  pan_id: GENERATE
-  ext_pan_id: GENERATE
+  network_key: [103, 180, 81, 232, 13, 30, 98, 37, 50, 18, 115, 84, 121, 227, 165, 205]
+  pan_id: 0xcbf6
+  ext_pan_id: [71, 173, 123, 31, 242, 227, 228, 205]
   channel: 15
   homeassistant: true
   last_seen: ISO_8601
