@@ -25,3 +25,9 @@ availability:
 
 device_options:
   retain: true
+
+groups:
+  '1':
+    friendly_name: living_room
+    devices:
+      - '0x001788010dcbac08/1'  # fixture
