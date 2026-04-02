@@ -11,6 +11,9 @@ LOG="/tmp/komodo-stack-sync.log"
 # Skip if stack dir doesn't exist or isn't a git repo
 [ -d "$STACK_DIR/.git" ] || exit 0
 
+# Rotate log if over 100KB
+[ -f "$LOG" ] && [ "$(stat -f%z "$LOG" 2>/dev/null || echo 0)" -gt 102400 ] && : > "$LOG"
+
 cd "$STACK_DIR"
 
 # Capture directory listing before pull
