@@ -7,7 +7,7 @@ serial:
   adapter: ember
 
 frontend:
-  port: 8080
+  port: 8099
 
 advanced:
   network_key: GENERATE
