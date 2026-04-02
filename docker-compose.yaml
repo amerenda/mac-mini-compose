@@ -178,7 +178,7 @@ services:
       - mosquitto
     volumes:
       - zigbee2mqtt-data:/app/data
-      - ./zigbee2mqtt/configuration.yaml:/app/data/configuration.yaml:ro
+      - ./zigbee2mqtt/configuration.yaml:/app/data/configuration.yaml
     ports:
       - "8080:8080"
     environment:
