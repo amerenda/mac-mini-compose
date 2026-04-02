@@ -153,11 +153,8 @@ lovelace:
       show_in_sidebar: true
       filename: dashboards/views/smart_lighting.yaml
 
-# MQTT broker — Mosquitto exposed on host port 1883
-# HA uses host networking so Docker service names don't resolve; use 127.0.0.1
-mqtt:
-  broker: 127.0.0.1
-  port: 1883
+# MQTT — configured via HA UI (Settings > Integrations > MQTT)
+# Broker: 127.0.0.1:1883 (Mosquitto on host network)
 
 # HTTP reverse proxy
 http:
