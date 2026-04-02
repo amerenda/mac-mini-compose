@@ -154,6 +154,37 @@ services:
       retries: 3
 
   # ============================================================
+  # Mosquitto — MQTT broker (used by Zigbee2MQTT + HA)
+  # ============================================================
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    restart: unless-stopped
+    volumes:
+      - mosquitto-data:/mosquitto/data
+      - ./mosquitto/config:/mosquitto/config:ro
+    ports:
+      - "1883:1883"
+
+  # ============================================================
+  # Zigbee2MQTT — Zigbee coordinator bridge
+  # Connects to SMLIGHT SLZB-06MG24 at 10.100.20.179:6638
+  # ============================================================
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt:latest
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    volumes:
+      - zigbee2mqtt-data:/app/data
+      - ./zigbee2mqtt/configuration.yaml:/app/data/configuration.yaml:ro
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: "America/New_York"
+
+  # ============================================================
   # Monitoring exporters — scraped by Prometheus on k3s
   # ============================================================
   node-exporter:
@@ -190,6 +221,8 @@ volumes:
   ha-config:
   whisper-data:
   piper-data:
+  mosquitto-data:
+  zigbee2mqtt-data:
 
 networks:
   default:

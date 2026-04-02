@@ -1,0 +1,27 @@
+mqtt:
+  base_topic: zigbee2mqtt
+  server: mqtt://mosquitto:1883
+
+serial:
+  port: tcp://10.100.20.179:6638
+  adapter: ember
+
+frontend:
+  port: 8080
+
+advanced:
+  network_key: GENERATE
+  pan_id: GENERATE
+  ext_pan_id: GENERATE
+  channel: 15
+  homeassistant: true
+  last_seen: ISO_8601
+
+availability:
+  active:
+    timeout: 10
+  passive:
+    timeout: 1500
+
+device_options:
+  retain: true
