@@ -178,12 +178,11 @@ services:
       - mosquitto
     volumes:
       - zigbee2mqtt-data:/app/data
-      - ./zigbee2mqtt/configuration.yaml:/app/config/configuration.yaml:ro
+      - ./zigbee2mqtt/configuration.yaml:/app/data/configuration.yaml:ro
     ports:
       - "8099:8099"
     environment:
       TZ: "America/New_York"
-      ZIGBEE2MQTT_CONFIG: /app/config/configuration.yaml
 
   # ============================================================
   # Monitoring exporters — scraped by Prometheus on k3s
