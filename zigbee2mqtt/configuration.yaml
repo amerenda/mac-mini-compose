@@ -26,12 +26,3 @@ availability:
 device_options:
   retain: true
 
-groups:
-  '1':
-    friendly_name: living_room
-    devices:
-      - '0x001788010dcbac08/1'  # fixture
-  '2':
-    friendly_name: bedroom
-    devices:
-      - '0x001788010dccdcdb/1'  # Bedroom1
