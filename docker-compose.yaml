@@ -90,7 +90,7 @@ services:
       - ./homeassistant/configuration/helpers/generated/input_text:/config/helpers/input_text:ro
       - ./homeassistant/configuration/helpers/generated/timer:/config/helpers/timer:ro
       - ./homeassistant/configuration/dashboards:/config/dashboards/views:ro
-      - ./homeassistant/configuration/packages:/config/packages/sl:ro
+      - ./homeassistant/configuration/packages:/config/packages:ro
       - ./homeassistant/configuration/groups.yaml:/config/groups.yaml:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8123/manifest.json"]
