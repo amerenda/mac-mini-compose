@@ -11,10 +11,11 @@ BUBBLE_VERSION="v3.1.4"
 CARD_MOD_VERSION="v4.2.1"
 VSTACK_VERSION="v1.0.1"
 STREAMLINE_VERSION="v0.2.0"
+HUE_LIGHT_VERSION="v1.9.0"
 
 # Combined marker for all components
 MARKER=/config/.ha-init-versions
-EXPECTED="${HACS_VERSION}|${MUSHROOM_VERSION}|${BUBBLE_VERSION}|${CARD_MOD_VERSION}|${VSTACK_VERSION}|${STREAMLINE_VERSION}"
+EXPECTED="${HACS_VERSION}|${MUSHROOM_VERSION}|${BUBBLE_VERSION}|${CARD_MOD_VERSION}|${VSTACK_VERSION}|${STREAMLINE_VERSION}|${HUE_LIGHT_VERSION}"
 
 if [ -f "$MARKER" ] && [ "$(cat "$MARKER")" = "$EXPECTED" ]; then
   echo "All components at expected versions — nothing to do"
@@ -76,6 +77,10 @@ install_card "streamline-card" \
   "https://github.com/brunosabot/streamline-card/releases/download/${STREAMLINE_VERSION}/streamline-card.js" \
   "streamline-card.js" "$STREAMLINE_VERSION"
 
+install_card "hue-like-light-card" \
+  "https://github.com/Gh61/lovelace-hue-like-light-card/releases/download/${HUE_LIGHT_VERSION}/hue-like-light-card.js" \
+  "hue-like-light-card.js" "$HUE_LIGHT_VERSION"
+
 # ── Register lovelace resources ──────────────────────────────
 # Only write if the file doesn't exist or is missing our resources
 RESOURCES_FILE="/config/.storage/lovelace_resources"
@@ -112,6 +117,11 @@ if [ ! -f "$RESOURCES_FILE" ] || ! grep -q "mushroom.js" "$RESOURCES_FILE"; then
         "id": "streamline-card",
         "type": "module",
         "url": "/local/streamline-card.js"
+      },
+      {
+        "id": "hue-like-light-card",
+        "type": "module",
+        "url": "/local/hue-like-light-card.js"
       }
     ]
   }

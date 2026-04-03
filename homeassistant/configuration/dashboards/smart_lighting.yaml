@@ -592,25 +592,52 @@ views:
               icon: mdi:content-copy
               tap_action:
                 action: toggle
+            - type: custom:hue-like-light-card
+              entity: light.living_room_0
+              title: Living Room Light
+              slider: default
             - type: horizontal-stack
               cards:
-                - type: custom:mushroom-light-card
-                  entity: light.living_room_0
-                  name: Light
-                  show_brightness_control: true
-                  show_color_temp_control: true
-                  collapsible_controls: false
-            - type: entities
-              show_header_toggle: false
-              entities:
-                - entity: scene.living_room_morning
+                - type: button
+                  entity: scene.living_room_morning
                   name: Morning
-                - entity: scene.living_room_day
+                  icon: mdi:weather-sunset-up
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.living_room_morning
+                - type: button
+                  entity: scene.living_room_day
                   name: Day
-                - entity: scene.living_room_evening
+                  icon: mdi:weather-sunny
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.living_room_day
+                - type: button
+                  entity: scene.living_room_evening
                   name: Evening
-                - entity: scene.living_room_night
+                  icon: mdi:weather-sunset-down
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.living_room_evening
+                - type: button
+                  entity: scene.living_room_night
                   name: Night
+                  icon: mdi:weather-night
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.living_room_night
 
       # ── Bedroom (Ambiance) ─────────────────────────────────
       - type: conditional
@@ -626,37 +653,60 @@ views:
               icon: mdi:content-copy
               tap_action:
                 action: toggle
+            - type: custom:hue-like-light-card
+              entity: light.bedroom_0
+              title: Light 1
+              slider: default
+            - type: custom:hue-like-light-card
+              entity: light.bedroom_1
+              title: Light 2
+              slider: default
+            - type: custom:hue-like-light-card
+              entity: light.lamp_0
+              title: Lamp
+              slider: default
             - type: horizontal-stack
               cards:
-                - type: custom:mushroom-light-card
-                  entity: light.bedroom_0
-                  name: Light 1
-                  show_brightness_control: true
-                  show_color_temp_control: true
-                  collapsible_controls: false
-                - type: custom:mushroom-light-card
-                  entity: light.bedroom_1
-                  name: Light 2
-                  show_brightness_control: true
-                  show_color_temp_control: true
-                  collapsible_controls: false
-            - type: custom:mushroom-light-card
-              entity: light.lamp_0
-              name: Lamp
-              show_brightness_control: true
-              show_color_temp_control: true
-              collapsible_controls: false
-            - type: entities
-              show_header_toggle: false
-              entities:
-                - entity: scene.bedroom_morning
+                - type: button
+                  entity: scene.bedroom_morning
                   name: Morning
-                - entity: scene.bedroom_day
+                  icon: mdi:weather-sunset-up
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.bedroom_morning
+                - type: button
+                  entity: scene.bedroom_day
                   name: Day
-                - entity: scene.bedroom_evening
+                  icon: mdi:weather-sunny
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.bedroom_day
+                - type: button
+                  entity: scene.bedroom_evening
                   name: Evening
-                - entity: scene.bedroom_night
+                  icon: mdi:weather-sunset-down
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.bedroom_evening
+                - type: button
+                  entity: scene.bedroom_night
                   name: Night
+                  icon: mdi:weather-night
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.bedroom_night
 
       # ── Bathroom (Ambiance) ────────────────────────────────
       - type: conditional
@@ -672,23 +722,52 @@ views:
               icon: mdi:content-copy
               tap_action:
                 action: toggle
-            - type: custom:mushroom-light-card
+            - type: custom:hue-like-light-card
               entity: light.bathroom_0
-              name: Light
-              show_brightness_control: true
-              show_color_temp_control: true
-              collapsible_controls: false
-            - type: entities
-              show_header_toggle: false
-              entities:
-                - entity: scene.bathroom_morning
+              title: Bathroom Light
+              slider: default
+            - type: horizontal-stack
+              cards:
+                - type: button
+                  entity: scene.bathroom_morning
                   name: Morning
-                - entity: scene.bathroom_day
+                  icon: mdi:weather-sunset-up
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.bathroom_morning
+                - type: button
+                  entity: scene.bathroom_day
                   name: Day
-                - entity: scene.bathroom_evening
+                  icon: mdi:weather-sunny
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.bathroom_day
+                - type: button
+                  entity: scene.bathroom_evening
                   name: Evening
-                - entity: scene.bathroom_night
+                  icon: mdi:weather-sunset-down
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.bathroom_evening
+                - type: button
+                  entity: scene.bathroom_night
                   name: Night
+                  icon: mdi:weather-night
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.bathroom_night
 
       # ── Kitchen (Dimmable) ─────────────────────────────────
       - type: conditional
@@ -704,29 +783,56 @@ views:
               icon: mdi:content-copy
               tap_action:
                 action: toggle
+            - type: custom:hue-like-light-card
+              entity: light.kitchen_0
+              title: Light 1
+              slider: default
+            - type: custom:hue-like-light-card
+              entity: light.kitchen_1
+              title: Light 2
+              slider: default
             - type: horizontal-stack
               cards:
-                - type: custom:mushroom-light-card
-                  entity: light.kitchen_0
-                  name: Light 1
-                  show_brightness_control: true
-                  collapsible_controls: false
-                - type: custom:mushroom-light-card
-                  entity: light.kitchen_1
-                  name: Light 2
-                  show_brightness_control: true
-                  collapsible_controls: false
-            - type: entities
-              show_header_toggle: false
-              entities:
-                - entity: scene.kitchen_morning
+                - type: button
+                  entity: scene.kitchen_morning
                   name: Morning
-                - entity: scene.kitchen_day
+                  icon: mdi:weather-sunset-up
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.kitchen_morning
+                - type: button
+                  entity: scene.kitchen_day
                   name: Day
-                - entity: scene.kitchen_evening
+                  icon: mdi:weather-sunny
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.kitchen_day
+                - type: button
+                  entity: scene.kitchen_evening
                   name: Evening
-                - entity: scene.kitchen_night
+                  icon: mdi:weather-sunset-down
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.kitchen_evening
+                - type: button
+                  entity: scene.kitchen_night
                   name: Night
+                  icon: mdi:weather-night
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.kitchen_night
 
       # ── Hallway (Dimmable) ─────────────────────────────────
       - type: conditional
@@ -742,19 +848,49 @@ views:
               icon: mdi:content-copy
               tap_action:
                 action: toggle
-            - type: custom:mushroom-light-card
+            - type: custom:hue-like-light-card
               entity: light.hallway_0
-              name: Light
-              show_brightness_control: true
-              collapsible_controls: false
-            - type: entities
-              show_header_toggle: false
-              entities:
-                - entity: scene.hallway_morning
+              title: Hallway Light
+              slider: default
+            - type: horizontal-stack
+              cards:
+                - type: button
+                  entity: scene.hallway_morning
                   name: Morning
-                - entity: scene.hallway_day
+                  icon: mdi:weather-sunset-up
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.hallway_morning
+                - type: button
+                  entity: scene.hallway_day
                   name: Day
-                - entity: scene.hallway_evening
+                  icon: mdi:weather-sunny
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.hallway_day
+                - type: button
+                  entity: scene.hallway_evening
                   name: Evening
-                - entity: scene.hallway_night
+                  icon: mdi:weather-sunset-down
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.hallway_evening
+                - type: button
+                  entity: scene.hallway_night
                   name: Night
+                  icon: mdi:weather-night
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: scene.turn_on
+                    target:
+                      entity_id: scene.hallway_night
