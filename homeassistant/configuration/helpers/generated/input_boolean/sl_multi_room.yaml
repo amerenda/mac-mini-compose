@@ -1,0 +1,88 @@
+# Smart Lighting v2 — Multi-room config
+# Per switch: which rooms to include when "Multi-Room Scene" action triggers
+# The switch's own room is included by default (toggle off to exclude)
+
+# Living Room switch includes:
+sl_living_room_multi_living_room:
+  name: "SL: LR Multi → Living Room"
+  icon: mdi:sofa
+sl_living_room_multi_bedroom:
+  name: "SL: LR Multi → Bedroom"
+  icon: mdi:bed
+sl_living_room_multi_bathroom:
+  name: "SL: LR Multi → Bathroom"
+  icon: mdi:shower
+sl_living_room_multi_kitchen:
+  name: "SL: LR Multi → Kitchen"
+  icon: mdi:silverware-fork-knife
+sl_living_room_multi_hallway:
+  name: "SL: LR Multi → Hallway"
+  icon: mdi:door-open
+
+# Bedroom switch includes:
+sl_bedroom_multi_living_room:
+  name: "SL: BR Multi → Living Room"
+  icon: mdi:sofa
+sl_bedroom_multi_bedroom:
+  name: "SL: BR Multi → Bedroom"
+  icon: mdi:bed
+sl_bedroom_multi_bathroom:
+  name: "SL: BR Multi → Bathroom"
+  icon: mdi:shower
+sl_bedroom_multi_kitchen:
+  name: "SL: BR Multi → Kitchen"
+  icon: mdi:silverware-fork-knife
+sl_bedroom_multi_hallway:
+  name: "SL: BR Multi → Hallway"
+  icon: mdi:door-open
+
+# Bathroom switch includes:
+sl_bathroom_multi_living_room:
+  name: "SL: BA Multi → Living Room"
+  icon: mdi:sofa
+sl_bathroom_multi_bedroom:
+  name: "SL: BA Multi → Bedroom"
+  icon: mdi:bed
+sl_bathroom_multi_bathroom:
+  name: "SL: BA Multi → Bathroom"
+  icon: mdi:shower
+sl_bathroom_multi_kitchen:
+  name: "SL: BA Multi → Kitchen"
+  icon: mdi:silverware-fork-knife
+sl_bathroom_multi_hallway:
+  name: "SL: BA Multi → Hallway"
+  icon: mdi:door-open
+
+# Kitchen switch includes:
+sl_kitchen_multi_living_room:
+  name: "SL: KI Multi → Living Room"
+  icon: mdi:sofa
+sl_kitchen_multi_bedroom:
+  name: "SL: KI Multi → Bedroom"
+  icon: mdi:bed
+sl_kitchen_multi_bathroom:
+  name: "SL: KI Multi → Bathroom"
+  icon: mdi:shower
+sl_kitchen_multi_kitchen:
+  name: "SL: KI Multi → Kitchen"
+  icon: mdi:silverware-fork-knife
+sl_kitchen_multi_hallway:
+  name: "SL: KI Multi → Hallway"
+  icon: mdi:door-open
+
+# Hallway switch includes:
+sl_hallway_multi_living_room:
+  name: "SL: HL Multi → Living Room"
+  icon: mdi:sofa
+sl_hallway_multi_bedroom:
+  name: "SL: HL Multi → Bedroom"
+  icon: mdi:bed
+sl_hallway_multi_bathroom:
+  name: "SL: HL Multi → Bathroom"
+  icon: mdi:shower
+sl_hallway_multi_kitchen:
+  name: "SL: HL Multi → Kitchen"
+  icon: mdi:silverware-fork-knife
+sl_hallway_multi_hallway:
+  name: "SL: HL Multi → Hallway"
+  icon: mdi:door-open

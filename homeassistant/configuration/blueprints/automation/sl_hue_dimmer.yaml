@@ -144,6 +144,36 @@ action:
             value_template: "{{ action == 'Do Nothing' }}"
         sequence: []
 
+      # ── Multi-Room Scene ────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Multi-Room Scene' }}"
+        sequence:
+          - variables:
+              all_rooms:
+                - living_room
+                - bedroom
+                - bathroom
+                - kitchen
+                - hallway
+              target_rooms: >
+                {{ all_rooms | select('in',
+                    all_rooms | select('is_state', 'input_boolean.sl_' ~ room ~ '_multi_' ~ all_rooms, 'on')
+                  ) | list }}
+          - repeat:
+              for_each: >
+                {% set ns = namespace(rooms=[]) %}
+                {% for r in ['living_room','bedroom','bathroom','kitchen','hallway'] %}
+                  {% if is_state('input_boolean.sl_' ~ room ~ '_multi_' ~ r, 'on') %}
+                    {% set ns.rooms = ns.rooms + [r] %}
+                  {% endif %}
+                {% endfor %}
+                {{ ns.rooms }}
+              sequence:
+                - service: script.sl_room_on
+                  data:
+                    room: "{{ repeat.item }}"
+
       # ── Toggle Room ─────────────────────────────────────
       - conditions:
           - condition: template

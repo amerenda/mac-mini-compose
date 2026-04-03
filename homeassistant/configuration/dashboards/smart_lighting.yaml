@@ -1199,6 +1199,18 @@ views:
               label: Button 4 Long Press
             - entity: input_text.sl_living_room_b4_scene
               name: Scene Entity ID
+            - type: section
+              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+            - entity: input_boolean.sl_living_room_multi_living_room
+              name: Living Room
+            - entity: input_boolean.sl_living_room_multi_bedroom
+              name: Bedroom
+            - entity: input_boolean.sl_living_room_multi_bathroom
+              name: Bathroom
+            - entity: input_boolean.sl_living_room_multi_kitchen
+              name: Kitchen
+            - entity: input_boolean.sl_living_room_multi_hallway
+              name: Hallway
 
       # ── Bedroom ─────────────────────────────────────────────
       - type: conditional
@@ -1220,6 +1232,18 @@ views:
               label: Button 4 Long Press
             - entity: input_text.sl_bedroom_b4_scene
               name: Scene Entity ID
+            - type: section
+              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+            - entity: input_boolean.sl_bedroom_multi_living_room
+              name: Living Room
+            - entity: input_boolean.sl_bedroom_multi_bedroom
+              name: Bedroom
+            - entity: input_boolean.sl_bedroom_multi_bathroom
+              name: Bathroom
+            - entity: input_boolean.sl_bedroom_multi_kitchen
+              name: Kitchen
+            - entity: input_boolean.sl_bedroom_multi_hallway
+              name: Hallway
 
       # ── Bathroom ────────────────────────────────────────────
       - type: conditional
@@ -1241,6 +1265,18 @@ views:
               label: Button 4 Long Press
             - entity: input_text.sl_bathroom_b4_scene
               name: Scene Entity ID
+            - type: section
+              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+            - entity: input_boolean.sl_bathroom_multi_living_room
+              name: Living Room
+            - entity: input_boolean.sl_bathroom_multi_bedroom
+              name: Bedroom
+            - entity: input_boolean.sl_bathroom_multi_bathroom
+              name: Bathroom
+            - entity: input_boolean.sl_bathroom_multi_kitchen
+              name: Kitchen
+            - entity: input_boolean.sl_bathroom_multi_hallway
+              name: Hallway
 
       # ── Kitchen ─────────────────────────────────────────────
       - type: conditional
@@ -1262,6 +1298,18 @@ views:
               label: Button 4 Long Press
             - entity: input_text.sl_kitchen_b4_scene
               name: Scene Entity ID
+            - type: section
+              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+            - entity: input_boolean.sl_kitchen_multi_living_room
+              name: Living Room
+            - entity: input_boolean.sl_kitchen_multi_bedroom
+              name: Bedroom
+            - entity: input_boolean.sl_kitchen_multi_bathroom
+              name: Bathroom
+            - entity: input_boolean.sl_kitchen_multi_kitchen
+              name: Kitchen
+            - entity: input_boolean.sl_kitchen_multi_hallway
+              name: Hallway
 
       # ── Hallway ─────────────────────────────────────────────
       - type: conditional
@@ -1283,6 +1331,18 @@ views:
               label: Button 4 Long Press
             - entity: input_text.sl_hallway_b4_scene
               name: Scene Entity ID
+            - type: section
+              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+            - entity: input_boolean.sl_hallway_multi_living_room
+              name: Living Room
+            - entity: input_boolean.sl_hallway_multi_bedroom
+              name: Bedroom
+            - entity: input_boolean.sl_hallway_multi_bathroom
+              name: Bathroom
+            - entity: input_boolean.sl_hallway_multi_kitchen
+              name: Kitchen
+            - entity: input_boolean.sl_hallway_multi_hallway
+              name: Hallway
 
       # ── Advanced: Per-Button Actions ────────────────────────
       - type: entities
