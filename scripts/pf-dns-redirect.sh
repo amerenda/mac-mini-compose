@@ -31,16 +31,41 @@ rdr pass on ${IFACE} proto udp from any to 10.100.20.18 port ${DNS_PORT} -> 127.
 rdr pass on ${IFACE} proto tcp from any to 10.100.20.18 port ${DNS_PORT} -> 127.0.0.1 port ${TECHNITIUM_PORT}
 EOF
 
-# ── Ensure pf.conf references our rdr-anchor ──────────────────────────────
-# Appends once; safe to re-run (idempotent).
+# ── Clean up any previous bad append (appended at end = wrong order) ──────
+
+if grep -q '# Local service redirects' "${PF_CONF}"; then
+    sed -i '' '/^$/N;/^\n# Local service redirects/d' "${PF_CONF}" 2>/dev/null || true
+    sed -i '' '/^# Local service redirects/d' "${PF_CONF}"
+    sed -i '' '/^rdr-anchor "com.local"$/d' "${PF_CONF}"
+    sed -i '' '/^anchor "com.local"$/d' "${PF_CONF}"
+    sed -i '' '/^load anchor "com.local/d' "${PF_CONF}"
+    logger -t pf-dns-redirect "Removed previous appended rules from ${PF_CONF}"
+fi
+
+# ── Ensure pf.conf references our anchors ─────────────────────────────────
+# pf requires strict ordering: normalization, translation (rdr), filtering.
+# Insert each directive after its corresponding com.apple counterpart.
+# Safe to re-run (idempotent).
 
 if ! grep -q 'rdr-anchor "com.local"' "${PF_CONF}"; then
-    echo '' >> "${PF_CONF}"
-    echo '# Local service redirects' >> "${PF_CONF}"
-    echo 'rdr-anchor "com.local"' >> "${PF_CONF}"
-    echo 'anchor "com.local"' >> "${PF_CONF}"
-    echo 'load anchor "com.local/dns-redirect" from "/etc/pf.anchors/dns-redirect"' >> "${PF_CONF}"
-    logger -t pf-dns-redirect "Added com.local anchors to ${PF_CONF}"
+    # rdr-anchor goes after rdr-anchor "com.apple/*"
+    sed -i '' 's|rdr-anchor "com.apple/\*"|rdr-anchor "com.apple/*"\
+rdr-anchor "com.local"|' "${PF_CONF}"
+    logger -t pf-dns-redirect "Added rdr-anchor com.local to ${PF_CONF}"
+fi
+
+if ! grep -q '^anchor "com.local"' "${PF_CONF}"; then
+    # anchor goes after anchor "com.apple/*"
+    sed -i '' 's|^anchor "com.apple/\*"|anchor "com.apple/*"\
+anchor "com.local"|' "${PF_CONF}"
+    logger -t pf-dns-redirect "Added anchor com.local to ${PF_CONF}"
+fi
+
+if ! grep -q 'load anchor "com.local' "${PF_CONF}"; then
+    # load directive goes after load anchor "com.apple"
+    sed -i '' 's|load anchor "com.apple" from.*|&\
+load anchor "com.local/dns-redirect" from "/etc/pf.anchors/dns-redirect"|' "${PF_CONF}"
+    logger -t pf-dns-redirect "Added load anchor com.local to ${PF_CONF}"
 fi
 
 # ── Enable pf and reload ───────────────────────────────────────────────────
