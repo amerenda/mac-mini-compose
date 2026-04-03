@@ -432,6 +432,7 @@ views:
             - type: custom:hue-like-light-card
               entity: light.living_room_1
               title: Light
+              showSwitch: false
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -542,20 +543,12 @@ views:
           type: vertical-stack
           cards:
             - type: custom:hue-like-light-card
-              entity: light.bedroom_1
-              title: Light 1
-              slider: default
-              onClickAction: hue-screen
-              offClickAction: hue-screen
-            - type: custom:hue-like-light-card
-              entity: light.bedroom_2
-              title: Light 2
-              slider: default
-              onClickAction: hue-screen
-              offClickAction: hue-screen
-            - type: custom:hue-like-light-card
-              entity: light.lamp_1
-              title: Lamp
+              entities:
+                - light.bedroom_1
+                - light.bedroom_2
+                - light.lamp_1
+              title: All Lights
+              showSwitch: false
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -668,6 +661,7 @@ views:
             - type: custom:hue-like-light-card
               entity: light.bathroom_1
               title: Light
+              showSwitch: false
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -778,14 +772,11 @@ views:
           type: vertical-stack
           cards:
             - type: custom:hue-like-light-card
-              entity: light.kitchen_1
-              title: Light 1
-              slider: default
-              onClickAction: hue-screen
-              offClickAction: hue-screen
-            - type: custom:hue-like-light-card
-              entity: light.kitchen_2
-              title: Light 2
+              entities:
+                - light.kitchen_1
+                - light.kitchen_2
+              title: All Lights
+              showSwitch: false
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -898,6 +889,7 @@ views:
             - type: custom:hue-like-light-card
               entity: light.hallway_1
               title: Light
+              showSwitch: false
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
