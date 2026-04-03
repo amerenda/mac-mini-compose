@@ -114,27 +114,155 @@ action:
       b4_scene_helper: "{{ states('input_text.sl_' ~ room ~ '_b4_scene') }}"
       b4_scene_input: !input button_4_long_press_scene
       b4_scene: "{{ b4_scene_helper if b4_scene_helper not in ['', 'unknown', 'unavailable'] else b4_scene_input }}"
-      custom_b1_short: !input button_1_short
-      custom_b1_long: !input button_1_long
-      custom_b2_short: !input button_2_short
-      custom_b2_long: !input button_2_long
-      custom_b3_short: !input button_3_short
-      custom_b3_long: !input button_3_long
-      custom_b4_short: !input button_4_short
-      custom_b4_long: !input button_4_long
+      # Per-button action overrides from dashboard helpers
+      b1s: "{{ states('input_select.sl_' ~ room ~ '_b1_short') }}"
+      b1l: "{{ states('input_select.sl_' ~ room ~ '_b1_long') }}"
+      b2s: "{{ states('input_select.sl_' ~ room ~ '_b2_short') }}"
+      b2l: "{{ states('input_select.sl_' ~ room ~ '_b2_long') }}"
+      b3s: "{{ states('input_select.sl_' ~ room ~ '_b3_short') }}"
+      b3l: "{{ states('input_select.sl_' ~ room ~ '_b3_long') }}"
+      b4s: "{{ states('input_select.sl_' ~ room ~ '_b4_short') }}"
+      b4l: "{{ states('input_select.sl_' ~ room ~ '_b4_long') }}"
+
+  - variables:
+      # Map action string → payload for the choose below
+      action_map:
+        on_press_release: "{{ b1s }}"
+        on_hold: "{{ b1l }}"
+        up_press_release: "{{ b2s }}"
+        up_hold: "{{ b2l }}"
+        down_press_release: "{{ b3s }}"
+        down_hold: "{{ b3l }}"
+        off_press_release: "{{ b4s }}"
+        off_hold: "{{ b4l }}"
+      action: "{{ action_map.get(trigger.payload, 'Default') | default('Default') }}"
 
   - choose:
-      # ── Button 1: Short Press ────────────────────────────
+      # ── Do Nothing ──────────────────────────────────────
       - conditions:
           - condition: template
-            value_template: "{{ trigger.payload == 'on_press_release' }}"
+            value_template: "{{ action == 'Do Nothing' }}"
+        sequence: []
+
+      # ── Toggle Room ─────────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Toggle Room' }}"
         sequence:
           - if:
               - condition: template
-                value_template: "{{ custom_b1_short | length > 0 }}"
-            then: !input button_1_short
+                value_template: "{{ is_state(light, 'on') }}"
+            then:
+              - service: script.sl_room_off
+                data:
+                  room: "{{ room }}"
             else:
-              # Default: toggle — off if on, scene if off
+              - service: script.sl_room_on
+                data:
+                  room: "{{ room }}"
+
+      # ── Power Off Room ──────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Power Off Room' }}"
+        sequence:
+          - service: script.sl_room_off
+            data:
+              room: "{{ room }}"
+
+      # ── Power Off All ───────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Power Off All' }}"
+        sequence:
+          - service: script.sl_toggle_all
+
+      # ── Brightness Up ──────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Brightness Up' }}"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: "{{ light }}"
+            data:
+              brightness_step: "{{ brightness_step | int }}"
+          - service: input_boolean.turn_on
+            target:
+              entity_id: "input_boolean.sl_{{ room }}_override"
+
+      # ── Brightness Down ─────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Brightness Down' }}"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: "{{ light }}"
+            data:
+              brightness_step: "{{ -1 * brightness_step | int }}"
+          - service: input_boolean.turn_on
+            target:
+              entity_id: "input_boolean.sl_{{ room }}_override"
+
+      # ── Brightness Max ──────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Brightness Max' }}"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: "{{ light }}"
+            data:
+              brightness: 255
+          - service: input_boolean.turn_on
+            target:
+              entity_id: "input_boolean.sl_{{ room }}_override"
+
+      # ── Brightness Min ──────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Brightness Min' }}"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: "{{ light }}"
+            data:
+              brightness: "{{ min_brightness | int }}"
+          - service: input_boolean.turn_on
+            target:
+              entity_id: "input_boolean.sl_{{ room }}_override"
+
+      # ── Cycle Scenes ────────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Cycle Scenes' }}"
+        sequence:
+          - service: script.sl_cycle_scene
+            data:
+              room: "{{ room }}"
+
+      # ── Custom Scene ────────────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ action == 'Custom Scene' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ b4_scene not in ['', 'unknown', 'unavailable', 'none'] }}"
+            then:
+              - service: scene.turn_on
+                target:
+                  entity_id: "{{ b4_scene }}"
+
+    # ── Default: use built-in behavior based on button ────
+    default:
+      - choose:
+          # Button 1 Short: toggle
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.payload == 'on_press_release' }}"
+            sequence:
               - if:
                   - condition: template
                     value_template: "{{ is_state(light, 'on') }}"
@@ -146,33 +274,19 @@ action:
                   - service: script.sl_room_on
                     data:
                       room: "{{ room }}"
-
-      # ── Button 1: Long Press ─────────────────────────────
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'on_hold' }}"
-        sequence:
-          - if:
+          # Button 1 Long: power off room
+          - conditions:
               - condition: template
-                value_template: "{{ custom_b1_long | length > 0 }}"
-            then: !input button_1_long
-            else:
-              # Default: power off all lights in room
+                value_template: "{{ trigger.payload == 'on_hold' }}"
+            sequence:
               - service: script.sl_room_off
                 data:
                   room: "{{ room }}"
-
-      # ── Button 2: Short Press ────────────────────────────
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'up_press_release' }}"
-        sequence:
-          - if:
+          # Button 2 Short: brightness up
+          - conditions:
               - condition: template
-                value_template: "{{ custom_b2_short | length > 0 }}"
-            then: !input button_2_short
-            else:
-              # Default: brightness up 20%
+                value_template: "{{ trigger.payload == 'up_press_release' }}"
+            sequence:
               - service: light.turn_on
                 target:
                   entity_id: "{{ light }}"
@@ -181,18 +295,11 @@ action:
               - service: input_boolean.turn_on
                 target:
                   entity_id: "input_boolean.sl_{{ room }}_override"
-
-      # ── Button 2: Long Press ─────────────────────────────
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'up_hold' }}"
-        sequence:
-          - if:
+          # Button 2 Long: brightness max
+          - conditions:
               - condition: template
-                value_template: "{{ custom_b2_long | length > 0 }}"
-            then: !input button_2_long
-            else:
-              # Default: brightness max
+                value_template: "{{ trigger.payload == 'up_hold' }}"
+            sequence:
               - service: light.turn_on
                 target:
                   entity_id: "{{ light }}"
@@ -201,18 +308,11 @@ action:
               - service: input_boolean.turn_on
                 target:
                   entity_id: "input_boolean.sl_{{ room }}_override"
-
-      # ── Button 3: Short Press ────────────────────────────
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'down_press_release' }}"
-        sequence:
-          - if:
+          # Button 3 Short: brightness down
+          - conditions:
               - condition: template
-                value_template: "{{ custom_b3_short | length > 0 }}"
-            then: !input button_3_short
-            else:
-              # Default: brightness down 20%
+                value_template: "{{ trigger.payload == 'down_press_release' }}"
+            sequence:
               - service: light.turn_on
                 target:
                   entity_id: "{{ light }}"
@@ -221,18 +321,11 @@ action:
               - service: input_boolean.turn_on
                 target:
                   entity_id: "input_boolean.sl_{{ room }}_override"
-
-      # ── Button 3: Long Press ─────────────────────────────
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'down_hold' }}"
-        sequence:
-          - if:
+          # Button 3 Long: brightness min
+          - conditions:
               - condition: template
-                value_template: "{{ custom_b3_long | length > 0 }}"
-            then: !input button_3_long
-            else:
-              # Default: brightness minimum
+                value_template: "{{ trigger.payload == 'down_hold' }}"
+            sequence:
               - service: light.turn_on
                 target:
                   entity_id: "{{ light }}"
@@ -241,33 +334,19 @@ action:
               - service: input_boolean.turn_on
                 target:
                   entity_id: "input_boolean.sl_{{ room }}_override"
-
-      # ── Button 4: Short Press ────────────────────────────
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'off_press_release' }}"
-        sequence:
-          - if:
+          # Button 4 Short: cycle scenes
+          - conditions:
               - condition: template
-                value_template: "{{ custom_b4_short | length > 0 }}"
-            then: !input button_4_short
-            else:
-              # Default: set current window scene, cycle on repeat
+                value_template: "{{ trigger.payload == 'off_press_release' }}"
+            sequence:
               - service: script.sl_cycle_scene
                 data:
                   room: "{{ room }}"
-
-      # ── Button 4: Long Press ─────────────────────────────
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'off_hold' }}"
-        sequence:
-          - if:
+          # Button 4 Long: custom scene
+          - conditions:
               - condition: template
-                value_template: "{{ custom_b4_long | length > 0 }}"
-            then: !input button_4_long
-            else:
-              # Default: activate configured scene (if set)
+                value_template: "{{ trigger.payload == 'off_hold' }}"
+            sequence:
               - if:
                   - condition: template
                     value_template: "{{ b4_scene not in ['', 'unknown', 'unavailable', 'none'] }}"

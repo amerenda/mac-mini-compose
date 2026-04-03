@@ -1283,3 +1283,189 @@ views:
               label: Button 4 Long Press
             - entity: input_text.sl_hallway_b4_scene
               name: Scene Entity ID
+
+      # ── Advanced: Per-Button Actions ────────────────────────
+      - type: entities
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.sl_show_button_config
+            name: Configure Button Actions
+            icon: mdi:gesture-tap-button
+
+      - type: conditional
+        conditions:
+          - entity: input_boolean.sl_show_button_config
+            state: "on"
+        card:
+          type: vertical-stack
+          cards:
+            # Living Room buttons
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_room_selector
+                  state: "Living Room"
+              card:
+                type: entities
+                title: Living Room — Button Actions
+                show_header_toggle: false
+                entities:
+                  - type: section
+                    label: "Button 1 (top)"
+                  - entity: input_select.sl_living_room_b1_short
+                    name: Short Press
+                  - entity: input_select.sl_living_room_b1_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 2 (up)"
+                  - entity: input_select.sl_living_room_b2_short
+                    name: Short Press
+                  - entity: input_select.sl_living_room_b2_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 3 (down)"
+                  - entity: input_select.sl_living_room_b3_short
+                    name: Short Press
+                  - entity: input_select.sl_living_room_b3_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 4 (bottom)"
+                  - entity: input_select.sl_living_room_b4_short
+                    name: Short Press
+                  - entity: input_select.sl_living_room_b4_long
+                    name: Long Press
+            # Bedroom buttons
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_room_selector
+                  state: "Bedroom"
+              card:
+                type: entities
+                title: Bedroom — Button Actions
+                show_header_toggle: false
+                entities:
+                  - type: section
+                    label: "Button 1 (top)"
+                  - entity: input_select.sl_bedroom_b1_short
+                    name: Short Press
+                  - entity: input_select.sl_bedroom_b1_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 2 (up)"
+                  - entity: input_select.sl_bedroom_b2_short
+                    name: Short Press
+                  - entity: input_select.sl_bedroom_b2_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 3 (down)"
+                  - entity: input_select.sl_bedroom_b3_short
+                    name: Short Press
+                  - entity: input_select.sl_bedroom_b3_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 4 (bottom)"
+                  - entity: input_select.sl_bedroom_b4_short
+                    name: Short Press
+                  - entity: input_select.sl_bedroom_b4_long
+                    name: Long Press
+            # Bathroom buttons
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_room_selector
+                  state: "Bathroom"
+              card:
+                type: entities
+                title: Bathroom — Button Actions
+                show_header_toggle: false
+                entities:
+                  - type: section
+                    label: "Button 1 (top)"
+                  - entity: input_select.sl_bathroom_b1_short
+                    name: Short Press
+                  - entity: input_select.sl_bathroom_b1_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 2 (up)"
+                  - entity: input_select.sl_bathroom_b2_short
+                    name: Short Press
+                  - entity: input_select.sl_bathroom_b2_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 3 (down)"
+                  - entity: input_select.sl_bathroom_b3_short
+                    name: Short Press
+                  - entity: input_select.sl_bathroom_b3_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 4 (bottom)"
+                  - entity: input_select.sl_bathroom_b4_short
+                    name: Short Press
+                  - entity: input_select.sl_bathroom_b4_long
+                    name: Long Press
+            # Kitchen buttons
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_room_selector
+                  state: "Kitchen"
+              card:
+                type: entities
+                title: Kitchen — Button Actions
+                show_header_toggle: false
+                entities:
+                  - type: section
+                    label: "Button 1 (top)"
+                  - entity: input_select.sl_kitchen_b1_short
+                    name: Short Press
+                  - entity: input_select.sl_kitchen_b1_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 2 (up)"
+                  - entity: input_select.sl_kitchen_b2_short
+                    name: Short Press
+                  - entity: input_select.sl_kitchen_b2_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 3 (down)"
+                  - entity: input_select.sl_kitchen_b3_short
+                    name: Short Press
+                  - entity: input_select.sl_kitchen_b3_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 4 (bottom)"
+                  - entity: input_select.sl_kitchen_b4_short
+                    name: Short Press
+                  - entity: input_select.sl_kitchen_b4_long
+                    name: Long Press
+            # Hallway buttons
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_room_selector
+                  state: "Hallway"
+              card:
+                type: entities
+                title: Hallway — Button Actions
+                show_header_toggle: false
+                entities:
+                  - type: section
+                    label: "Button 1 (top)"
+                  - entity: input_select.sl_hallway_b1_short
+                    name: Short Press
+                  - entity: input_select.sl_hallway_b1_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 2 (up)"
+                  - entity: input_select.sl_hallway_b2_short
+                    name: Short Press
+                  - entity: input_select.sl_hallway_b2_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 3 (down)"
+                  - entity: input_select.sl_hallway_b3_short
+                    name: Short Press
+                  - entity: input_select.sl_hallway_b3_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 4 (bottom)"
+                  - entity: input_select.sl_hallway_b4_short
+                    name: Short Press
+                  - entity: input_select.sl_hallway_b4_long
+                    name: Long Press

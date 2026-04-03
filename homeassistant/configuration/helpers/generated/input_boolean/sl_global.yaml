@@ -29,6 +29,9 @@ sl_weekend_sunday:
   icon: mdi:calendar
 
 # Dashboard UI toggles
+sl_show_button_config:
+  name: "SL: Show Button Config"
+  icon: mdi:gesture-tap-button
 sl_show_defaults:
   name: "SL: Show Default Templates"
   icon: mdi:tune-variant
