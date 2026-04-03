@@ -9,6 +9,24 @@ sl_house_mode:
   initial: Home
   icon: mdi:home-account
 
+sl_scene_window:
+  name: "SL: Scene Window"
+  options:
+    - Morning
+    - Day
+    - Evening
+    - Night
+  initial: Morning
+  icon: mdi:weather-sunset-up
+
+sl_scene_type:
+  name: "SL: Scene Type"
+  options:
+    - Ambiance
+    - Dimmable
+  initial: Ambiance
+  icon: mdi:lightbulb-group
+
 sl_room_selector:
   name: "SL: Room"
   options:
