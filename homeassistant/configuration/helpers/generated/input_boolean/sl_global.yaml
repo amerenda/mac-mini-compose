@@ -29,6 +29,9 @@ sl_weekend_sunday:
   icon: mdi:calendar
 
 # Dashboard UI toggles
+sl_show_defaults:
+  name: "SL: Show Default Templates"
+  icon: mdi:tune-variant
 sl_show_schedule:
   name: "SL: Show Schedule"
   icon: mdi:clock-edit-outline

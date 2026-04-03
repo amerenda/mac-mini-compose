@@ -18,7 +18,6 @@ action:
       entity_id:
         - input_boolean.sl_bathroom_override
         - input_boolean.sl_bedroom_override
-        - input_boolean.sl_entrance_lights_override
         - input_boolean.sl_hallway_override
         - input_boolean.sl_kitchen_override
         - input_boolean.sl_living_room_override
@@ -35,7 +34,6 @@ action:
       rooms:
         - bathroom
         - bedroom
-        - entrance_lights
         - hallway
         - kitchen
         - living_room

@@ -215,69 +215,6 @@ views:
                 entity: input_select.sl_bedroom_night_scene
                 name: Night Scene
 
-      # ── Room Settings: Entrance ────────────────────────────
-      - type: conditional
-        conditions:
-          - entity: input_select.sl_room_selector
-            state: "Entrance"
-        card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - type: section
-              label: Motion Triggers
-            - entity: input_boolean.sl_entrance_lights_motion_morning
-              name: Morning
-            - entity: input_boolean.sl_entrance_lights_motion_day
-              name: Day
-            - entity: input_boolean.sl_entrance_lights_motion_evening
-              name: Evening
-            - entity: input_boolean.sl_entrance_lights_motion_night
-              name: Night
-            - type: section
-              label: Settings
-            - entity: input_number.sl_entrance_lights_motion_timeout
-              name: Motion Timeout (min)
-            - entity: input_boolean.sl_entrance_lights_auto_transition
-              name: Auto Transition
-            - entity: input_boolean.sl_entrance_lights_smooth_transition
-              name: Smooth Transition
-            - entity: input_number.sl_entrance_lights_smooth_transition_duration
-              name: Transition Duration (min)
-            - entity: input_boolean.sl_entrance_lights_override
-              name: Override Active
-            - type: section
-              label: Scene Overrides
-            - entity: input_boolean.sl_entrance_lights_override_scenes
-              name: Override Window Scenes
-            - type: conditional
-              conditions:
-                - entity: input_boolean.sl_entrance_lights_override_scenes
-                  state: "on"
-              row:
-                entity: input_select.sl_entrance_lights_morning_scene
-                name: Morning Scene
-            - type: conditional
-              conditions:
-                - entity: input_boolean.sl_entrance_lights_override_scenes
-                  state: "on"
-              row:
-                entity: input_select.sl_entrance_lights_day_scene
-                name: Day Scene
-            - type: conditional
-              conditions:
-                - entity: input_boolean.sl_entrance_lights_override_scenes
-                  state: "on"
-              row:
-                entity: input_select.sl_entrance_lights_evening_scene
-                name: Evening Scene
-            - type: conditional
-              conditions:
-                - entity: input_boolean.sl_entrance_lights_override_scenes
-                  state: "on"
-              row:
-                entity: input_select.sl_entrance_lights_night_scene
-                name: Night Scene
 
       # ── Room Settings: Hallway ─────────────────────────────
       - type: conditional
@@ -791,130 +728,140 @@ views:
                     target:
                       entity_id: scene.hallway_night
 
-      # ── Default Scene Templates (bottom) ────────────────────
-      - type: custom:mushroom-title-card
-        title: Default Scene Templates
-        subtitle: Set defaults, then apply to all rooms using defaults
-
+      # ── Default Scene Templates ─────────────────────────────
       - type: entities
         show_header_toggle: false
         entities:
-          - entity: input_select.sl_scene_type
-            name: Light Type
-          - entity: input_select.sl_scene_window
-            name: Time Window
+          - entity: input_boolean.sl_show_defaults
+            name: Edit Default Templates
+            icon: mdi:tune-variant
 
-      # Ambiance defaults (conditional per window)
       - type: conditional
         conditions:
-          - entity: input_select.sl_scene_type
-            state: "Ambiance"
-          - entity: input_select.sl_scene_window
-            state: "Morning"
+          - entity: input_boolean.sl_show_defaults
+            state: "on"
         card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - entity: input_number.sl_default_ambiance_morning_brightness
-              name: Brightness
-            - entity: input_number.sl_default_ambiance_morning_color_temp
-              name: Color Temperature
-      - type: conditional
-        conditions:
-          - entity: input_select.sl_scene_type
-            state: "Ambiance"
-          - entity: input_select.sl_scene_window
-            state: "Day"
-        card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - entity: input_number.sl_default_ambiance_day_brightness
-              name: Brightness
-            - entity: input_number.sl_default_ambiance_day_color_temp
-              name: Color Temperature
-      - type: conditional
-        conditions:
-          - entity: input_select.sl_scene_type
-            state: "Ambiance"
-          - entity: input_select.sl_scene_window
-            state: "Evening"
-        card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - entity: input_number.sl_default_ambiance_evening_brightness
-              name: Brightness
-            - entity: input_number.sl_default_ambiance_evening_color_temp
-              name: Color Temperature
-      - type: conditional
-        conditions:
-          - entity: input_select.sl_scene_type
-            state: "Ambiance"
-          - entity: input_select.sl_scene_window
-            state: "Night"
-        card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - entity: input_number.sl_default_ambiance_night_brightness
-              name: Brightness
-            - entity: input_number.sl_default_ambiance_night_color_temp
-              name: Color Temperature
+          type: vertical-stack
+          cards:
+            - type: entities
+              show_header_toggle: false
+              entities:
+                - entity: input_select.sl_scene_type
+                  name: Light Type
+                - entity: input_select.sl_scene_window
+                  name: Time Window
 
-      # Dimmable defaults (conditional per window)
-      - type: conditional
-        conditions:
-          - entity: input_select.sl_scene_type
-            state: "Dimmable"
-          - entity: input_select.sl_scene_window
-            state: "Morning"
-        card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - entity: input_number.sl_default_dimmable_morning_brightness
-              name: Brightness
-      - type: conditional
-        conditions:
-          - entity: input_select.sl_scene_type
-            state: "Dimmable"
-          - entity: input_select.sl_scene_window
-            state: "Day"
-        card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - entity: input_number.sl_default_dimmable_day_brightness
-              name: Brightness
-      - type: conditional
-        conditions:
-          - entity: input_select.sl_scene_type
-            state: "Dimmable"
-          - entity: input_select.sl_scene_window
-            state: "Evening"
-        card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - entity: input_number.sl_default_dimmable_evening_brightness
-              name: Brightness
-      - type: conditional
-        conditions:
-          - entity: input_select.sl_scene_type
-            state: "Dimmable"
-          - entity: input_select.sl_scene_window
-            state: "Night"
-        card:
-          type: entities
-          show_header_toggle: false
-          entities:
-            - entity: input_number.sl_default_dimmable_night_brightness
-              name: Brightness
+            # Ambiance defaults
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_scene_type
+                  state: "Ambiance"
+                - entity: input_select.sl_scene_window
+                  state: "Morning"
+              card:
+                type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.sl_default_ambiance_morning_brightness
+                    name: Brightness
+                  - entity: input_number.sl_default_ambiance_morning_color_temp
+                    name: Color Temperature
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_scene_type
+                  state: "Ambiance"
+                - entity: input_select.sl_scene_window
+                  state: "Day"
+              card:
+                type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.sl_default_ambiance_day_brightness
+                    name: Brightness
+                  - entity: input_number.sl_default_ambiance_day_color_temp
+                    name: Color Temperature
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_scene_type
+                  state: "Ambiance"
+                - entity: input_select.sl_scene_window
+                  state: "Evening"
+              card:
+                type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.sl_default_ambiance_evening_brightness
+                    name: Brightness
+                  - entity: input_number.sl_default_ambiance_evening_color_temp
+                    name: Color Temperature
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_scene_type
+                  state: "Ambiance"
+                - entity: input_select.sl_scene_window
+                  state: "Night"
+              card:
+                type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.sl_default_ambiance_night_brightness
+                    name: Brightness
+                  - entity: input_number.sl_default_ambiance_night_color_temp
+                    name: Color Temperature
 
-      - type: button
-        name: Apply Defaults to All Rooms
-        icon: mdi:refresh
-        tap_action:
-          action: call-service
-          service: script.sl_rebuild_scenes
+            # Dimmable defaults
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_scene_type
+                  state: "Dimmable"
+                - entity: input_select.sl_scene_window
+                  state: "Morning"
+              card:
+                type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.sl_default_dimmable_morning_brightness
+                    name: Brightness
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_scene_type
+                  state: "Dimmable"
+                - entity: input_select.sl_scene_window
+                  state: "Day"
+              card:
+                type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.sl_default_dimmable_day_brightness
+                    name: Brightness
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_scene_type
+                  state: "Dimmable"
+                - entity: input_select.sl_scene_window
+                  state: "Evening"
+              card:
+                type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.sl_default_dimmable_evening_brightness
+                    name: Brightness
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_scene_type
+                  state: "Dimmable"
+                - entity: input_select.sl_scene_window
+                  state: "Night"
+              card:
+                type: entities
+                show_header_toggle: false
+                entities:
+                  - entity: input_number.sl_default_dimmable_night_brightness
+                    name: Brightness
+
+            - type: button
+              name: Apply Defaults to All Rooms
+              icon: mdi:refresh
+              tap_action:
+                action: call-service
+                service: script.sl_rebuild_scenes

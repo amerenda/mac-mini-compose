@@ -32,7 +32,6 @@ sl_room_selector:
   options:
     - Bathroom
     - Bedroom
-    - Entrance
     - Hallway
     - Kitchen
     - Living Room

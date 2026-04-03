@@ -20,7 +20,6 @@ action:
       rooms:
         - bathroom
         - bedroom
-        - entrance_lights
         - hallway
         - kitchen
         - living_room

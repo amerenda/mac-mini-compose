@@ -10,11 +10,6 @@ sl_bedroom_motion_off:
   duration: "00:05:00"
   icon: mdi:timer-off-outline
 
-sl_entrance_lights_motion_off:
-  name: "SL: Entrance Lights — Motion Off Timer"
-  duration: "00:05:00"
-  icon: mdi:timer-off-outline
-
 sl_hallway_motion_off:
   name: "SL: Hallway — Motion Off Timer"
   duration: "00:05:00"
