@@ -1,6 +1,8 @@
 sl_cycle_scene:
   alias: "SL: Cycle Scene"
-  description: "Cycle through window scenes for a room (morning → day → evening → night → morning)"
+  description: >
+    First press: apply current window scene.
+    Subsequent presses: cycle morning → day → evening → night → morning.
   mode: single
   fields:
     room:
@@ -17,16 +19,15 @@ sl_cycle_scene:
           - night
         current_window: "{{ states('sensor.sl_current_window') }}"
         last_applied: "{{ states('input_text.sl_' ~ room ~ '_last_scene_window') }}"
-        # If no scene was forced yet, start at current window; otherwise cycle from last applied
-        current_index: >
-          {% if last_applied in windows %}
-            {{ windows.index(last_applied) }}
+        # First press (nothing tracked yet, or tracker was cleared): apply current window
+        # Subsequent presses: cycle to next from last applied
+        target_window: >
+          {% if last_applied not in windows %}
+            {{ current_window if current_window in windows else 'morning' }}
           {% else %}
-            {{ windows.index(current_window) if current_window in windows else 0 }}
+            {{ windows[((windows.index(last_applied)) + 1) % 4] }}
           {% endif %}
-        next_index: "{{ (current_index | int + 1) % 4 }}"
-        next_window: "{{ windows[next_index | int] }}"
-        scene_entity: "scene.{{ room }}_{{ next_window }}"
+        scene_entity: "scene.{{ room }}_{{ target_window }}"
         scene_exists: "{{ scene_entity in (states.scene | map(attribute='entity_id') | list) }}"
     - if:
         - condition: template
@@ -39,4 +40,4 @@ sl_cycle_scene:
           target:
             entity_id: "input_text.sl_{{ room }}_last_scene_window"
           data:
-            value: "{{ next_window }}"
+            value: "{{ target_window }}"

@@ -16,3 +16,8 @@ sl_room_off:
     - service: input_boolean.turn_off
       target:
         entity_id: "input_boolean.sl_{{ room }}_override"
+    - service: input_text.set_value
+      target:
+        entity_id: "input_text.sl_{{ room }}_last_scene_window"
+      data:
+        value: ""
