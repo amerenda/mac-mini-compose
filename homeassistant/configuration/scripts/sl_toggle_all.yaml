@@ -1,0 +1,35 @@
+sl_toggle_all:
+  alias: "SL: Toggle All Lights"
+  description: "If any lights are on, turn all off. Otherwise, turn all on with current scenes."
+  mode: single
+  sequence:
+    - variables:
+        rooms:
+          - living_room
+          - bedroom
+          - bathroom
+          - kitchen
+          - hallway
+        any_on: >
+          {{ is_state('light.living_room', 'on')
+             or is_state('light.bedroom', 'on')
+             or is_state('light.bathroom', 'on')
+             or is_state('light.kitchen', 'on')
+             or is_state('light.hallway', 'on') }}
+    - if:
+        - condition: template
+          value_template: "{{ any_on }}"
+      then:
+        - repeat:
+            for_each: "{{ rooms }}"
+            sequence:
+              - service: script.sl_room_off
+                data:
+                  room: "{{ repeat.item }}"
+      else:
+        - repeat:
+            for_each: "{{ rooms }}"
+            sequence:
+              - service: script.sl_room_on
+                data:
+                  room: "{{ repeat.item }}"
