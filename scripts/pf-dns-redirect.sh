@@ -30,7 +30,7 @@ TECHNITIUM_PORT=5354
 # ── Add DNS IP alias to en0 ────────────────────────────────────────────────
 # Idempotent — ifconfig alias is a no-op if already present.
 
-ifconfig ${IFACE} alias ${DNS_IP} 255.255.255.0
+ifconfig ${IFACE} alias ${DNS_IP}/24
 logger -t pf-dns-redirect "IP alias ${DNS_IP} on ${IFACE} configured"
 
 # ── Enable IP forwarding ───────────────────────────────────────────────────
@@ -42,10 +42,9 @@ logger -t pf-dns-redirect "IP forwarding enabled"
 
 mkdir -p /etc/pf.anchors
 cat > "${ANCHOR_FILE}" <<EOF
-# UDP: redirect to dns-udp-proxy.py on same IP (avoids routing-via-Tailscale issue).
+# UDP + TCP: redirect to dns-proxy.py on same IP (avoids routing-via-Tailscale issue).
 rdr pass on ${IFACE} proto udp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
-# TCP: redirect to loopback:5354 — OrbStack's *:5354 TCP listener forwards to Technitium.
-rdr pass on ${IFACE} proto tcp from any to ${DNS_IP} port ${DNS_PORT} -> 127.0.0.1 port ${TECHNITIUM_PORT}
+rdr pass on ${IFACE} proto tcp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
 EOF
 
 # ── Clean up any previous bad append ─────────────────────────────────────
