@@ -104,11 +104,16 @@ action:
   - variables:
       room: !input room
       light: !input light_entity
-      brightness_step_pct_val: !input brightness_step_pct
-      min_brightness_pct_val: !input min_brightness_pct
-      brightness_step: "{{ (brightness_step_pct_val | float(20)) / 100 * 255 | int }}"
-      min_brightness: "{{ (min_brightness_pct_val | float(20)) / 100 * 255 | int }}"
-      b4_scene: !input button_4_long_press_scene
+      # Read config from helpers (dashboard-editable) with blueprint input as fallback
+      brightness_step_pct_val: "{{ states('input_number.sl_' ~ room ~ '_brightness_step') | float(0) }}"
+      brightness_step_pct_fallback: !input brightness_step_pct
+      min_brightness_pct_val: "{{ states('input_number.sl_' ~ room ~ '_min_brightness') | float(0) }}"
+      min_brightness_pct_fallback: !input min_brightness_pct
+      brightness_step: "{{ ((brightness_step_pct_val if brightness_step_pct_val > 0 else brightness_step_pct_fallback) | float(20)) / 100 * 255 | int }}"
+      min_brightness: "{{ ((min_brightness_pct_val if min_brightness_pct_val > 0 else min_brightness_pct_fallback) | float(20)) / 100 * 255 | int }}"
+      b4_scene_helper: "{{ states('input_text.sl_' ~ room ~ '_b4_scene') }}"
+      b4_scene_input: !input button_4_long_press_scene
+      b4_scene: "{{ b4_scene_helper if b4_scene_helper not in ['', 'unknown', 'unavailable'] else b4_scene_input }}"
       custom_b1_short: !input button_1_short
       custom_b1_long: !input button_1_long
       custom_b2_short: !input button_2_short

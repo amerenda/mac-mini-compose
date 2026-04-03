@@ -1,0 +1,21 @@
+# Smart Lighting v2 — Button 4 long press scene (per room)
+sl_living_room_b4_scene:
+  name: "SL: Living Room Button 4 Scene"
+  max: 100
+  icon: mdi:movie-open
+sl_bedroom_b4_scene:
+  name: "SL: Bedroom Button 4 Scene"
+  max: 100
+  icon: mdi:movie-open
+sl_bathroom_b4_scene:
+  name: "SL: Bathroom Button 4 Scene"
+  max: 100
+  icon: mdi:movie-open
+sl_kitchen_b4_scene:
+  name: "SL: Kitchen Button 4 Scene"
+  max: 100
+  icon: mdi:movie-open
+sl_hallway_b4_scene:
+  name: "SL: Hallway Button 4 Scene"
+  max: 100
+  icon: mdi:movie-open

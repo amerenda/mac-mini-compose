@@ -1,0 +1,85 @@
+# Smart Lighting v2 — Switch configuration (per room)
+sl_living_room_brightness_step:
+  name: "SL: Living Room Brightness Step"
+  min: 5
+  max: 50
+  step: 5
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-6
+sl_living_room_min_brightness:
+  name: "SL: Living Room Min Brightness"
+  min: 1
+  max: 100
+  step: 1
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-4
+
+sl_bedroom_brightness_step:
+  name: "SL: Bedroom Brightness Step"
+  min: 5
+  max: 50
+  step: 5
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-6
+sl_bedroom_min_brightness:
+  name: "SL: Bedroom Min Brightness"
+  min: 1
+  max: 100
+  step: 1
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-4
+
+sl_bathroom_brightness_step:
+  name: "SL: Bathroom Brightness Step"
+  min: 5
+  max: 50
+  step: 5
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-6
+sl_bathroom_min_brightness:
+  name: "SL: Bathroom Min Brightness"
+  min: 1
+  max: 100
+  step: 1
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-4
+
+sl_kitchen_brightness_step:
+  name: "SL: Kitchen Brightness Step"
+  min: 5
+  max: 50
+  step: 5
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-6
+sl_kitchen_min_brightness:
+  name: "SL: Kitchen Min Brightness"
+  min: 1
+  max: 100
+  step: 1
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-4
+
+sl_hallway_brightness_step:
+  name: "SL: Hallway Brightness Step"
+  min: 5
+  max: 50
+  step: 5
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-6
+sl_hallway_min_brightness:
+  name: "SL: Hallway Min Brightness"
+  min: 1
+  max: 100
+  step: 1
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-4

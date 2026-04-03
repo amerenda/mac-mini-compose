@@ -1158,3 +1158,128 @@ views:
           data:
             room: "{{ states('input_select.sl_room_selector') | lower | replace(' ', '_') | replace('all_rooms', 'all') }}"
             window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+
+  # ════════════════════════════════════════════════════════════
+  # Switch Config Tab
+  # ════════════════════════════════════════════════════════════
+  - title: Switches
+    path: switches
+    icon: mdi:light-switch
+    cards:
+      - type: entities
+        show_header_toggle: false
+        entities:
+          - entity: input_select.sl_room_selector
+            name: Room
+
+      - type: markdown
+        content: |
+          **Button 1 (top):** Short = toggle on/off, Long = power off all
+          **Button 2:** Short = brightness up, Long = brightness max
+          **Button 3:** Short = brightness down, Long = brightness min
+          **Button 4 (bottom):** Short = cycle scenes, Long = custom scene
+
+      # ── Living Room ─────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Living Room"
+        card:
+          type: entities
+          title: Living Room Switch
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Brightness Controls
+            - entity: input_number.sl_living_room_brightness_step
+              name: Brightness Step (per press)
+            - entity: input_number.sl_living_room_min_brightness
+              name: Minimum Brightness (long dim)
+            - type: section
+              label: Button 4 Long Press
+            - entity: input_text.sl_living_room_b4_scene
+              name: Scene Entity ID
+
+      # ── Bedroom ─────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Bedroom"
+        card:
+          type: entities
+          title: Bedroom Switch
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Brightness Controls
+            - entity: input_number.sl_bedroom_brightness_step
+              name: Brightness Step (per press)
+            - entity: input_number.sl_bedroom_min_brightness
+              name: Minimum Brightness (long dim)
+            - type: section
+              label: Button 4 Long Press
+            - entity: input_text.sl_bedroom_b4_scene
+              name: Scene Entity ID
+
+      # ── Bathroom ────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Bathroom"
+        card:
+          type: entities
+          title: Bathroom Switch
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Brightness Controls
+            - entity: input_number.sl_bathroom_brightness_step
+              name: Brightness Step (per press)
+            - entity: input_number.sl_bathroom_min_brightness
+              name: Minimum Brightness (long dim)
+            - type: section
+              label: Button 4 Long Press
+            - entity: input_text.sl_bathroom_b4_scene
+              name: Scene Entity ID
+
+      # ── Kitchen ─────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Kitchen"
+        card:
+          type: entities
+          title: Kitchen Switch
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Brightness Controls
+            - entity: input_number.sl_kitchen_brightness_step
+              name: Brightness Step (per press)
+            - entity: input_number.sl_kitchen_min_brightness
+              name: Minimum Brightness (long dim)
+            - type: section
+              label: Button 4 Long Press
+            - entity: input_text.sl_kitchen_b4_scene
+              name: Scene Entity ID
+
+      # ── Hallway ─────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Hallway"
+        card:
+          type: entities
+          title: Hallway Switches (2)
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Brightness Controls
+            - entity: input_number.sl_hallway_brightness_step
+              name: Brightness Step (per press)
+            - entity: input_number.sl_hallway_min_brightness
+              name: Minimum Brightness (long dim)
+            - type: section
+              label: Button 4 Long Press
+            - entity: input_text.sl_hallway_b4_scene
+              name: Scene Entity ID
