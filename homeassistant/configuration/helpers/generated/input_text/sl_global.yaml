@@ -1,4 +1,9 @@
 # Smart Lighting v2 — State tracking
+sl_custom_scene_name:
+  name: "SL: Custom Scene Name"
+  max: 50
+  icon: mdi:tag
+
 sl_last_window:
   name: "SL: Last Active Window"
   initial: ""

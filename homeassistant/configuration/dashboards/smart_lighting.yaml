@@ -415,7 +415,6 @@ views:
     path: scenes
     icon: mdi:palette
     cards:
-      # ── Room selector + scenes at the top ───────────────────
       - type: entities
         show_header_toggle: false
         entities:
@@ -430,17 +429,9 @@ views:
         card:
           type: vertical-stack
           cards:
-            - type: custom:mushroom-entity-card
-              entity: input_boolean.sl_living_room_use_defaults
-              name: Use Defaults
-              icon: mdi:content-copy
-              tap_action:
-                action: toggle
             - type: custom:hue-like-light-card
-              entities:
-                - light.living_room_1
-              title: All Lights
-              description: "Tap to set color & brightness for all"
+              entity: light.living_room_1
+              title: Light
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -482,6 +473,50 @@ views:
                     service: scene.turn_on
                     target:
                       entity_id: scene.living_room_night
+            - type: custom:mushroom-title-card
+              title: Save Current State
+            - type: horizontal-stack
+              cards:
+                - type: button
+                  name: As Morning
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: living_room
+                      window: morning
+                - type: button
+                  name: As Day
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: living_room
+                      window: day
+                - type: button
+                  name: As Evening
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: living_room
+                      window: evening
+                - type: button
+                  name: As Night
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: living_room
+                      window: night
 
       # ── Bedroom ─────────────────────────────────────────────
       - type: conditional
@@ -491,19 +526,21 @@ views:
         card:
           type: vertical-stack
           cards:
-            - type: custom:mushroom-entity-card
-              entity: input_boolean.sl_bedroom_use_defaults
-              name: Use Defaults
-              icon: mdi:content-copy
-              tap_action:
-                action: toggle
             - type: custom:hue-like-light-card
-              entities:
-                - light.bedroom_1
-                - light.bedroom_2
-                - light.lamp_1
-              title: All Lights
-              description: "Tap to control individually"
+              entity: light.bedroom_1
+              title: Light 1
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.bedroom_2
+              title: Light 2
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.lamp_1
+              title: Lamp
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -545,6 +582,50 @@ views:
                     service: scene.turn_on
                     target:
                       entity_id: scene.bedroom_night
+            - type: custom:mushroom-title-card
+              title: Save Current State
+            - type: horizontal-stack
+              cards:
+                - type: button
+                  name: As Morning
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: bedroom
+                      window: morning
+                - type: button
+                  name: As Day
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: bedroom
+                      window: day
+                - type: button
+                  name: As Evening
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: bedroom
+                      window: evening
+                - type: button
+                  name: As Night
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: bedroom
+                      window: night
 
       # ── Bathroom ────────────────────────────────────────────
       - type: conditional
@@ -554,16 +635,9 @@ views:
         card:
           type: vertical-stack
           cards:
-            - type: custom:mushroom-entity-card
-              entity: input_boolean.sl_bathroom_use_defaults
-              name: Use Defaults
-              icon: mdi:content-copy
-              tap_action:
-                action: toggle
             - type: custom:hue-like-light-card
-              entities:
-                - light.bathroom_1
-              title: All Lights
+              entity: light.bathroom_1
+              title: Light
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -605,6 +679,50 @@ views:
                     service: scene.turn_on
                     target:
                       entity_id: scene.bathroom_night
+            - type: custom:mushroom-title-card
+              title: Save Current State
+            - type: horizontal-stack
+              cards:
+                - type: button
+                  name: As Morning
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: bathroom
+                      window: morning
+                - type: button
+                  name: As Day
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: bathroom
+                      window: day
+                - type: button
+                  name: As Evening
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: bathroom
+                      window: evening
+                - type: button
+                  name: As Night
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: bathroom
+                      window: night
 
       # ── Kitchen ─────────────────────────────────────────────
       - type: conditional
@@ -614,18 +732,15 @@ views:
         card:
           type: vertical-stack
           cards:
-            - type: custom:mushroom-entity-card
-              entity: input_boolean.sl_kitchen_use_defaults
-              name: Use Defaults
-              icon: mdi:content-copy
-              tap_action:
-                action: toggle
             - type: custom:hue-like-light-card
-              entities:
-                - light.kitchen_1
-                - light.kitchen_2
-              title: All Lights
-              description: "Tap to control individually"
+              entity: light.kitchen_1
+              title: Light 1
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.kitchen_2
+              title: Light 2
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -667,6 +782,50 @@ views:
                     service: scene.turn_on
                     target:
                       entity_id: scene.kitchen_night
+            - type: custom:mushroom-title-card
+              title: Save Current State
+            - type: horizontal-stack
+              cards:
+                - type: button
+                  name: As Morning
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: kitchen
+                      window: morning
+                - type: button
+                  name: As Day
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: kitchen
+                      window: day
+                - type: button
+                  name: As Evening
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: kitchen
+                      window: evening
+                - type: button
+                  name: As Night
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: kitchen
+                      window: night
 
       # ── Hallway ─────────────────────────────────────────────
       - type: conditional
@@ -676,16 +835,9 @@ views:
         card:
           type: vertical-stack
           cards:
-            - type: custom:mushroom-entity-card
-              entity: input_boolean.sl_hallway_use_defaults
-              name: Use Defaults
-              icon: mdi:content-copy
-              tap_action:
-                action: toggle
             - type: custom:hue-like-light-card
-              entities:
-                - light.hallway_1
-              title: All Lights
+              entity: light.hallway_1
+              title: Light
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
@@ -727,141 +879,163 @@ views:
                     service: scene.turn_on
                     target:
                       entity_id: scene.hallway_night
+            - type: custom:mushroom-title-card
+              title: Save Current State
+            - type: horizontal-stack
+              cards:
+                - type: button
+                  name: As Morning
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: hallway
+                      window: morning
+                - type: button
+                  name: As Day
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: hallway
+                      window: day
+                - type: button
+                  name: As Evening
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: hallway
+                      window: evening
+                - type: button
+                  name: As Night
+                  icon: mdi:content-save
+                  show_state: false
+                  tap_action:
+                    action: call-service
+                    service: script.sl_save_scene
+                    data:
+                      room: hallway
+                      window: night
 
-      # ── Default Scene Templates ─────────────────────────────
+  # ════════════════════════════════════════════════════════════
+  # Custom Scenes Tab
+  # ════════════════════════════════════════════════════════════
+  - title: Custom Scenes
+    path: custom-scenes
+    icon: mdi:creation
+    cards:
+      - type: custom:mushroom-title-card
+        title: Create Custom Scene
+        subtitle: Set the lights, then save with a name
+
       - type: entities
         show_header_toggle: false
         entities:
-          - entity: input_boolean.sl_show_defaults
-            name: Edit Default Templates
-            icon: mdi:tune-variant
+          - entity: input_select.sl_room_selector
+            name: Room
+          - entity: input_text.sl_custom_scene_name
+            name: Scene Name
 
+      # ── Living Room ─────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_boolean.sl_show_defaults
-            state: "on"
+          - entity: input_select.sl_room_selector
+            state: "Living Room"
+        card:
+          type: custom:hue-like-light-card
+          entity: light.living_room_1
+          title: Light
+          slider: default
+          onClickAction: hue-screen
+          offClickAction: hue-screen
+
+      # ── Bedroom ─────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Bedroom"
         card:
           type: vertical-stack
           cards:
-            - type: entities
-              show_header_toggle: false
-              entities:
-                - entity: input_select.sl_scene_type
-                  name: Light Type
-                - entity: input_select.sl_scene_window
-                  name: Time Window
+            - type: custom:hue-like-light-card
+              entity: light.bedroom_1
+              title: Light 1
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.bedroom_2
+              title: Light 2
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.lamp_1
+              title: Lamp
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
 
-            # Ambiance defaults
-            - type: conditional
-              conditions:
-                - entity: input_select.sl_scene_type
-                  state: "Ambiance"
-                - entity: input_select.sl_scene_window
-                  state: "Morning"
-              card:
-                type: entities
-                show_header_toggle: false
-                entities:
-                  - entity: input_number.sl_default_ambiance_morning_brightness
-                    name: Brightness
-                  - entity: input_number.sl_default_ambiance_morning_color_temp
-                    name: Color Temperature
-            - type: conditional
-              conditions:
-                - entity: input_select.sl_scene_type
-                  state: "Ambiance"
-                - entity: input_select.sl_scene_window
-                  state: "Day"
-              card:
-                type: entities
-                show_header_toggle: false
-                entities:
-                  - entity: input_number.sl_default_ambiance_day_brightness
-                    name: Brightness
-                  - entity: input_number.sl_default_ambiance_day_color_temp
-                    name: Color Temperature
-            - type: conditional
-              conditions:
-                - entity: input_select.sl_scene_type
-                  state: "Ambiance"
-                - entity: input_select.sl_scene_window
-                  state: "Evening"
-              card:
-                type: entities
-                show_header_toggle: false
-                entities:
-                  - entity: input_number.sl_default_ambiance_evening_brightness
-                    name: Brightness
-                  - entity: input_number.sl_default_ambiance_evening_color_temp
-                    name: Color Temperature
-            - type: conditional
-              conditions:
-                - entity: input_select.sl_scene_type
-                  state: "Ambiance"
-                - entity: input_select.sl_scene_window
-                  state: "Night"
-              card:
-                type: entities
-                show_header_toggle: false
-                entities:
-                  - entity: input_number.sl_default_ambiance_night_brightness
-                    name: Brightness
-                  - entity: input_number.sl_default_ambiance_night_color_temp
-                    name: Color Temperature
+      # ── Bathroom ────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Bathroom"
+        card:
+          type: custom:hue-like-light-card
+          entity: light.bathroom_1
+          title: Light
+          slider: default
+          onClickAction: hue-screen
+          offClickAction: hue-screen
 
-            # Dimmable defaults
-            - type: conditional
-              conditions:
-                - entity: input_select.sl_scene_type
-                  state: "Dimmable"
-                - entity: input_select.sl_scene_window
-                  state: "Morning"
-              card:
-                type: entities
-                show_header_toggle: false
-                entities:
-                  - entity: input_number.sl_default_dimmable_morning_brightness
-                    name: Brightness
-            - type: conditional
-              conditions:
-                - entity: input_select.sl_scene_type
-                  state: "Dimmable"
-                - entity: input_select.sl_scene_window
-                  state: "Day"
-              card:
-                type: entities
-                show_header_toggle: false
-                entities:
-                  - entity: input_number.sl_default_dimmable_day_brightness
-                    name: Brightness
-            - type: conditional
-              conditions:
-                - entity: input_select.sl_scene_type
-                  state: "Dimmable"
-                - entity: input_select.sl_scene_window
-                  state: "Evening"
-              card:
-                type: entities
-                show_header_toggle: false
-                entities:
-                  - entity: input_number.sl_default_dimmable_evening_brightness
-                    name: Brightness
-            - type: conditional
-              conditions:
-                - entity: input_select.sl_scene_type
-                  state: "Dimmable"
-                - entity: input_select.sl_scene_window
-                  state: "Night"
-              card:
-                type: entities
-                show_header_toggle: false
-                entities:
-                  - entity: input_number.sl_default_dimmable_night_brightness
-                    name: Brightness
+      # ── Kitchen ─────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Kitchen"
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:hue-like-light-card
+              entity: light.kitchen_1
+              title: Light 1
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.kitchen_2
+              title: Light 2
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
 
-            - type: button
-              name: Apply Defaults to All Rooms
-              icon: mdi:refresh
-              tap_action:
-                action: call-service
-                service: script.sl_rebuild_scenes
+      # ── Hallway ─────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Hallway"
+        card:
+          type: custom:hue-like-light-card
+          entity: light.hallway_1
+          title: Light
+          slider: default
+          onClickAction: hue-screen
+          offClickAction: hue-screen
+
+      - type: button
+        name: Save as Custom Scene
+        icon: mdi:content-save-all
+        tap_action:
+          action: call-service
+          service: script.sl_save_scene
+          data:
+            room: "{{ states('input_select.sl_room_selector') | lower | replace(' ', '_') }}"
+            window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
