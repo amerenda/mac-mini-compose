@@ -9,6 +9,7 @@ frontend:
 automation: !include automations.yaml
 automation manual: !include_dir_list automations
 scene: !include scenes.yaml
+scene manual: !include_dir_list scenes
 group: !include groups.yaml
 
 # Scripts managed as separate files under /config/scripts/*.yaml (dict merge)

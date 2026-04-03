@@ -115,6 +115,7 @@ services:
       - ./homeassistant/configuration/helpers/generated/input_text:/config/helpers/input_text:ro
       - ./homeassistant/configuration/helpers/generated/timer:/config/helpers/timer:ro
       - ./homeassistant/configuration/dashboards:/config/dashboards/views:ro
+      - ./homeassistant/configuration/scenes:/config/scenes:ro
       - ./homeassistant/configuration/groups.yaml:/config/groups.yaml:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8123/manifest.json"]

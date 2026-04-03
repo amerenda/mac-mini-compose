@@ -1,0 +1,57 @@
+# Smart Lighting v2 — Living Room Hue Dimmer Switch (Z2M)
+# On button → apply current scene via sl_room_on
+# Off button → turn off via sl_room_off
+# Up/Down → manual brightness adjust (sets override)
+alias: "SL: Living Room — Switch"
+id: sl_living_room_switch
+trigger:
+  - platform: mqtt
+    topic: zigbee2mqtt/living_room_s_0/action
+action:
+  - choose:
+      # On button pressed
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'on_press_release' }}"
+        sequence:
+          - service: script.sl_room_on
+            data:
+              room: living_room
+
+      # Off button pressed
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'off_press_release' }}"
+        sequence:
+          - service: script.sl_room_off
+            data:
+              room: living_room
+
+      # Brighten button pressed
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'up_press_release' }}"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.living_room
+            data:
+              brightness_step: 51
+          - service: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.sl_living_room_override
+
+      # Dim button pressed
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'down_press_release' }}"
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.living_room
+            data:
+              brightness_step: -51
+          - service: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.sl_living_room_override
+mode: single

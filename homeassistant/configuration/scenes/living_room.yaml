@@ -1,0 +1,41 @@
+# Living Room scenes — 4 time windows
+# All lights: Hue White and color ambiance A19 (color_temp: 153-500 mired, brightness: 0-255)
+#
+# Color temp reference:
+#   153 mired = 6500K (daylight/cool white)
+#   250 mired = 4000K (cool)
+#   370 mired = 2700K (neutral/soft white)
+#   454 mired = 2200K (warm)
+#   500 mired = 2000K (candlelight)
+
+- id: living_room_morning
+  name: living_room_morning
+  entities:
+    light.living_room_0:
+      state: "on"
+      brightness: 200
+      color_temp: 300
+
+- id: living_room_day
+  name: living_room_day
+  entities:
+    light.living_room_0:
+      state: "on"
+      brightness: 254
+      color_temp: 250
+
+- id: living_room_evening
+  name: living_room_evening
+  entities:
+    light.living_room_0:
+      state: "on"
+      brightness: 180
+      color_temp: 400
+
+- id: living_room_night
+  name: living_room_night
+  entities:
+    light.living_room_0:
+      state: "on"
+      brightness: 80
+      color_temp: 500

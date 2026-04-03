@@ -1,0 +1,45 @@
+# Scene template — copy this file and rename to <room>.yaml
+# Replace ROOM with: bedroom, bathroom, hallway, kitchen, entrance_lights
+# Replace light.ROOM_0, light.ROOM_1 etc. with actual light entity IDs
+#
+# Color temp reference (mired):
+#   153 = 6500K daylight     250 = 4000K cool
+#   370 = 2700K soft white   454 = 2200K warm    500 = 2000K candlelight
+#
+# Brightness: 0-255
+
+- id: ROOM_morning
+  name: ROOM_morning
+  entities:
+    light.ROOM_0:
+      state: "on"
+      brightness: 200
+      color_temp: 300
+    # light.ROOM_1:
+    #   state: "on"
+    #   brightness: 200
+    #   color_temp: 300
+
+- id: ROOM_day
+  name: ROOM_day
+  entities:
+    light.ROOM_0:
+      state: "on"
+      brightness: 254
+      color_temp: 250
+
+- id: ROOM_evening
+  name: ROOM_evening
+  entities:
+    light.ROOM_0:
+      state: "on"
+      brightness: 180
+      color_temp: 400
+
+- id: ROOM_night
+  name: ROOM_night
+  entities:
+    light.ROOM_0:
+      state: "on"
+      brightness: 80
+      color_temp: 500
