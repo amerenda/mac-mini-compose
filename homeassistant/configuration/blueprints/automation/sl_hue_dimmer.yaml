@@ -104,8 +104,10 @@ action:
   - variables:
       room: !input room
       light: !input light_entity
-      brightness_step: "{{ (brightness_step_pct | float(20)) / 100 * 255 | int }}"
-      min_brightness: "{{ (min_brightness_pct | float(20)) / 100 * 255 | int }}"
+      brightness_step_pct_val: !input brightness_step_pct
+      min_brightness_pct_val: !input min_brightness_pct
+      brightness_step: "{{ (brightness_step_pct_val | float(20)) / 100 * 255 | int }}"
+      min_brightness: "{{ (min_brightness_pct_val | float(20)) / 100 * 255 | int }}"
       b4_scene: !input button_4_long_press_scene
       custom_b1_short: !input button_1_short
       custom_b1_long: !input button_1_long
