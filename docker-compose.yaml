@@ -2,14 +2,17 @@ services:
   # ============================================================
   # Technitium DNS — authoritative + ad-blocking
   # Replaces Pi-hole + BIND9 on k3s
-  # Binds to all interfaces via host networking; restrict to
-  # 10.100.20.240 in the web UI once confirmed working.
+  # Binds to 10.100.20.18 explicitly — OrbStack intercepts *:53
+  # for its own DNS proxy so network_mode: host doesn't work for UDP.
   # ============================================================
   technitium:
     image: technitium/dns-server:latest
     container_name: technitium
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - "10.100.20.18:53:53/udp"
+      - "10.100.20.18:53:53/tcp"
+      - "10.100.20.18:5380:5380/tcp"
     environment:
       TZ: "America/New_York"
       DNS_SERVER_DOMAIN: "dns.amer.home"
