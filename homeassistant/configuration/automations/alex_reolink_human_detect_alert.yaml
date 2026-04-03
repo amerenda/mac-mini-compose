@@ -40,7 +40,7 @@ actions:
   - action: "input_text.set_value"
     target: { entity_id: "input_text.intruder_image_timestamp" }
     data: { value: "{{ timestamp }}" }
-  - action: "notify.mobile_app_pixel_9_pro_xl"
+  - action: "notify.mobile_app_pixel_9_pro_xl_alex"
     data:
       title: "Human detected - {{ room }}"
       message: "{{ now().strftime('%-I:%M %p on %b %-d') }}"
