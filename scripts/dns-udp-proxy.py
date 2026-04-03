@@ -22,7 +22,7 @@ import syslog
 import sys
 
 LISTEN_IP   = "10.100.20.18"
-LISTEN_PORT = 5355
+LISTEN_PORT = 15354
 BACKEND_IP  = "192.168.139.2"
 BACKEND_PORT = 5354
 TIMEOUT     = 3  # seconds to wait for backend response

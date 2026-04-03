@@ -27,10 +27,10 @@ ANCHOR="com.local"
 ANCHOR_FILE="/etc/pf.anchors/com.local"
 PF_CONF="/etc/pf.conf"
 
-# Testing: 5354->5355. Change DNS_PORT to 53 at LAN cutover.
+# Testing: 5354->15354. Change DNS_PORT to 53 at LAN cutover.
 DNS_PORT=5354
-# socat-dns-proxy.sh listens here and forwards to OrbStack VM.
-SOCAT_PORT=5355
+# dns-udp-proxy.py listens here and forwards to OrbStack VM.
+SOCAT_PORT=15354
 
 # OrbStack Linux VM IP — Technitium runs here in network_mode: host.
 ORBSTACK_VM_IP="192.168.139.2"
