@@ -593,7 +593,7 @@ views:
               tap_action:
                 action: toggle
             - type: custom:hue-like-light-card
-              entity: light.living_room_0
+              entity: light.living_room_1
               title: Living Room Light
               slider: default
             - type: horizontal-stack
@@ -654,15 +654,15 @@ views:
               tap_action:
                 action: toggle
             - type: custom:hue-like-light-card
-              entity: light.bedroom_0
+              entity: light.bedroom_1
               title: Light 1
               slider: default
             - type: custom:hue-like-light-card
-              entity: light.bedroom_1
+              entity: light.bedroom_2
               title: Light 2
               slider: default
             - type: custom:hue-like-light-card
-              entity: light.lamp_0
+              entity: light.lamp_1
               title: Lamp
               slider: default
             - type: horizontal-stack
@@ -723,7 +723,7 @@ views:
               tap_action:
                 action: toggle
             - type: custom:hue-like-light-card
-              entity: light.bathroom_0
+              entity: light.bathroom_1
               title: Bathroom Light
               slider: default
             - type: horizontal-stack
@@ -784,11 +784,11 @@ views:
               tap_action:
                 action: toggle
             - type: custom:hue-like-light-card
-              entity: light.kitchen_0
+              entity: light.kitchen_1
               title: Light 1
               slider: default
             - type: custom:hue-like-light-card
-              entity: light.kitchen_1
+              entity: light.kitchen_2
               title: Light 2
               slider: default
             - type: horizontal-stack
@@ -849,7 +849,7 @@ views:
               tap_action:
                 action: toggle
             - type: custom:hue-like-light-card
-              entity: light.hallway_0
+              entity: light.hallway_1
               title: Hallway Light
               slider: default
             - type: horizontal-stack

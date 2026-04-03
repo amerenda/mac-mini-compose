@@ -1,0 +1,10 @@
+alias: "SL: Bathroom — Switch"
+id: sl_bathroom_switch
+use_blueprint:
+  path: _defaults/sl_hue_dimmer.yaml
+  input:
+    switch_action_topic: zigbee2mqtt/bathroom_s_1/action
+    room: bathroom
+    light_entity: light.bathroom
+    min_brightness_pct: 20
+    brightness_step_pct: 20

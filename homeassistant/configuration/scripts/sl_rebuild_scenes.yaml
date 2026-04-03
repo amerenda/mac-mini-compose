@@ -11,16 +11,16 @@ sl_rebuild_scenes:
           - night
         ambiance_rooms:
           - room: living_room
-            lights: ["light.living_room_0"]
+            lights: ["light.living_room_1"]
           - room: bedroom
-            lights: ["light.bedroom_0", "light.bedroom_1", "light.lamp_0"]
+            lights: ["light.bedroom_1", "light.bedroom_2", "light.lamp_1"]
           - room: bathroom
-            lights: ["light.bathroom_0"]
+            lights: ["light.bathroom_1"]
         dimmable_rooms:
           - room: kitchen
-            lights: ["light.kitchen_0", "light.kitchen_1"]
+            lights: ["light.kitchen_1", "light.kitchen_2"]
           - room: hallway
-            lights: ["light.hallway_0"]
+            lights: ["light.hallway_1"]
 
     # Rebuild ambiance room scenes
     - repeat:

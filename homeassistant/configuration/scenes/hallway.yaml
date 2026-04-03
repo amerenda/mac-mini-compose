@@ -3,27 +3,27 @@
 - id: hallway_morning
   name: hallway_morning
   entities:
-    light.hallway_0:
+    light.hallway_1:
       state: "on"
       brightness: 200
 
 - id: hallway_day
   name: hallway_day
   entities:
-    light.hallway_0:
+    light.hallway_1:
       state: "on"
       brightness: 254
 
 - id: hallway_evening
   name: hallway_evening
   entities:
-    light.hallway_0:
+    light.hallway_1:
       state: "on"
       brightness: 150
 
 - id: hallway_night
   name: hallway_night
   entities:
-    light.hallway_0:
+    light.hallway_1:
       state: "on"
       brightness: 50

@@ -11,7 +11,7 @@
 - id: living_room_morning
   name: living_room_morning
   entities:
-    light.living_room_0:
+    light.living_room_1:
       state: "on"
       brightness: 200
       color_temp: 300
@@ -19,7 +19,7 @@
 - id: living_room_day
   name: living_room_day
   entities:
-    light.living_room_0:
+    light.living_room_1:
       state: "on"
       brightness: 254
       color_temp: 250
@@ -27,7 +27,7 @@
 - id: living_room_evening
   name: living_room_evening
   entities:
-    light.living_room_0:
+    light.living_room_1:
       state: "on"
       brightness: 180
       color_temp: 400
@@ -35,7 +35,7 @@
 - id: living_room_night
   name: living_room_night
   entities:
-    light.living_room_0:
+    light.living_room_1:
       state: "on"
       brightness: 80
       color_temp: 500

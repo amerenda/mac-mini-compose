@@ -1,41 +1,41 @@
-# Kitchen scenes — white-only lights: kitchen_0, kitchen_1
+# Kitchen scenes — dimmable lights: kitchen_1, kitchen_2
 # Hue White A19: brightness only, no color_temp
 - id: kitchen_morning
   name: kitchen_morning
   entities:
-    light.kitchen_0:
+    light.kitchen_1:
       state: "on"
       brightness: 200
-    light.kitchen_1:
+    light.kitchen_2:
       state: "on"
       brightness: 200
 
 - id: kitchen_day
   name: kitchen_day
   entities:
-    light.kitchen_0:
+    light.kitchen_1:
       state: "on"
       brightness: 254
-    light.kitchen_1:
+    light.kitchen_2:
       state: "on"
       brightness: 254
 
 - id: kitchen_evening
   name: kitchen_evening
   entities:
-    light.kitchen_0:
+    light.kitchen_1:
       state: "on"
       brightness: 150
-    light.kitchen_1:
+    light.kitchen_2:
       state: "on"
       brightness: 150
 
 - id: kitchen_night
   name: kitchen_night
   entities:
-    light.kitchen_0:
+    light.kitchen_1:
       state: "on"
       brightness: 50
-    light.kitchen_1:
+    light.kitchen_2:
       state: "on"
       brightness: 50
