@@ -123,28 +123,33 @@ strategy:
         icon_color: blue
         order: 1
         extra_cards:
-          - type: custom:auto-entities
-            show_empty: false
+          - type: conditional
+            conditions:
+              - entity: switch.living_room_privacy_mode
+                state_not: "on"
             card:
-              type: entities
-              title: Camera Controls
-              show_header_toggle: false
-            filter:
-              include:
-                - entity_id: button.living_room_guard_go_to
-                - entity_id: button.living_room_ptz_down
-                - entity_id: button.living_room_ptz_left
-                - entity_id: button.living_room_ptz_right
-                - entity_id: button.living_room_ptz_up
-                - entity_id: button.living_room_ptz_stop
-                - entity_id: siren.living_room_siren
-                - entity_id: binary_sensor.living_room_animal
-                - entity_id: binary_sensor.living_room_motion
-                - entity_id: binary_sensor.living_room_baby_crying
-                - entity_id: binary_sensor.living_room_person
-              exclude:
-                - state: "unavailable"
-                - state: "unknown"
+              type: custom:auto-entities
+              show_empty: false
+              card:
+                type: entities
+                title: Camera Controls
+                show_header_toggle: false
+              filter:
+                include:
+                  - entity_id: button.living_room_guard_go_to
+                  - entity_id: button.living_room_ptz_down
+                  - entity_id: button.living_room_ptz_left
+                  - entity_id: button.living_room_ptz_right
+                  - entity_id: button.living_room_ptz_up
+                  - entity_id: button.living_room_ptz_stop
+                  - entity_id: siren.living_room_siren
+                  - entity_id: binary_sensor.living_room_animal
+                  - entity_id: binary_sensor.living_room_motion
+                  - entity_id: binary_sensor.living_room_baby_crying
+                  - entity_id: binary_sensor.living_room_person
+                exclude:
+                  - state: "unavailable"
+                  - state: "unknown"
       kitchen:
         name: Kitchen
         icon: mdi:silverware-fork-knife
@@ -161,28 +166,33 @@ strategy:
         icon_color: purple
         order: 4
         extra_cards:
-          - type: custom:auto-entities
-            show_empty: false
+          - type: conditional
+            conditions:
+              - entity: switch.bedroom_privacy_mode
+                state_not: "on"
             card:
-              type: entities
-              title: Camera Controls
-              show_header_toggle: false
-            filter:
-              include:
-                - entity_id: button.bedroom_guard_go_to
-                - entity_id: button.bedroom_ptz_down
-                - entity_id: button.bedroom_ptz_left
-                - entity_id: button.bedroom_ptz_right
-                - entity_id: button.bedroom_ptz_up
-                - entity_id: button.bedroom_ptz_stop
-                - entity_id: siren.bedroom_siren
-                - entity_id: binary_sensor.bedroom_animal
-                - entity_id: binary_sensor.bedroom_motion
-                - entity_id: binary_sensor.bedroom_baby_crying
-                - entity_id: binary_sensor.bedroom_person
-              exclude:
-                - state: "unavailable"
-                - state: "unknown"
+              type: custom:auto-entities
+              show_empty: false
+              card:
+                type: entities
+                title: Camera Controls
+                show_header_toggle: false
+              filter:
+                include:
+                  - entity_id: button.bedroom_guard_go_to
+                  - entity_id: button.bedroom_ptz_down
+                  - entity_id: button.bedroom_ptz_left
+                  - entity_id: button.bedroom_ptz_right
+                  - entity_id: button.bedroom_ptz_up
+                  - entity_id: button.bedroom_ptz_stop
+                  - entity_id: siren.bedroom_siren
+                  - entity_id: binary_sensor.bedroom_animal
+                  - entity_id: binary_sensor.bedroom_motion
+                  - entity_id: binary_sensor.bedroom_baby_crying
+                  - entity_id: binary_sensor.bedroom_person
+                exclude:
+                  - state: "unavailable"
+                  - state: "unknown"
       hallway:
         name: Hallway
         icon: mdi:door-open
