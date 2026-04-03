@@ -3,19 +3,19 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.local.socat-dns-proxy</string>
+    <string>com.local.dns-udp-proxy</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/bin/bash</string>
-        <string>/Users/alex/mac-mini-compose/scripts/socat-dns-proxy.sh</string>
+        <string>/usr/bin/python3</string>
+        <string>/Users/alex/mac-mini-compose/scripts/dns-udp-proxy.py</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/var/log/socat-dns-proxy.log</string>
+    <string>/var/log/dns-udp-proxy.log</string>
     <key>StandardErrorPath</key>
-    <string>/var/log/socat-dns-proxy.log</string>
+    <string>/var/log/dns-udp-proxy.log</string>
 </dict>
 </plist>
