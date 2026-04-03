@@ -9,14 +9,23 @@ trigger:
     topic: zigbee2mqtt/living_room_s_0/action
 action:
   - choose:
-      # On button pressed
+      # On button pressed — toggle: turn on with scene, or turn off if already on
       - conditions:
           - condition: template
             value_template: "{{ trigger.payload == 'on_press' }}"
         sequence:
-          - service: script.sl_room_on
-            data:
-              room: living_room
+          - if:
+              - condition: state
+                entity_id: light.living_room
+                state: "on"
+            then:
+              - service: script.sl_room_off
+                data:
+                  room: living_room
+            else:
+              - service: script.sl_room_on
+                data:
+                  room: living_room
 
       # Off button pressed
       - conditions:
