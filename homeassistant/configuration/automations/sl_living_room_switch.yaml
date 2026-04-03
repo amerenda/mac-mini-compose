@@ -12,7 +12,7 @@ action:
       # On button pressed
       - conditions:
           - condition: template
-            value_template: "{{ trigger.payload == 'on_press_release' }}"
+            value_template: "{{ trigger.payload == 'on_press' }}"
         sequence:
           - service: script.sl_room_on
             data:
@@ -21,7 +21,7 @@ action:
       # Off button pressed
       - conditions:
           - condition: template
-            value_template: "{{ trigger.payload == 'off_press_release' }}"
+            value_template: "{{ trigger.payload == 'off_press' }}"
         sequence:
           - service: script.sl_room_off
             data:
@@ -30,7 +30,7 @@ action:
       # Brighten button pressed
       - conditions:
           - condition: template
-            value_template: "{{ trigger.payload == 'up_press_release' }}"
+            value_template: "{{ trigger.payload == 'up_press' }}"
         sequence:
           - service: light.turn_on
             target:
@@ -44,7 +44,7 @@ action:
       # Dim button pressed
       - conditions:
           - condition: template
-            value_template: "{{ trigger.payload == 'down_press_release' }}"
+            value_template: "{{ trigger.payload == 'down_press' }}"
         sequence:
           - service: light.turn_on
             target:
