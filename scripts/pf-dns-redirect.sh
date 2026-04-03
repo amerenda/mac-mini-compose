@@ -24,6 +24,10 @@ PROXY_PORT=15354          # dns-udp-proxy.py listener port
 ANCHOR_FILE="/etc/pf.anchors/com.local"
 PF_CONF="/etc/pf.conf"
 
+# Tailscale interface — DNS queries from remote Tailscale clients arrive here.
+# (utun0 is the Tailscale interface on macOS)
+TS_IFACE="utun0"
+
 ORBSTACK_VM_IP="192.168.139.2"
 TECHNITIUM_PORT=5354
 
@@ -42,9 +46,12 @@ logger -t pf-dns-redirect "IP forwarding enabled"
 
 mkdir -p /etc/pf.anchors
 cat > "${ANCHOR_FILE}" <<EOF
-# UDP + TCP: redirect to dns-proxy.py on same IP (avoids routing-via-Tailscale issue).
+# UDP + TCP: redirect DNS on LAN interface to dns-proxy.py
 rdr pass on ${IFACE} proto udp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
 rdr pass on ${IFACE} proto tcp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
+# UDP + TCP: redirect DNS arriving via Tailscale so remote clients work
+rdr pass on ${TS_IFACE} proto udp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
+rdr pass on ${TS_IFACE} proto tcp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
 EOF
 
 # ── Clean up any previous bad append ─────────────────────────────────────
