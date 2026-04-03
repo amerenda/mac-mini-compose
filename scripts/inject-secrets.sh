@@ -132,7 +132,7 @@ fi
 
 log "Injecting services secrets..."
 
-TECHNITIUM_PW=$("$BWS_BIN" secret get "PLACEHOLDER_TECHNITIUM_BWS_ID" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+TECHNITIUM_PW=$("$BWS_BIN" secret get "ae363b89-3fd6-43e3-9a83-b42100e7aed3" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
 PIHOLE_PW=$("$BWS_BIN" secret get "c8157be0-0195-41f3-b3c6-b37100d27645" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
 
 {
