@@ -29,7 +29,14 @@ TECHNITIUM_PORT=5354
 # Find with: docker exec technitium hostname -I | awk '{print $1}'
 ORBSTACK_VM_IP="192.168.139.2"
 
-logger -t pf-dns-redirect "Setting up DNS redirect on ${IFACE}:${DNS_PORT} -> 127.0.0.1:${TECHNITIUM_PORT}"
+logger -t pf-dns-redirect "Setting up DNS redirect on ${IFACE}:${DNS_PORT} -> ${ORBSTACK_VM_IP}:${TECHNITIUM_PORT}"
+
+# ── Enable IP forwarding ───────────────────────────────────────────────────
+# Required so macOS forwards pf-redirected packets from en0 to the OrbStack
+# VM network (192.168.139.x). Made persistent via /etc/sysctl.conf by Ansible.
+
+sysctl -w net.inet.ip.forwarding=1
+logger -t pf-dns-redirect "IP forwarding enabled"
 
 # ── Write anchor rules ──────────────────────────────────────────────────────
 
