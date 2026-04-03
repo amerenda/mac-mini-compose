@@ -27,8 +27,8 @@ ANCHOR="com.local"
 ANCHOR_FILE="/etc/pf.anchors/com.local"
 PF_CONF="/etc/pf.conf"
 
-# Testing: 5354->15354. Change DNS_PORT to 53 at LAN cutover.
-DNS_PORT=5354
+# Cutover: redirecting port 53 (standard DNS).
+DNS_PORT=53
 # dns-udp-proxy.py listens here and forwards to OrbStack VM.
 SOCAT_PORT=15354
 
