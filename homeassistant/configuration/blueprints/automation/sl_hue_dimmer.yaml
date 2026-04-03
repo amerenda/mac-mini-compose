@@ -21,6 +21,15 @@ blueprint:
       selector:
         entity:
           domain: light
+    brightness_step_pct:
+      name: Brightness Step (%)
+      description: "How much brightness changes per button 2/3 short press"
+      default: 20
+      selector:
+        number:
+          min: 5
+          max: 50
+          unit_of_measurement: "%"
     min_brightness_pct:
       name: Minimum Brightness (%)
       description: "Brightness floor for button 3 long press"
@@ -95,6 +104,7 @@ action:
   - variables:
       room: !input room
       light: !input light_entity
+      brightness_step: "{{ (brightness_step_pct | float(20)) / 100 * 255 | int }}"
       min_brightness: "{{ (min_brightness_pct | float(20)) / 100 * 255 | int }}"
       b4_scene: !input button_4_long_press_scene
       custom_b1_short: !input button_1_short
@@ -160,7 +170,7 @@ action:
                 target:
                   entity_id: "{{ light }}"
                 data:
-                  brightness_step: 51
+                  brightness_step: "{{ brightness_step | int }}"
               - service: input_boolean.turn_on
                 target:
                   entity_id: "input_boolean.sl_{{ room }}_override"
@@ -200,7 +210,7 @@ action:
                 target:
                   entity_id: "{{ light }}"
                 data:
-                  brightness_step: -51
+                  brightness_step: "{{ -1 * brightness_step | int }}"
               - service: input_boolean.turn_on
                 target:
                   entity_id: "input_boolean.sl_{{ room }}_override"
