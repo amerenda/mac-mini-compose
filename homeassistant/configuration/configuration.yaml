@@ -80,18 +80,6 @@ lovelace:
       icon: mdi:home
       show_in_sidebar: true
       filename: dashboards/views/dean.yaml
-    room-schedule-viewer:
-      mode: yaml
-      title: Room Schedule Viewer
-      icon: mdi:calendar-clock
-      show_in_sidebar: true
-      filename: dashboards/views/room_schedule_viewer.yaml
-    room-schedule-configuration:
-      mode: yaml
-      title: Room Schedule Configuration
-      icon: mdi:calendar-edit
-      show_in_sidebar: true
-      filename: dashboards/views/room_schedule_configuration.yaml
     subway-dashboard:
       mode: yaml
       title: Subway
@@ -110,42 +98,6 @@ lovelace:
       icon: mdi:cat
       show_in_sidebar: true
       filename: dashboards/views/uni.yaml
-    health-dashboard:
-      mode: yaml
-      title: Health
-      icon: mdi:heart-pulse
-      show_in_sidebar: true
-      filename: dashboards/views/health.yaml
-    sleep-dashboard:
-      mode: yaml
-      title: Sleep
-      icon: mdi:sleep
-      show_in_sidebar: true
-      filename: dashboards/views/sleep.yaml
-    tmp-health-mini:
-      mode: yaml
-      title: Health (mini-graph)
-      icon: mdi:heart-pulse
-      show_in_sidebar: true
-      filename: dashboards/views/tmp_health_mini.yaml
-    tmp-health-apex:
-      mode: yaml
-      title: Health (apex)
-      icon: mdi:heart-pulse
-      show_in_sidebar: true
-      filename: dashboards/views/tmp_health_apex.yaml
-    tmp-sleep-mini:
-      mode: yaml
-      title: Sleep (mini-graph)
-      icon: mdi:sleep
-      show_in_sidebar: true
-      filename: dashboards/views/tmp_sleep_mini.yaml
-    tmp-sleep-apex:
-      mode: yaml
-      title: Sleep (apex)
-      icon: mdi:sleep
-      show_in_sidebar: true
-      filename: dashboards/views/tmp_sleep_apex.yaml
     smart-lighting-dashboard:
       mode: yaml
       title: Smart Lighting
