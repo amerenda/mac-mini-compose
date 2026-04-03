@@ -45,6 +45,15 @@ def handle(data: bytes, client_addr: tuple, listen_sock: socket.socket) -> None:
 def main() -> None:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    # Tailscale installs a route for 10.100.20.0/24 via utun0 which causes
+    # replies to be sent through the Tailscale tunnel instead of en0. Force
+    # the socket to use en0 so replies reach LAN clients on the right interface.
+    # IP_BOUND_IF = 25 (macOS <netinet/in.h>)
+    IP_BOUND_IF = 25
+    en0_idx = socket.if_nametoindex("en0")
+    sock.setsockopt(socket.IPPROTO_IP, IP_BOUND_IF, en0_idx)
+
     sock.bind((LISTEN_IP, LISTEN_PORT))
 
     syslog.syslog(
