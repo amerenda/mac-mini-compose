@@ -1,8 +1,120 @@
 # Smart Lighting v2 — Per-room button action overrides
-# "Default" uses the built-in behavior. Other options override.
-# Actions available for each button:
 
-_button_options: &button_options
+# Living Room
+sl_living_room_b1_short:
+  name: "SL: LR Button 1 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_living_room_b1_long:
+  name: "SL: LR Button 1 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_living_room_b2_short:
+  name: "SL: LR Button 2 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_living_room_b2_long:
+  name: "SL: LR Button 2 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_living_room_b3_short:
+  name: "SL: LR Button 3 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_living_room_b3_long:
+  name: "SL: LR Button 3 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_living_room_b4_short:
+  name: "SL: LR Button 4 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_living_room_b4_long:
+  name: "SL: LR Button 4 Long"
   options:
     - Default
     - Toggle Room
@@ -18,52 +130,523 @@ _button_options: &button_options
   initial: Default
   icon: mdi:gesture-tap-button
 
-# Living Room
-sl_living_room_b1_short: { name: "SL: LR Button 1 Short", <<: *button_options }
-sl_living_room_b1_long:  { name: "SL: LR Button 1 Long",  <<: *button_options }
-sl_living_room_b2_short: { name: "SL: LR Button 2 Short", <<: *button_options }
-sl_living_room_b2_long:  { name: "SL: LR Button 2 Long",  <<: *button_options }
-sl_living_room_b3_short: { name: "SL: LR Button 3 Short", <<: *button_options }
-sl_living_room_b3_long:  { name: "SL: LR Button 3 Long",  <<: *button_options }
-sl_living_room_b4_short: { name: "SL: LR Button 4 Short", <<: *button_options }
-sl_living_room_b4_long:  { name: "SL: LR Button 4 Long",  <<: *button_options }
-
 # Bedroom
-sl_bedroom_b1_short: { name: "SL: BR Button 1 Short", <<: *button_options }
-sl_bedroom_b1_long:  { name: "SL: BR Button 1 Long",  <<: *button_options }
-sl_bedroom_b2_short: { name: "SL: BR Button 2 Short", <<: *button_options }
-sl_bedroom_b2_long:  { name: "SL: BR Button 2 Long",  <<: *button_options }
-sl_bedroom_b3_short: { name: "SL: BR Button 3 Short", <<: *button_options }
-sl_bedroom_b3_long:  { name: "SL: BR Button 3 Long",  <<: *button_options }
-sl_bedroom_b4_short: { name: "SL: BR Button 4 Short", <<: *button_options }
-sl_bedroom_b4_long:  { name: "SL: BR Button 4 Long",  <<: *button_options }
+sl_bedroom_b1_short:
+  name: "SL: BR Button 1 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bedroom_b1_long:
+  name: "SL: BR Button 1 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bedroom_b2_short:
+  name: "SL: BR Button 2 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bedroom_b2_long:
+  name: "SL: BR Button 2 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bedroom_b3_short:
+  name: "SL: BR Button 3 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bedroom_b3_long:
+  name: "SL: BR Button 3 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bedroom_b4_short:
+  name: "SL: BR Button 4 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bedroom_b4_long:
+  name: "SL: BR Button 4 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
 
 # Bathroom
-sl_bathroom_b1_short: { name: "SL: BA Button 1 Short", <<: *button_options }
-sl_bathroom_b1_long:  { name: "SL: BA Button 1 Long",  <<: *button_options }
-sl_bathroom_b2_short: { name: "SL: BA Button 2 Short", <<: *button_options }
-sl_bathroom_b2_long:  { name: "SL: BA Button 2 Long",  <<: *button_options }
-sl_bathroom_b3_short: { name: "SL: BA Button 3 Short", <<: *button_options }
-sl_bathroom_b3_long:  { name: "SL: BA Button 3 Long",  <<: *button_options }
-sl_bathroom_b4_short: { name: "SL: BA Button 4 Short", <<: *button_options }
-sl_bathroom_b4_long:  { name: "SL: BA Button 4 Long",  <<: *button_options }
+sl_bathroom_b1_short:
+  name: "SL: BA Button 1 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bathroom_b1_long:
+  name: "SL: BA Button 1 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bathroom_b2_short:
+  name: "SL: BA Button 2 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bathroom_b2_long:
+  name: "SL: BA Button 2 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bathroom_b3_short:
+  name: "SL: BA Button 3 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bathroom_b3_long:
+  name: "SL: BA Button 3 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bathroom_b4_short:
+  name: "SL: BA Button 4 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_bathroom_b4_long:
+  name: "SL: BA Button 4 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
 
 # Kitchen
-sl_kitchen_b1_short: { name: "SL: KI Button 1 Short", <<: *button_options }
-sl_kitchen_b1_long:  { name: "SL: KI Button 1 Long",  <<: *button_options }
-sl_kitchen_b2_short: { name: "SL: KI Button 2 Short", <<: *button_options }
-sl_kitchen_b2_long:  { name: "SL: KI Button 2 Long",  <<: *button_options }
-sl_kitchen_b3_short: { name: "SL: KI Button 3 Short", <<: *button_options }
-sl_kitchen_b3_long:  { name: "SL: KI Button 3 Long",  <<: *button_options }
-sl_kitchen_b4_short: { name: "SL: KI Button 4 Short", <<: *button_options }
-sl_kitchen_b4_long:  { name: "SL: KI Button 4 Long",  <<: *button_options }
+sl_kitchen_b1_short:
+  name: "SL: KI Button 1 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_kitchen_b1_long:
+  name: "SL: KI Button 1 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_kitchen_b2_short:
+  name: "SL: KI Button 2 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_kitchen_b2_long:
+  name: "SL: KI Button 2 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_kitchen_b3_short:
+  name: "SL: KI Button 3 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_kitchen_b3_long:
+  name: "SL: KI Button 3 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_kitchen_b4_short:
+  name: "SL: KI Button 4 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_kitchen_b4_long:
+  name: "SL: KI Button 4 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
 
 # Hallway
-sl_hallway_b1_short: { name: "SL: HL Button 1 Short", <<: *button_options }
-sl_hallway_b1_long:  { name: "SL: HL Button 1 Long",  <<: *button_options }
-sl_hallway_b2_short: { name: "SL: HL Button 2 Short", <<: *button_options }
-sl_hallway_b2_long:  { name: "SL: HL Button 2 Long",  <<: *button_options }
-sl_hallway_b3_short: { name: "SL: HL Button 3 Short", <<: *button_options }
-sl_hallway_b3_long:  { name: "SL: HL Button 3 Long",  <<: *button_options }
-sl_hallway_b4_short: { name: "SL: HL Button 4 Short", <<: *button_options }
-sl_hallway_b4_long:  { name: "SL: HL Button 4 Long",  <<: *button_options }
+sl_hallway_b1_short:
+  name: "SL: HL Button 1 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_hallway_b1_long:
+  name: "SL: HL Button 1 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_hallway_b2_short:
+  name: "SL: HL Button 2 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_hallway_b2_long:
+  name: "SL: HL Button 2 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_hallway_b3_short:
+  name: "SL: HL Button 3 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_hallway_b3_long:
+  name: "SL: HL Button 3 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_hallway_b4_short:
+  name: "SL: HL Button 4 Short"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+sl_hallway_b4_long:
+  name: "SL: HL Button 4 Long"
+  options:
+    - Default
+    - Toggle Room
+    - Power Off Room
+    - Power Off All
+    - Brightness Up
+    - Brightness Down
+    - Brightness Max
+    - Brightness Min
+    - Cycle Scenes
+    - Custom Scene
+    - Do Nothing
+  initial: Default
+  icon: mdi:gesture-tap-button
+
