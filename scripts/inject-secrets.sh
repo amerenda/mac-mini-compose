@@ -128,17 +128,28 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
-# ── Services .env (pihole, bind9) ───────────────────────────────────────────
+# ── Services .env (technitium, pihole, bind9) ───────────────────────────────
 
 log "Injecting services secrets..."
+
+TECHNITIUM_PW=$("$BWS_BIN" secret get "PLACEHOLDER_TECHNITIUM_BWS_ID" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
 PIHOLE_PW=$("$BWS_BIN" secret get "c8157be0-0195-41f3-b3c6-b37100d27645" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
-if [[ -n "$PIHOLE_PW" ]] && [[ "$PIHOLE_PW" != "null" ]]; then
-    echo "PIHOLE_WEBPASSWORD=$PIHOLE_PW" > "$COMPOSE_DIR/.env"
-    chown "$OWNER" "$COMPOSE_DIR/.env"
-else
-    log "WARN: failed to fetch pihole password"
-    ERRORS=$((ERRORS + 1))
-fi
+
+{
+    if [[ -n "$TECHNITIUM_PW" ]] && [[ "$TECHNITIUM_PW" != "null" ]]; then
+        echo "TECHNITIUM_ADMIN_PASSWORD=$TECHNITIUM_PW"
+    else
+        log "WARN: failed to fetch technitium password"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$PIHOLE_PW" ]] && [[ "$PIHOLE_PW" != "null" ]]; then
+        echo "PIHOLE_WEBPASSWORD=$PIHOLE_PW"
+    else
+        log "WARN: failed to fetch pihole password"
+        ERRORS=$((ERRORS + 1))
+    fi
+} > "$COMPOSE_DIR/.env"
+chown "$OWNER" "$COMPOSE_DIR/.env"
 
 mkdir -p "$COMPOSE_DIR/bind9/keys"
 BIND_KEY=$("$BWS_BIN" secret get "9904dc3d-6dd4-4727-907e-b3700178ea19" 2>/dev/null | /opt/homebrew/bin/jq -r .value)

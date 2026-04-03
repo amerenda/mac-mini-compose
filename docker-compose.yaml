@@ -1,5 +1,28 @@
 services:
   # ============================================================
+  # Technitium DNS — authoritative + ad-blocking
+  # Replaces Pi-hole + BIND9 on k3s
+  # Binds to all interfaces via host networking; restrict to
+  # 10.100.20.240 in the web UI once confirmed working.
+  # ============================================================
+  technitium:
+    image: technitium/dns-server:latest
+    container_name: technitium
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TZ: "America/New_York"
+      DNS_SERVER_DOMAIN: "dns.amer.home"
+      DNS_SERVER_ADMIN_PASSWORD: "${TECHNITIUM_ADMIN_PASSWORD}"
+    volumes:
+      - technitium-data:/etc/dns
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5380/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
   # BIND9 — Authoritative DNS (primary)
   # Disabled — not migrated yet. Uncomment when ready.
   # ============================================================
@@ -216,6 +239,7 @@ services:
 volumes:
   # pihole-data:
   # pihole-dnsmasq:
+  technitium-data:
   agent-kb-data:
   ha-config:
   whisper-data:
