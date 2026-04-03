@@ -2,17 +2,16 @@ services:
   # ============================================================
   # Technitium DNS — authoritative + ad-blocking
   # Replaces Pi-hole + BIND9 on k3s
-  # OrbStack intercepts *:53 and *:5353 (mDNS). Using 5354 as host port.
+  # OrbStack intercepts *:53 and *:5353 (mDNS) and doesn't forward LAN
+  # UDP to port-mapped containers. Using network_mode: host with Technitium
+  # configured to listen on 5354 (set via web UI) bypasses both issues.
   # A macOS pf rule will redirect 10.100.20.18:53 → 5354 at cutover.
   # ============================================================
   technitium:
     image: technitium/dns-server:latest
     container_name: technitium
     restart: unless-stopped
-    ports:
-      - "5354:53/udp"
-      - "5354:53/tcp"
-      - "5380:5380/tcp"
+    network_mode: host
     environment:
       TZ: "America/New_York"
       DNS_SERVER_DOMAIN: "dns.amer.home"
