@@ -943,6 +943,73 @@ views:
           - entity: input_text.sl_custom_scene_name
             name: Scene Name
 
+      # ── All Rooms ─────────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "All Rooms"
+        card:
+          type: vertical-stack
+          cards:
+            - type: custom:mushroom-title-card
+              title: Living Room
+            - type: custom:hue-like-light-card
+              entity: light.living_room_1
+              title: Light
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:mushroom-title-card
+              title: Bedroom
+            - type: custom:hue-like-light-card
+              entity: light.bedroom_1
+              title: Light 1
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.bedroom_2
+              title: Light 2
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.lamp_1
+              title: Lamp
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:mushroom-title-card
+              title: Bathroom
+            - type: custom:hue-like-light-card
+              entity: light.bathroom_1
+              title: Light
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:mushroom-title-card
+              title: Kitchen
+            - type: custom:hue-like-light-card
+              entity: light.kitchen_1
+              title: Light 1
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:hue-like-light-card
+              entity: light.kitchen_2
+              title: Light 2
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+            - type: custom:mushroom-title-card
+              title: Hallway
+            - type: custom:hue-like-light-card
+              entity: light.hallway_1
+              title: Light
+              slider: default
+              onClickAction: hue-screen
+              offClickAction: hue-screen
+
       # ── Living Room ─────────────────────────────────────────
       - type: conditional
         conditions:
@@ -1037,5 +1104,5 @@ views:
           action: call-service
           service: script.sl_save_scene
           data:
-            room: "{{ states('input_select.sl_room_selector') | lower | replace(' ', '_') }}"
+            room: "{{ states('input_select.sl_room_selector') | lower | replace(' ', '_') | replace('all_rooms', 'all') }}"
             window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"

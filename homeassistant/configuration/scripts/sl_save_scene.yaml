@@ -1,10 +1,10 @@
 sl_save_scene:
   alias: "SL: Save Current Light State as Scene"
-  description: "Capture the current state of all lights in a room and save as a scene"
+  description: "Capture the current state of lights and save as a scene"
   mode: single
   fields:
     room:
-      description: "Room identifier"
+      description: "Room identifier or 'all'"
       required: true
       selector:
         text:
@@ -15,14 +15,15 @@ sl_save_scene:
         text:
   sequence:
     - variables:
-        scene_id: "{{ room }}_{{ window }}"
         room_lights:
           living_room: ["light.living_room_1"]
           bedroom: ["light.bedroom_1", "light.bedroom_2", "light.lamp_1"]
           bathroom: ["light.bathroom_1"]
           kitchen: ["light.kitchen_1", "light.kitchen_2"]
           hallway: ["light.hallway_1"]
-        lights: "{{ room_lights[room] | default([]) }}"
+        all_lights: ["light.living_room_1", "light.bedroom_1", "light.bedroom_2", "light.lamp_1", "light.bathroom_1", "light.kitchen_1", "light.kitchen_2", "light.hallway_1"]
+        lights: "{{ all_lights if room == 'all' else room_lights[room] | default([]) }}"
+        scene_id: "{{ 'all_rooms_' ~ window if room == 'all' else room ~ '_' ~ window }}"
     - service: scene.create
       data:
         scene_id: "{{ scene_id }}"

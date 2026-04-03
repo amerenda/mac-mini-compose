@@ -30,6 +30,7 @@ sl_scene_type:
 sl_room_selector:
   name: "SL: Room"
   options:
+    - All Rooms
     - Bathroom
     - Bedroom
     - Hallway
