@@ -1,6 +1,6 @@
 title: Smart Lighting
 views:
-  - title: Smart Lighting
+  - title: Controls
     path: schedule
     icon: mdi:lightbulb-auto
     cards:
@@ -470,3 +470,199 @@ views:
               row:
                 entity: input_select.sl_living_room_night_scene
                 name: Night Scene
+
+  # ════════════════════════════════════════════════════════════
+  # Scene Editor Tab
+  # ════════════════════════════════════════════════════════════
+  - title: Scene Editor
+    path: scenes
+    icon: mdi:palette
+    cards:
+      # ── Default Scene Templates ─────────────────────────────
+      - type: markdown
+        content: >
+          ## Default Scene Templates
+
+          Set the default brightness and color temperature for each time window.
+          Rooms with **Use Defaults** enabled will automatically use these values.
+
+      - type: entities
+        title: "☀️ Ambiance Defaults (color temp lights)"
+        show_header_toggle: false
+        entities:
+          - type: section
+            label: Morning
+          - entity: input_number.sl_default_ambiance_morning_brightness
+            name: Brightness
+          - entity: input_number.sl_default_ambiance_morning_color_temp
+            name: Color Temperature
+          - type: section
+            label: Day
+          - entity: input_number.sl_default_ambiance_day_brightness
+            name: Brightness
+          - entity: input_number.sl_default_ambiance_day_color_temp
+            name: Color Temperature
+          - type: section
+            label: Evening
+          - entity: input_number.sl_default_ambiance_evening_brightness
+            name: Brightness
+          - entity: input_number.sl_default_ambiance_evening_color_temp
+            name: Color Temperature
+          - type: section
+            label: Night
+          - entity: input_number.sl_default_ambiance_night_brightness
+            name: Brightness
+          - entity: input_number.sl_default_ambiance_night_color_temp
+            name: Color Temperature
+
+      - type: entities
+        title: "💡 Dimmable Defaults (brightness-only lights)"
+        show_header_toggle: false
+        entities:
+          - type: section
+            label: Morning
+          - entity: input_number.sl_default_dimmable_morning_brightness
+            name: Brightness
+          - type: section
+            label: Day
+          - entity: input_number.sl_default_dimmable_day_brightness
+            name: Brightness
+          - type: section
+            label: Evening
+          - entity: input_number.sl_default_dimmable_evening_brightness
+            name: Brightness
+          - type: section
+            label: Night
+          - entity: input_number.sl_default_dimmable_night_brightness
+            name: Brightness
+
+      - type: button
+        name: Apply Defaults Now
+        icon: mdi:refresh
+        tap_action:
+          action: call-service
+          service: script.sl_rebuild_scenes
+
+      # ── Room Scene Editor ───────────────────────────────────
+      - type: markdown
+        content: >
+          ## Room Scenes
+
+          Toggle **Use Defaults** off for a room to customize its scenes.
+          When off, edit the scene directly using the scene cards below.
+
+      # ── Living Room (Ambiance) ──────────────────────────────
+      - type: entities
+        title: "Living Room"
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.sl_living_room_use_defaults
+            name: Use Defaults
+          - type: section
+            label: Scenes
+          - entity: scene.living_room_morning
+            name: Morning
+          - entity: scene.living_room_day
+            name: Day
+          - entity: scene.living_room_evening
+            name: Evening
+          - entity: scene.living_room_night
+            name: Night
+          - type: section
+            label: Lights
+          - entity: light.living_room_0
+            name: Living Room Light
+
+      # ── Bedroom (Ambiance) ─────────────────────────────────
+      - type: entities
+        title: "Bedroom"
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.sl_bedroom_use_defaults
+            name: Use Defaults
+          - type: section
+            label: Scenes
+          - entity: scene.bedroom_morning
+            name: Morning
+          - entity: scene.bedroom_day
+            name: Day
+          - entity: scene.bedroom_evening
+            name: Evening
+          - entity: scene.bedroom_night
+            name: Night
+          - type: section
+            label: Lights
+          - entity: light.bedroom_0
+            name: Bedroom Light 1
+          - entity: light.bedroom_1
+            name: Bedroom Light 2
+          - entity: light.lamp_0
+            name: Bedroom Lamp
+
+      # ── Bathroom (Ambiance) ────────────────────────────────
+      - type: entities
+        title: "Bathroom"
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.sl_bathroom_use_defaults
+            name: Use Defaults
+          - type: section
+            label: Scenes
+          - entity: scene.bathroom_morning
+            name: Morning
+          - entity: scene.bathroom_day
+            name: Day
+          - entity: scene.bathroom_evening
+            name: Evening
+          - entity: scene.bathroom_night
+            name: Night
+          - type: section
+            label: Lights
+          - entity: light.bathroom_0
+            name: Bathroom Light
+
+      # ── Kitchen (Dimmable) ─────────────────────────────────
+      - type: entities
+        title: "Kitchen"
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.sl_kitchen_use_defaults
+            name: Use Defaults
+          - type: section
+            label: Scenes
+          - entity: scene.kitchen_morning
+            name: Morning
+          - entity: scene.kitchen_day
+            name: Day
+          - entity: scene.kitchen_evening
+            name: Evening
+          - entity: scene.kitchen_night
+            name: Night
+          - type: section
+            label: Lights
+          - entity: light.kitchen_0
+            name: Kitchen Light 1
+          - entity: light.kitchen_1
+            name: Kitchen Light 2
+
+      # ── Hallway (Dimmable) ─────────────────────────────────
+      - type: entities
+        title: "Hallway"
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.sl_hallway_use_defaults
+            name: Use Defaults
+          - type: section
+            label: Scenes
+          - entity: scene.hallway_morning
+            name: Morning
+          - entity: scene.hallway_day
+            name: Day
+          - entity: scene.hallway_evening
+            name: Evening
+          - entity: scene.hallway_night
+            name: Night
+          - type: section
+            label: Lights
+          - entity: light.hallway_0
+            name: Hallway Light

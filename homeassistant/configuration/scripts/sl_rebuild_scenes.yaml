@@ -1,0 +1,83 @@
+sl_rebuild_scenes:
+  alias: "SL: Rebuild Scenes from Defaults"
+  description: "Recreate scene entities for rooms using default templates"
+  mode: single
+  sequence:
+    - variables:
+        windows:
+          - morning
+          - day
+          - evening
+          - night
+        ambiance_rooms:
+          - room: living_room
+            lights: ["light.living_room_0"]
+          - room: bedroom
+            lights: ["light.bedroom_0", "light.bedroom_1", "light.lamp_0"]
+          - room: bathroom
+            lights: ["light.bathroom_0"]
+        dimmable_rooms:
+          - room: kitchen
+            lights: ["light.kitchen_0", "light.kitchen_1"]
+          - room: hallway
+            lights: ["light.hallway_0"]
+
+    # Rebuild ambiance room scenes
+    - repeat:
+        for_each: "{{ ambiance_rooms }}"
+        sequence:
+          - variables:
+              room: "{{ repeat.item.room }}"
+              lights: "{{ repeat.item.lights }}"
+              use_defaults: "{{ is_state('input_boolean.sl_' ~ room ~ '_use_defaults', 'on') }}"
+          - condition: template
+            value_template: "{{ use_defaults }}"
+          - repeat:
+              for_each: "{{ windows }}"
+              sequence:
+                - variables:
+                    window: "{{ repeat.item }}"
+                    brightness: "{{ states('input_number.sl_default_ambiance_' ~ window ~ '_brightness') | int }}"
+                    color_temp: "{{ states('input_number.sl_default_ambiance_' ~ window ~ '_color_temp') | int }}"
+                - service: scene.create
+                  data:
+                    scene_id: "{{ room }}_{{ window }}"
+                    snapshot_entities: "{{ lights }}"
+                - delay:
+                    milliseconds: 100
+                # Now set the actual values by applying to lights then re-snapshotting
+                - service: scene.create
+                  data:
+                    scene_id: "{{ room }}_{{ window }}"
+                    entities: >
+                      {% set ns = namespace(result={}) %}
+                      {% for light in lights %}
+                        {% set ns.result = dict(ns.result, **{light: {'state': 'on', 'brightness': brightness, 'color_temp': color_temp}}) %}
+                      {% endfor %}
+                      {{ ns.result }}
+
+    # Rebuild dimmable room scenes
+    - repeat:
+        for_each: "{{ dimmable_rooms }}"
+        sequence:
+          - variables:
+              room: "{{ repeat.item.room }}"
+              lights: "{{ repeat.item.lights }}"
+              use_defaults: "{{ is_state('input_boolean.sl_' ~ room ~ '_use_defaults', 'on') }}"
+          - condition: template
+            value_template: "{{ use_defaults }}"
+          - repeat:
+              for_each: "{{ windows }}"
+              sequence:
+                - variables:
+                    window: "{{ repeat.item }}"
+                    brightness: "{{ states('input_number.sl_default_dimmable_' ~ window ~ '_brightness') | int }}"
+                - service: scene.create
+                  data:
+                    scene_id: "{{ room }}_{{ window }}"
+                    entities: >
+                      {% set ns = namespace(result={}) %}
+                      {% for light in lights %}
+                        {% set ns.result = dict(ns.result, **{light: {'state': 'on', 'brightness': brightness}}) %}
+                      {% endfor %}
+                      {{ ns.result }}
