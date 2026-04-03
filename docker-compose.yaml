@@ -157,6 +157,30 @@ services:
     command: --preload-model ok_nabu
 
   # ============================================================
+  # Postgres — Unified PostgreSQL instance (pgvector/pg16)
+  # Port 5432. agent-kb stays on 5433 during transition.
+  # ============================================================
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "${MINI_POSTGRES_PASSWORD}"
+      MINI_POSTGRES_TODO_PASSWORD: "${MINI_POSTGRES_TODO_PASSWORD}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
   # Agent KB — PostgreSQL + pgvector for agent framework
   # ============================================================
   agent-kb:
@@ -242,6 +266,7 @@ volumes:
   # pihole-data:
   # pihole-dnsmasq:
   technitium-data:
+  postgres-data:
   agent-kb-data:
   ha-config:
   whisper-data:

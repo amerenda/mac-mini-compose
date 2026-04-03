@@ -23,7 +23,9 @@ command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
 PIHOLE_PW=$(bws secret get c8157be0-0195-41f3-b3c6-b37100d27645 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
 AGENT_KB_PW=$(bws secret get 549c2404-4417-48bd-9fa1-b41c00e6365c --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-printf 'PIHOLE_WEBPASSWORD=%s\nAGENT_KB_PASSWORD=%s\n' "$PIHOLE_PW" "$AGENT_KB_PW" > .env
+MINI_POSTGRES_PW=$(bws secret get <REPLACE_WITH_BWS_ID_FOR_mini-postgres-password> --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
+MINI_POSTGRES_TODO_PW=$(bws secret get <REPLACE_WITH_BWS_ID_FOR_mini-postgres-todo-password> --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
+printf 'PIHOLE_WEBPASSWORD=%s\nAGENT_KB_PASSWORD=%s\nMINI_POSTGRES_PASSWORD=%s\nMINI_POSTGRES_TODO_PASSWORD=%s\n' "$PIHOLE_PW" "$AGENT_KB_PW" "$MINI_POSTGRES_PW" "$MINI_POSTGRES_TODO_PW" > .env
 mkdir -p bind9/keys
 BIND_KEY=$(bws secret get 9904dc3d-6dd4-4727-907e-b3700178ea19 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
 printf 'key "externaldns-key." { algorithm hmac-sha256; secret "%s"; };\n' "$BIND_KEY" > bind9/keys/key.conf
