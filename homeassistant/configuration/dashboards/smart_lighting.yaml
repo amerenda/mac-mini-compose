@@ -517,6 +517,21 @@ views:
                     data:
                       room: living_room
                       window: night
+            - type: entities
+              show_header_toggle: false
+              entities:
+                - entity: input_text.sl_custom_scene_name
+                  name: Custom Name
+            - type: button
+              name: Save as Custom
+              icon: mdi:creation
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.sl_save_scene
+                data:
+                  room: living_room
+                  window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
 
       # ── Bedroom ─────────────────────────────────────────────
       - type: conditional
@@ -626,6 +641,21 @@ views:
                     data:
                       room: bedroom
                       window: night
+            - type: entities
+              show_header_toggle: false
+              entities:
+                - entity: input_text.sl_custom_scene_name
+                  name: Custom Name
+            - type: button
+              name: Save as Custom
+              icon: mdi:creation
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.sl_save_scene
+                data:
+                  room: bedroom
+                  window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
 
       # ── Bathroom ────────────────────────────────────────────
       - type: conditional
@@ -723,6 +753,21 @@ views:
                     data:
                       room: bathroom
                       window: night
+            - type: entities
+              show_header_toggle: false
+              entities:
+                - entity: input_text.sl_custom_scene_name
+                  name: Custom Name
+            - type: button
+              name: Save as Custom
+              icon: mdi:creation
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.sl_save_scene
+                data:
+                  room: bathroom
+                  window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
 
       # ── Kitchen ─────────────────────────────────────────────
       - type: conditional
@@ -826,6 +871,21 @@ views:
                     data:
                       room: kitchen
                       window: night
+            - type: entities
+              show_header_toggle: false
+              entities:
+                - entity: input_text.sl_custom_scene_name
+                  name: Custom Name
+            - type: button
+              name: Save as Custom
+              icon: mdi:creation
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.sl_save_scene
+                data:
+                  room: kitchen
+                  window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
 
       # ── Hallway ─────────────────────────────────────────────
       - type: conditional
