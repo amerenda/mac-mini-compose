@@ -50,3 +50,11 @@ services:
       REPO_URL: https://github.com/amerenda/mycroft
       RUNNER_NAME: mini-mycroft
       LABELS: self-hosted,linux,arm64,docker,mac-mini
+
+  runner-wikimedia:
+    <<: *runner-common
+    container_name: runner-wikimedia
+    environment:
+      REPO_URL: https://github.com/amerenda/wikimedia
+      RUNNER_NAME: mini-wikimedia
+      LABELS: self-hosted,linux,arm64,docker,mac-mini
