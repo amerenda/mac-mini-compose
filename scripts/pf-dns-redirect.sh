@@ -29,8 +29,11 @@ logger -t pf-dns-redirect "Setting up DNS redirect on ${IFACE}:${DNS_PORT} -> 12
 
 mkdir -p /etc/pf.anchors
 cat > "${ANCHOR_FILE}" <<EOF
+# Redirect dst: LAN:DNS_PORT -> loopback:TECHNITIUM_PORT
 rdr pass on ${IFACE} proto udp from any to 10.100.20.18 port ${DNS_PORT} -> 127.0.0.1 port ${TECHNITIUM_PORT}
 rdr pass on ${IFACE} proto tcp from any to 10.100.20.18 port ${DNS_PORT} -> 127.0.0.1 port ${TECHNITIUM_PORT}
+# Masquerade src to 127.0.0.1 so OrbStack accepts the packet as local-to-local
+nat on lo0 proto { udp, tcp } from any to 127.0.0.1 port ${TECHNITIUM_PORT} -> 127.0.0.1
 EOF
 
 # ── Clean up any previous bad append (appended at end = wrong order) ──────
@@ -47,6 +50,13 @@ sed -i '' '/^load anchor "com.local\/dns-redirect"/d' "${PF_CONF}" 2>/dev/null |
 # pf requires strict ordering: normalization, translation (rdr), filtering.
 # Insert each directive after its corresponding com.apple counterpart.
 # Safe to re-run (idempotent).
+
+if ! grep -q 'nat-anchor "com.local"' "${PF_CONF}"; then
+    # nat-anchor goes after nat-anchor "com.apple/*"
+    sed -i '' 's|nat-anchor "com.apple/\*"|nat-anchor "com.apple/*"\
+nat-anchor "com.local"|' "${PF_CONF}"
+    logger -t pf-dns-redirect "Added nat-anchor com.local to ${PF_CONF}"
+fi
 
 if ! grep -q 'rdr-anchor "com.local"' "${PF_CONF}"; then
     # rdr-anchor goes after rdr-anchor "com.apple/*"
