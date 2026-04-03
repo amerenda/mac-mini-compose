@@ -84,7 +84,7 @@ install_card "hue-like-light-card" \
 # ── Register lovelace resources ──────────────────────────────
 # Only write if the file doesn't exist or is missing our resources
 RESOURCES_FILE="/config/.storage/lovelace_resources"
-if [ ! -f "$RESOURCES_FILE" ] || ! grep -q "mushroom.js" "$RESOURCES_FILE"; then
+if [ ! -f "$RESOURCES_FILE" ] || ! grep -q "hue-like-light-card.js" "$RESOURCES_FILE"; then
   echo "Registering frontend resources..."
   cat > "$RESOURCES_FILE" << 'RESEOF'
 {
