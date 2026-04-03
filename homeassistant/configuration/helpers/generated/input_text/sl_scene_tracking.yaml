@@ -1,0 +1,16 @@
+# Tracks the last scene window applied via button 4 cycle, per room
+sl_living_room_last_scene_window:
+  name: "SL: Living Room Last Scene Window"
+  max: 20
+sl_bedroom_last_scene_window:
+  name: "SL: Bedroom Last Scene Window"
+  max: 20
+sl_bathroom_last_scene_window:
+  name: "SL: Bathroom Last Scene Window"
+  max: 20
+sl_kitchen_last_scene_window:
+  name: "SL: Kitchen Last Scene Window"
+  max: 20
+sl_hallway_last_scene_window:
+  name: "SL: Hallway Last Scene Window"
+  max: 20

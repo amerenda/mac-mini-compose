@@ -1,0 +1,42 @@
+sl_cycle_scene:
+  alias: "SL: Cycle Scene"
+  description: "Cycle through window scenes for a room (morning → day → evening → night → morning)"
+  mode: single
+  fields:
+    room:
+      description: "Room identifier"
+      required: true
+      selector:
+        text:
+  sequence:
+    - variables:
+        windows:
+          - morning
+          - day
+          - evening
+          - night
+        current_window: "{{ states('sensor.sl_current_window') }}"
+        last_applied: "{{ states('input_text.sl_' ~ room ~ '_last_scene_window') }}"
+        # If no scene was forced yet, start at current window; otherwise cycle from last applied
+        current_index: >
+          {% if last_applied in windows %}
+            {{ windows.index(last_applied) }}
+          {% else %}
+            {{ windows.index(current_window) if current_window in windows else 0 }}
+          {% endif %}
+        next_index: "{{ (current_index | int + 1) % 4 }}"
+        next_window: "{{ windows[next_index | int] }}"
+        scene_entity: "scene.{{ room }}_{{ next_window }}"
+        scene_exists: "{{ scene_entity in (states.scene | map(attribute='entity_id') | list) }}"
+    - if:
+        - condition: template
+          value_template: "{{ scene_exists }}"
+      then:
+        - service: scene.turn_on
+          target:
+            entity_id: "{{ scene_entity }}"
+        - service: input_text.set_value
+          target:
+            entity_id: "input_text.sl_{{ room }}_last_scene_window"
+          data:
+            value: "{{ next_window }}"

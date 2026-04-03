@@ -1,66 +1,10 @@
-# Smart Lighting v2 — Living Room Hue Dimmer Switch (Z2M)
-# On button → apply current scene via sl_room_on
-# Off button → turn off via sl_room_off
-# Up/Down → manual brightness adjust (sets override)
+# Living Room Hue Dimmer — uses SL blueprint with defaults
 alias: "SL: Living Room — Switch"
 id: sl_living_room_switch
-trigger:
-  - platform: mqtt
-    topic: zigbee2mqtt/living_room_s_0/action
-action:
-  - choose:
-      # On button pressed — toggle: turn on with scene, or turn off if already on
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'on_press' }}"
-        sequence:
-          - if:
-              - condition: state
-                entity_id: light.living_room
-                state: "on"
-            then:
-              - service: script.sl_room_off
-                data:
-                  room: living_room
-            else:
-              - service: script.sl_room_on
-                data:
-                  room: living_room
-
-      # Off button pressed
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'off_press' }}"
-        sequence:
-          - service: script.sl_room_off
-            data:
-              room: living_room
-
-      # Brighten button pressed
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'up_press' }}"
-        sequence:
-          - service: light.turn_on
-            target:
-              entity_id: light.living_room
-            data:
-              brightness_step: 51
-          - service: input_boolean.turn_on
-            target:
-              entity_id: input_boolean.sl_living_room_override
-
-      # Dim button pressed
-      - conditions:
-          - condition: template
-            value_template: "{{ trigger.payload == 'down_press' }}"
-        sequence:
-          - service: light.turn_on
-            target:
-              entity_id: light.living_room
-            data:
-              brightness_step: -51
-          - service: input_boolean.turn_on
-            target:
-              entity_id: input_boolean.sl_living_room_override
-mode: single
+use_blueprint:
+  path: _defaults/sl_hue_dimmer.yaml
+  input:
+    switch_action_topic: zigbee2mqtt/living_room_s_0/action
+    room: living_room
+    light_entity: light.living_room
+    min_brightness_pct: 20

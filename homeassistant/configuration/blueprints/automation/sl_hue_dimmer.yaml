@@ -1,0 +1,263 @@
+blueprint:
+  name: "SL: Hue Dimmer Switch"
+  description: >
+    Configurable Hue dimmer switch (gen 2) automation for Smart Lighting v2.
+    All 8 actions (4 buttons × short/long press) are configurable with sensible defaults.
+  domain: automation
+  input:
+    switch_action_topic:
+      name: Switch Action Topic
+      description: "Z2M MQTT action topic (e.g., zigbee2mqtt/living_room_s_0/action)"
+      selector:
+        text:
+    room:
+      name: Room
+      description: "Room identifier matching scene convention (e.g., living_room)"
+      selector:
+        text:
+    light_entity:
+      name: Light Entity
+      description: "Light entity or Z2M group to control"
+      selector:
+        entity:
+          domain: light
+    min_brightness_pct:
+      name: Minimum Brightness (%)
+      description: "Brightness floor for button 3 long press"
+      default: 20
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+    button_4_long_press_scene:
+      name: "Button 4 Long Press Scene"
+      description: "Scene to activate on button 4 long press (leave empty for no action)"
+      default: ""
+      selector:
+        text:
+
+    # ── Overridable actions ──────────────────────────────────
+    button_1_short:
+      name: "Button 1 Short Press"
+      description: "Default: toggle lights on (with scene) / off"
+      default: []
+      selector:
+        action:
+    button_1_long:
+      name: "Button 1 Long Press"
+      description: "Default: turn off all lights in room"
+      default: []
+      selector:
+        action:
+    button_2_short:
+      name: "Button 2 Short Press"
+      description: "Default: brightness up (+20%)"
+      default: []
+      selector:
+        action:
+    button_2_long:
+      name: "Button 2 Long Press"
+      description: "Default: brightness max"
+      default: []
+      selector:
+        action:
+    button_3_short:
+      name: "Button 3 Short Press"
+      description: "Default: brightness down (-20%)"
+      default: []
+      selector:
+        action:
+    button_3_long:
+      name: "Button 3 Long Press"
+      description: "Default: brightness minimum"
+      default: []
+      selector:
+        action:
+    button_4_short:
+      name: "Button 4 Short Press"
+      description: "Default: set current window scene, then cycle on repeat"
+      default: []
+      selector:
+        action:
+    button_4_long:
+      name: "Button 4 Long Press"
+      description: "Default: activate selected scene (if configured)"
+      default: []
+      selector:
+        action:
+
+trigger:
+  - platform: mqtt
+    topic: !input switch_action_topic
+
+action:
+  - variables:
+      room: !input room
+      light: !input light_entity
+      min_brightness: "{{ (min_brightness_pct | float(20)) / 100 * 255 | int }}"
+      b4_scene: !input button_4_long_press_scene
+      custom_b1_short: !input button_1_short
+      custom_b1_long: !input button_1_long
+      custom_b2_short: !input button_2_short
+      custom_b2_long: !input button_2_long
+      custom_b3_short: !input button_3_short
+      custom_b3_long: !input button_3_long
+      custom_b4_short: !input button_4_short
+      custom_b4_long: !input button_4_long
+
+  - choose:
+      # ── Button 1: Short Press ────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'on_press_release' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ custom_b1_short | length > 0 }}"
+            then: !input button_1_short
+            else:
+              # Default: toggle — off if on, scene if off
+              - if:
+                  - condition: template
+                    value_template: "{{ is_state(light, 'on') }}"
+                then:
+                  - service: script.sl_room_off
+                    data:
+                      room: "{{ room }}"
+                else:
+                  - service: script.sl_room_on
+                    data:
+                      room: "{{ room }}"
+
+      # ── Button 1: Long Press ─────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'on_hold' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ custom_b1_long | length > 0 }}"
+            then: !input button_1_long
+            else:
+              # Default: power off all lights in room
+              - service: script.sl_room_off
+                data:
+                  room: "{{ room }}"
+
+      # ── Button 2: Short Press ────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'up_press_release' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ custom_b2_short | length > 0 }}"
+            then: !input button_2_short
+            else:
+              # Default: brightness up 20%
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ light }}"
+                data:
+                  brightness_step: 51
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: "input_boolean.sl_{{ room }}_override"
+
+      # ── Button 2: Long Press ─────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'up_hold' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ custom_b2_long | length > 0 }}"
+            then: !input button_2_long
+            else:
+              # Default: brightness max
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ light }}"
+                data:
+                  brightness: 255
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: "input_boolean.sl_{{ room }}_override"
+
+      # ── Button 3: Short Press ────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'down_press_release' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ custom_b3_short | length > 0 }}"
+            then: !input button_3_short
+            else:
+              # Default: brightness down 20%
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ light }}"
+                data:
+                  brightness_step: -51
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: "input_boolean.sl_{{ room }}_override"
+
+      # ── Button 3: Long Press ─────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'down_hold' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ custom_b3_long | length > 0 }}"
+            then: !input button_3_long
+            else:
+              # Default: brightness minimum
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ light }}"
+                data:
+                  brightness: "{{ min_brightness | int }}"
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: "input_boolean.sl_{{ room }}_override"
+
+      # ── Button 4: Short Press ────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'off_press_release' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ custom_b4_short | length > 0 }}"
+            then: !input button_4_short
+            else:
+              # Default: set current window scene, cycle on repeat
+              - service: script.sl_cycle_scene
+                data:
+                  room: "{{ room }}"
+
+      # ── Button 4: Long Press ─────────────────────────────
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == 'off_hold' }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ custom_b4_long | length > 0 }}"
+            then: !input button_4_long
+            else:
+              # Default: activate configured scene (if set)
+              - if:
+                  - condition: template
+                    value_template: "{{ b4_scene not in ['', 'unknown', 'unavailable', 'none'] }}"
+                then:
+                  - service: scene.turn_on
+                    target:
+                      entity_id: "{{ b4_scene }}"
+
+mode: single
+max_exceeded: silent
