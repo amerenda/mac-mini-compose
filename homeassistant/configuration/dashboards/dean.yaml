@@ -99,6 +99,44 @@ strategy:
         tap_action:
           action: call-service
           service: script.sl_toggle_all
+      - type: horizontal-stack
+        cards:
+          - type: button
+            name: Morning
+            icon: mdi:weather-sunset-up
+            show_state: false
+            tap_action:
+              action: call-service
+              service: script.sl_all_rooms_scene
+              data:
+                window: morning
+          - type: button
+            name: Day
+            icon: mdi:weather-sunny
+            show_state: false
+            tap_action:
+              action: call-service
+              service: script.sl_all_rooms_scene
+              data:
+                window: day
+          - type: button
+            name: Evening
+            icon: mdi:weather-sunset-down
+            show_state: false
+            tap_action:
+              action: call-service
+              service: script.sl_all_rooms_scene
+              data:
+                window: evening
+          - type: button
+            name: Night
+            icon: mdi:weather-night
+            show_state: false
+            tap_action:
+              action: call-service
+              service: script.sl_all_rooms_scene
+              data:
+                window: night
 
       - type: custom:mushroom-title-card
         title: Latest Pet Detection

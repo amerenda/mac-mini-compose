@@ -1,6 +1,6 @@
 sl_rebuild_scenes:
   alias: "SL: Rebuild Scenes from Defaults"
-  description: "Recreate scene entities for rooms using default templates"
+  description: "Set lights to default values, then snapshot as scenes"
   mode: single
   sequence:
     - variables:
@@ -39,22 +39,23 @@ sl_rebuild_scenes:
                     window: "{{ repeat.item }}"
                     brightness: "{{ states('input_number.sl_default_ambiance_' ~ window ~ '_brightness') | int }}"
                     color_temp: "{{ states('input_number.sl_default_ambiance_' ~ window ~ '_color_temp') | int }}"
+                # Set each light to desired values
+                - repeat:
+                    for_each: "{{ lights }}"
+                    sequence:
+                      - service: light.turn_on
+                        target:
+                          entity_id: "{{ repeat.item }}"
+                        data:
+                          brightness: "{{ brightness }}"
+                          color_temp: "{{ color_temp }}"
+                - delay:
+                    milliseconds: 500
+                # Snapshot current state as scene
                 - service: scene.create
                   data:
                     scene_id: "{{ room }}_{{ window }}"
                     snapshot_entities: "{{ lights }}"
-                - delay:
-                    milliseconds: 100
-                # Now set the actual values by applying to lights then re-snapshotting
-                - service: scene.create
-                  data:
-                    scene_id: "{{ room }}_{{ window }}"
-                    entities: >
-                      {% set ns = namespace(result={}) %}
-                      {% for light in lights %}
-                        {% set ns.result = dict(ns.result, **{light: {'state': 'on', 'brightness': brightness, 'color_temp': color_temp}}) %}
-                      {% endfor %}
-                      {{ ns.result }}
 
     # Rebuild dimmable room scenes
     - repeat:
@@ -72,12 +73,19 @@ sl_rebuild_scenes:
                 - variables:
                     window: "{{ repeat.item }}"
                     brightness: "{{ states('input_number.sl_default_dimmable_' ~ window ~ '_brightness') | int }}"
+                # Set each light to desired brightness
+                - repeat:
+                    for_each: "{{ lights }}"
+                    sequence:
+                      - service: light.turn_on
+                        target:
+                          entity_id: "{{ repeat.item }}"
+                        data:
+                          brightness: "{{ brightness }}"
+                - delay:
+                    milliseconds: 500
+                # Snapshot current state as scene
                 - service: scene.create
                   data:
                     scene_id: "{{ room }}_{{ window }}"
-                    entities: >
-                      {% set ns = namespace(result={}) %}
-                      {% for light in lights %}
-                        {% set ns.result = dict(ns.result, **{light: {'state': 'on', 'brightness': brightness}}) %}
-                      {% endfor %}
-                      {{ ns.result }}
+                    snapshot_entities: "{{ lights }}"
