@@ -1169,8 +1169,8 @@ views:
       - type: entities
         show_header_toggle: false
         entities:
-          - entity: input_select.sl_switch_selector
-            name: Switch
+          - entity: input_select.sl_room_selector
+            name: Room
 
       - type: markdown
         content: |
@@ -1182,11 +1182,11 @@ views:
       # ── Living Room ─────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_switch_selector
+          - entity: input_select.sl_room_selector
             state: "Living Room"
         card:
           type: entities
-          title: Living Room Switch
+          title: living_room_s_1
           show_header_toggle: false
           entities:
             - type: section
@@ -1200,7 +1200,7 @@ views:
             - entity: input_text.sl_living_room_b4_scene
               name: Scene Entity ID
             - type: section
-              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+              label: Multi-Room
             - entity: input_boolean.sl_living_room_multi_living_room
               name: Living Room
             - entity: input_boolean.sl_living_room_multi_bedroom
@@ -1215,11 +1215,11 @@ views:
       # ── Bedroom ─────────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_switch_selector
+          - entity: input_select.sl_room_selector
             state: "Bedroom"
         card:
           type: entities
-          title: Bedroom Switch
+          title: bedroom_s_1
           show_header_toggle: false
           entities:
             - type: section
@@ -1233,7 +1233,7 @@ views:
             - entity: input_text.sl_bedroom_b4_scene
               name: Scene Entity ID
             - type: section
-              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+              label: Multi-Room
             - entity: input_boolean.sl_bedroom_multi_living_room
               name: Living Room
             - entity: input_boolean.sl_bedroom_multi_bedroom
@@ -1248,11 +1248,11 @@ views:
       # ── Bathroom ────────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_switch_selector
+          - entity: input_select.sl_room_selector
             state: "Bathroom"
         card:
           type: entities
-          title: Bathroom Switch
+          title: bathroom_s_1
           show_header_toggle: false
           entities:
             - type: section
@@ -1266,7 +1266,7 @@ views:
             - entity: input_text.sl_bathroom_b4_scene
               name: Scene Entity ID
             - type: section
-              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+              label: Multi-Room
             - entity: input_boolean.sl_bathroom_multi_living_room
               name: Living Room
             - entity: input_boolean.sl_bathroom_multi_bedroom
@@ -1281,11 +1281,11 @@ views:
       # ── Kitchen ─────────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_switch_selector
+          - entity: input_select.sl_room_selector
             state: "Kitchen"
         card:
           type: entities
-          title: Kitchen Switch
+          title: kitchen_s_1
           show_header_toggle: false
           entities:
             - type: section
@@ -1299,7 +1299,7 @@ views:
             - entity: input_text.sl_kitchen_b4_scene
               name: Scene Entity ID
             - type: section
-              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+              label: Multi-Room
             - entity: input_boolean.sl_kitchen_multi_living_room
               name: Living Room
             - entity: input_boolean.sl_kitchen_multi_bedroom
@@ -1311,14 +1311,28 @@ views:
             - entity: input_boolean.sl_kitchen_multi_hallway
               name: Hallway
 
-      # ── Hallway ─────────────────────────────────────────────
+      # ── Hallway (switch picker) ─────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_switch_selector
-            state: "Hallway (S1)"
+          - entity: input_select.sl_room_selector
+            state: "Hallway"
         card:
           type: entities
-          title: Hallway Switches (2)
+          show_header_toggle: false
+          entities:
+            - entity: input_select.sl_switch_selector
+              name: Switch
+
+      # Hallway S1
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "Hallway"
+          - entity: input_select.sl_switch_selector
+            state: "hallway_s_1"
+        card:
+          type: entities
+          title: hallway_s_1
           show_header_toggle: false
           entities:
             - type: section
@@ -1332,7 +1346,7 @@ views:
             - entity: input_text.sl_hallway_b4_scene
               name: Scene Entity ID
             - type: section
-              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+              label: Multi-Room
             - entity: input_boolean.sl_hallway_multi_living_room
               name: Living Room
             - entity: input_boolean.sl_hallway_multi_bedroom
@@ -1344,14 +1358,16 @@ views:
             - entity: input_boolean.sl_hallway_multi_hallway
               name: Hallway
 
-      # ── Hallway (S2) ────────────────────────────────────────
+      # Hallway S2
       - type: conditional
         conditions:
+          - entity: input_select.sl_room_selector
+            state: "Hallway"
           - entity: input_select.sl_switch_selector
-            state: "Hallway (S2)"
+            state: "hallway_s_2"
         card:
           type: entities
-          title: Hallway Switch 2
+          title: hallway_s_2
           show_header_toggle: false
           entities:
             - type: section
@@ -1365,7 +1381,7 @@ views:
             - entity: input_text.sl_hallway_s2_b4_scene
               name: Scene Entity ID
             - type: section
-              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+              label: Multi-Room
             - entity: input_boolean.sl_hallway_s2_multi_living_room
               name: Living Room
             - entity: input_boolean.sl_hallway_s2_multi_bedroom
@@ -1395,11 +1411,11 @@ views:
             # Living Room buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_switch_selector
+                - entity: input_select.sl_room_selector
                   state: "Living Room"
               card:
                 type: entities
-                title: Living Room — Button Actions
+                title: living_room_s_1 — Buttons
                 show_header_toggle: false
                 entities:
                   - type: section
@@ -1429,11 +1445,11 @@ views:
             # Bedroom buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_switch_selector
+                - entity: input_select.sl_room_selector
                   state: "Bedroom"
               card:
                 type: entities
-                title: Bedroom — Button Actions
+                title: bedroom_s_1 — Buttons
                 show_header_toggle: false
                 entities:
                   - type: section
@@ -1463,11 +1479,11 @@ views:
             # Bathroom buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_switch_selector
+                - entity: input_select.sl_room_selector
                   state: "Bathroom"
               card:
                 type: entities
-                title: Bathroom — Button Actions
+                title: bathroom_s_1 — Buttons
                 show_header_toggle: false
                 entities:
                   - type: section
@@ -1497,11 +1513,11 @@ views:
             # Kitchen buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_switch_selector
+                - entity: input_select.sl_room_selector
                   state: "Kitchen"
               card:
                 type: entities
-                title: Kitchen — Button Actions
+                title: kitchen_s_1 — Buttons
                 show_header_toggle: false
                 entities:
                   - type: section
@@ -1528,14 +1544,16 @@ views:
                     name: Short Press
                   - entity: input_select.sl_kitchen_b4_long
                     name: Long Press
-            # Hallway buttons
+            # Hallway S1 buttons
             - type: conditional
               conditions:
+                - entity: input_select.sl_room_selector
+                  state: "Hallway"
                 - entity: input_select.sl_switch_selector
-                  state: "Hallway (S1)"
+                  state: "hallway_s_1"
               card:
                 type: entities
-                title: Hallway — Button Actions
+                title: hallway_s_1 — Buttons
                 show_header_toggle: false
                 entities:
                   - type: section
@@ -1565,11 +1583,13 @@ views:
             # Hallway S2 buttons
             - type: conditional
               conditions:
+                - entity: input_select.sl_room_selector
+                  state: "Hallway"
                 - entity: input_select.sl_switch_selector
-                  state: "Hallway (S2)"
+                  state: "hallway_s_2"
               card:
                 type: entities
-                title: Hallway S2 — Button Actions
+                title: hallway_s_2 — Buttons
                 show_header_toggle: false
                 entities:
                   - type: section

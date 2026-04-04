@@ -30,13 +30,13 @@ sl_scene_type:
 sl_switch_selector:
   name: "SL: Switch"
   options:
-    - Living Room
-    - Bedroom
-    - Bathroom
-    - Kitchen
-    - Hallway (S1)
-    - Hallway (S2)
-  initial: Living Room
+    - living_room_s_1
+    - bedroom_s_1
+    - bathroom_s_1
+    - kitchen_s_1
+    - hallway_s_1
+    - hallway_s_2
+  initial: living_room_s_1
   icon: mdi:light-switch
 
 sl_room_selector:
