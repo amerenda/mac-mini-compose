@@ -296,22 +296,40 @@ action:
     # ── Default: use built-in behavior based on button ────
     default:
       - choose:
-          # Button 1 Short: toggle
+          # Button 1 Short: toggle (multi-room aware)
           - conditions:
               - condition: template
                 value_template: "{{ trigger.payload == 'on_press_release' }}"
             sequence:
+              - variables:
+                  multi_rooms: >
+                    {% set ns = namespace(rooms=[]) %}
+                    {% for r in ['living_room','bedroom','bathroom','kitchen','hallway'] %}
+                      {% if is_state('input_boolean.sl_' ~ sid ~ '_multi_' ~ r, 'on') %}
+                        {% set ns.rooms = ns.rooms + [r] %}
+                      {% endif %}
+                    {% endfor %}
+                    {{ ns.rooms }}
+                  has_multi: "{{ multi_rooms | length > 0 }}"
               - if:
                   - condition: template
                     value_template: "{{ is_state(light, 'on') }}"
                 then:
-                  - service: script.sl_room_off
-                    data:
-                      room: "{{ room }}"
+                  # Off: turn off all multi rooms if configured, else just this room
+                  - repeat:
+                      for_each: "{{ multi_rooms if has_multi else [room] }}"
+                      sequence:
+                        - service: script.sl_room_off
+                          data:
+                            room: "{{ repeat.item }}"
                 else:
-                  - service: script.sl_room_on
-                    data:
-                      room: "{{ room }}"
+                  # On: turn on all multi rooms if configured, else just this room
+                  - repeat:
+                      for_each: "{{ multi_rooms if has_multi else [room] }}"
+                      sequence:
+                        - service: script.sl_room_on
+                          data:
+                            room: "{{ repeat.item }}"
           # Button 1 Long: power off room
           - conditions:
               - condition: template
