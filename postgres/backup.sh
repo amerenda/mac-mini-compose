@@ -13,6 +13,9 @@ if [ -z "$BUCKET" ] || [ -z "$ENDPOINT" ]; then
   exit 1
 fi
 
+# GCS S3-compat requires path-style addressing
+aws configure set default.s3.addressing_style path
+
 for DB in $DATABASES; do
   FILENAME="${DB}_${TIMESTAMP}.sql.gz"
   echo "[$(date)] Backing up $DB..."
