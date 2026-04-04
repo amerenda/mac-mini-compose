@@ -1,26 +1,8 @@
-# Rebuild scenes when default templates or use_defaults toggles change
-alias: "SL: Rebuild Scenes on Default Change"
+# Rebuild scenes ONLY on HA start (once, after 30s)
+# Manual rebuild via "Apply Defaults" button on dashboard
+alias: "SL: Rebuild Scenes on Start"
 id: sl_rebuild_on_default_change
 trigger:
-  - platform: state
-    entity_id:
-      - input_number.sl_default_ambiance_morning_brightness
-      - input_number.sl_default_ambiance_morning_color_temp
-      - input_number.sl_default_ambiance_day_brightness
-      - input_number.sl_default_ambiance_day_color_temp
-      - input_number.sl_default_ambiance_evening_brightness
-      - input_number.sl_default_ambiance_evening_color_temp
-      - input_number.sl_default_ambiance_night_brightness
-      - input_number.sl_default_ambiance_night_color_temp
-      - input_number.sl_default_dimmable_morning_brightness
-      - input_number.sl_default_dimmable_day_brightness
-      - input_number.sl_default_dimmable_evening_brightness
-      - input_number.sl_default_dimmable_night_brightness
-      - input_boolean.sl_living_room_use_defaults
-      - input_boolean.sl_bedroom_use_defaults
-      - input_boolean.sl_bathroom_use_defaults
-      - input_boolean.sl_kitchen_use_defaults
-      - input_boolean.sl_hallway_use_defaults
   - platform: homeassistant
     event: start
 action:
