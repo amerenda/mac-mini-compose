@@ -5,7 +5,8 @@ set -e
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 DATABASES="todo agent_kb argo_workflows"
-BUCKET="${BACKUP_BUCKET}"
+BUCKET="${BACKUP_BUCKET:-amerenda-backups}"
+BUCKET_PATH="${BACKUP_BUCKET_PATH:-us/mac-mini/dean}"
 ENDPOINT="${BACKUP_ENDPOINT}"
 
 if [ -z "$BUCKET" ] || [ -z "$ENDPOINT" ]; then
@@ -21,7 +22,7 @@ for DB in $DATABASES; do
   echo "[$(date)] Backing up $DB..."
   pg_dump -h "${PGHOST}" -p "${PGPORT:-5432}" -U "${PGUSER}" -d "$DB" \
     | gzip -9 > "/tmp/${FILENAME}"
-  aws s3 cp "/tmp/${FILENAME}" "s3://${BUCKET}/postgres/${FILENAME}" \
+  aws s3 cp "/tmp/${FILENAME}" "s3://${BUCKET}/${BUCKET_PATH}/${FILENAME}" \
     --endpoint-url "${ENDPOINT}"
   rm "/tmp/${FILENAME}"
   echo "[$(date)] $DB done: ${FILENAME}"
@@ -29,12 +30,12 @@ done
 
 # Retention: keep last 7 per database, delete older
 for DB in $DATABASES; do
-  aws s3 ls "s3://${BUCKET}/postgres/" --endpoint-url "${ENDPOINT}" \
+  aws s3 ls "s3://${BUCKET}/${BUCKET_PATH}/" --endpoint-url "${ENDPOINT}" \
     | grep " ${DB}_" | sort | head -n -7 \
     | awk '{print $4}' \
     | while read -r KEY; do
         echo "[$(date)] Deleting old backup: $KEY"
-        aws s3 rm "s3://${BUCKET}/postgres/${KEY}" --endpoint-url "${ENDPOINT}"
+        aws s3 rm "s3://${BUCKET}/${BUCKET_PATH}/${KEY}" --endpoint-url "${ENDPOINT}"
       done
 done
 
