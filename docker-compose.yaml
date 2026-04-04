@@ -255,6 +255,7 @@ services:
       AWS_SECRET_ACCESS_KEY: "${BACKUP_SECRET_KEY}"
       BACKUP_ENDPOINT: "${BACKUP_ENDPOINT}"
       BACKUP_BUCKET: "amerenda-db-backups"
+      AWS_DEFAULT_REGION: "us-east1"
     command: >
       sh -c "
         apk add --no-cache postgresql16-client aws-cli &&
