@@ -38,7 +38,8 @@ sl_rebuild_scenes:
                 - variables:
                     window: "{{ repeat.item }}"
                     brightness: "{{ states('input_number.sl_default_ambiance_' ~ window ~ '_brightness') | int }}"
-                    color_temp: "{{ states('input_number.sl_default_ambiance_' ~ window ~ '_color_temp') | int }}"
+                    mired: "{{ states('input_number.sl_default_ambiance_' ~ window ~ '_color_temp') | int }}"
+                    kelvin: "{{ (1000000 / mired) | int }}"
                 # Set each light to desired values
                 - repeat:
                     for_each: "{{ lights }}"
@@ -48,7 +49,7 @@ sl_rebuild_scenes:
                           entity_id: "{{ repeat.item }}"
                         data:
                           brightness: "{{ brightness }}"
-                          color_temp: "{{ color_temp }}"
+                          kelvin: "{{ kelvin }}"
                 - delay:
                     milliseconds: 500
                 # Snapshot current state as scene
