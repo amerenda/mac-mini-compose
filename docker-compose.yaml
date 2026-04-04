@@ -256,10 +256,9 @@ services:
       BACKUP_ENDPOINT: "${BACKUP_ENDPOINT}"
       BACKUP_BUCKET: "amerenda-backups"
       BACKUP_BUCKET_PATH: "us/mac-mini/dean"
-      AWS_DEFAULT_REGION: "auto"
     command: >
       sh -c "
-        apk add --no-cache postgresql16-client aws-cli &&
+        apk add --no-cache postgresql16-client s3cmd &&
         echo '0 2 * * * sh /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
         crond -f -l 8
       "
