@@ -86,3 +86,20 @@ sl_hallway_multi_kitchen:
 sl_hallway_multi_hallway:
   name: "SL: HL Multi → Hallway"
   icon: mdi:door-open
+
+# Hallway Switch 2 includes:
+sl_hallway_s2_multi_living_room:
+  name: "SL: HL-S2 Multi → Living Room"
+  icon: mdi:sofa
+sl_hallway_s2_multi_bedroom:
+  name: "SL: HL-S2 Multi → Bedroom"
+  icon: mdi:bed
+sl_hallway_s2_multi_bathroom:
+  name: "SL: HL-S2 Multi → Bathroom"
+  icon: mdi:shower
+sl_hallway_s2_multi_kitchen:
+  name: "SL: HL-S2 Multi → Kitchen"
+  icon: mdi:silverware-fork-knife
+sl_hallway_s2_multi_hallway:
+  name: "SL: HL-S2 Multi → Hallway"
+  icon: mdi:door-open

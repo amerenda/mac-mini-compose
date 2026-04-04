@@ -83,3 +83,20 @@ sl_hallway_min_brightness:
   initial: 20
   unit_of_measurement: "%"
   icon: mdi:brightness-4
+
+sl_hallway_s2_brightness_step:
+  name: "SL: Hallway S2 Brightness Step"
+  min: 5
+  max: 50
+  step: 5
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-6
+sl_hallway_s2_min_brightness:
+  name: "SL: Hallway S2 Min Brightness"
+  min: 1
+  max: 100
+  step: 1
+  initial: 20
+  unit_of_measurement: "%"
+  icon: mdi:brightness-4

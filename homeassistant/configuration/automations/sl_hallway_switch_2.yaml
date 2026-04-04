@@ -6,5 +6,6 @@ use_blueprint:
     switch_action_topic: zigbee2mqtt/hallway_s_2/action
     room: hallway
     light_entity: light.hallway
+    switch_id: hallway_s2
     min_brightness_pct: 20
     brightness_step_pct: 20

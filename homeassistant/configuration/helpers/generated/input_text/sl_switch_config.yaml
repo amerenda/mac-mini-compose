@@ -19,3 +19,8 @@ sl_hallway_b4_scene:
   name: "SL: Hallway Button 4 Scene"
   max: 100
   icon: mdi:movie-open
+
+sl_hallway_s2_b4_scene:
+  name: "SL: Hallway S2 Button 4 Scene"
+  max: 100
+  icon: mdi:movie-open

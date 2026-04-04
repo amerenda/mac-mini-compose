@@ -1169,8 +1169,8 @@ views:
       - type: entities
         show_header_toggle: false
         entities:
-          - entity: input_select.sl_room_selector
-            name: Room
+          - entity: input_select.sl_switch_selector
+            name: Switch
 
       - type: markdown
         content: |
@@ -1182,7 +1182,7 @@ views:
       # ── Living Room ─────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_room_selector
+          - entity: input_select.sl_switch_selector
             state: "Living Room"
         card:
           type: entities
@@ -1215,7 +1215,7 @@ views:
       # ── Bedroom ─────────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_room_selector
+          - entity: input_select.sl_switch_selector
             state: "Bedroom"
         card:
           type: entities
@@ -1248,7 +1248,7 @@ views:
       # ── Bathroom ────────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_room_selector
+          - entity: input_select.sl_switch_selector
             state: "Bathroom"
         card:
           type: entities
@@ -1281,7 +1281,7 @@ views:
       # ── Kitchen ─────────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_room_selector
+          - entity: input_select.sl_switch_selector
             state: "Kitchen"
         card:
           type: entities
@@ -1314,8 +1314,8 @@ views:
       # ── Hallway ─────────────────────────────────────────────
       - type: conditional
         conditions:
-          - entity: input_select.sl_room_selector
-            state: "Hallway"
+          - entity: input_select.sl_switch_selector
+            state: "Hallway (S1)"
         card:
           type: entities
           title: Hallway Switches (2)
@@ -1344,6 +1344,39 @@ views:
             - entity: input_boolean.sl_hallway_multi_hallway
               name: Hallway
 
+      # ── Hallway (S2) ────────────────────────────────────────
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_switch_selector
+            state: "Hallway (S2)"
+        card:
+          type: entities
+          title: Hallway Switch 2
+          show_header_toggle: false
+          entities:
+            - type: section
+              label: Brightness Controls
+            - entity: input_number.sl_hallway_s2_brightness_step
+              name: Brightness Step (per press)
+            - entity: input_number.sl_hallway_s2_min_brightness
+              name: Minimum Brightness (long dim)
+            - type: section
+              label: Button 4 Long Press
+            - entity: input_text.sl_hallway_s2_b4_scene
+              name: Scene Entity ID
+            - type: section
+              label: Multi-Room (select rooms for "Multi-Room Scene" action)
+            - entity: input_boolean.sl_hallway_s2_multi_living_room
+              name: Living Room
+            - entity: input_boolean.sl_hallway_s2_multi_bedroom
+              name: Bedroom
+            - entity: input_boolean.sl_hallway_s2_multi_bathroom
+              name: Bathroom
+            - entity: input_boolean.sl_hallway_s2_multi_kitchen
+              name: Kitchen
+            - entity: input_boolean.sl_hallway_s2_multi_hallway
+              name: Hallway
+
       # ── Advanced: Per-Button Actions ────────────────────────
       - type: entities
         show_header_toggle: false
@@ -1362,7 +1395,7 @@ views:
             # Living Room buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_room_selector
+                - entity: input_select.sl_switch_selector
                   state: "Living Room"
               card:
                 type: entities
@@ -1396,7 +1429,7 @@ views:
             # Bedroom buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_room_selector
+                - entity: input_select.sl_switch_selector
                   state: "Bedroom"
               card:
                 type: entities
@@ -1430,7 +1463,7 @@ views:
             # Bathroom buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_room_selector
+                - entity: input_select.sl_switch_selector
                   state: "Bathroom"
               card:
                 type: entities
@@ -1464,7 +1497,7 @@ views:
             # Kitchen buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_room_selector
+                - entity: input_select.sl_switch_selector
                   state: "Kitchen"
               card:
                 type: entities
@@ -1498,8 +1531,8 @@ views:
             # Hallway buttons
             - type: conditional
               conditions:
-                - entity: input_select.sl_room_selector
-                  state: "Hallway"
+                - entity: input_select.sl_switch_selector
+                  state: "Hallway (S1)"
               card:
                 type: entities
                 title: Hallway — Button Actions
@@ -1528,4 +1561,38 @@ views:
                   - entity: input_select.sl_hallway_b4_short
                     name: Short Press
                   - entity: input_select.sl_hallway_b4_long
+                    name: Long Press
+            # Hallway S2 buttons
+            - type: conditional
+              conditions:
+                - entity: input_select.sl_switch_selector
+                  state: "Hallway (S2)"
+              card:
+                type: entities
+                title: Hallway S2 — Button Actions
+                show_header_toggle: false
+                entities:
+                  - type: section
+                    label: "Button 1 (top)"
+                  - entity: input_select.sl_hallway_s2_b1_short
+                    name: Short Press
+                  - entity: input_select.sl_hallway_s2_b1_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 2 (up)"
+                  - entity: input_select.sl_hallway_s2_b2_short
+                    name: Short Press
+                  - entity: input_select.sl_hallway_s2_b2_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 3 (down)"
+                  - entity: input_select.sl_hallway_s2_b3_short
+                    name: Short Press
+                  - entity: input_select.sl_hallway_s2_b3_long
+                    name: Long Press
+                  - type: section
+                    label: "Button 4 (bottom)"
+                  - entity: input_select.sl_hallway_s2_b4_short
+                    name: Short Press
+                  - entity: input_select.sl_hallway_s2_b4_long
                     name: Long Press

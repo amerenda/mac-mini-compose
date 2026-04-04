@@ -21,6 +21,12 @@ blueprint:
       selector:
         entity:
           domain: light
+    switch_id:
+      name: Switch Config ID
+      description: "Unique ID for this switch's config helpers (defaults to room name)"
+      default: ""
+      selector:
+        text:
     brightness_step_pct:
       name: Brightness Step (%)
       description: "How much brightness changes per button 2/3 short press"
@@ -104,25 +110,27 @@ action:
   - variables:
       room: !input room
       light: !input light_entity
+      switch_id_input: !input switch_id
+      sid: "{{ switch_id_input if switch_id_input not in ['', 'unknown', 'unavailable'] else room }}"
       # Read config from helpers (dashboard-editable) with blueprint input as fallback
-      brightness_step_pct_val: "{{ states('input_number.sl_' ~ room ~ '_brightness_step') | float(0) }}"
+      brightness_step_pct_val: "{{ states('input_number.sl_' ~ sid ~ '_brightness_step') | float(0) }}"
       brightness_step_pct_fallback: !input brightness_step_pct
-      min_brightness_pct_val: "{{ states('input_number.sl_' ~ room ~ '_min_brightness') | float(0) }}"
+      min_brightness_pct_val: "{{ states('input_number.sl_' ~ sid ~ '_min_brightness') | float(0) }}"
       min_brightness_pct_fallback: !input min_brightness_pct
       brightness_step: "{{ ((brightness_step_pct_val if brightness_step_pct_val > 0 else brightness_step_pct_fallback) | float(20)) / 100 * 255 | int }}"
       min_brightness: "{{ ((min_brightness_pct_val if min_brightness_pct_val > 0 else min_brightness_pct_fallback) | float(20)) / 100 * 255 | int }}"
-      b4_scene_helper: "{{ states('input_text.sl_' ~ room ~ '_b4_scene') }}"
+      b4_scene_helper: "{{ states('input_text.sl_' ~ sid ~ '_b4_scene') }}"
       b4_scene_input: !input button_4_long_press_scene
       b4_scene: "{{ b4_scene_helper if b4_scene_helper not in ['', 'unknown', 'unavailable'] else b4_scene_input }}"
       # Per-button action overrides from dashboard helpers
-      b1s: "{{ states('input_select.sl_' ~ room ~ '_b1_short') }}"
-      b1l: "{{ states('input_select.sl_' ~ room ~ '_b1_long') }}"
-      b2s: "{{ states('input_select.sl_' ~ room ~ '_b2_short') }}"
-      b2l: "{{ states('input_select.sl_' ~ room ~ '_b2_long') }}"
-      b3s: "{{ states('input_select.sl_' ~ room ~ '_b3_short') }}"
-      b3l: "{{ states('input_select.sl_' ~ room ~ '_b3_long') }}"
-      b4s: "{{ states('input_select.sl_' ~ room ~ '_b4_short') }}"
-      b4l: "{{ states('input_select.sl_' ~ room ~ '_b4_long') }}"
+      b1s: "{{ states('input_select.sl_' ~ sid ~ '_b1_short') }}"
+      b1l: "{{ states('input_select.sl_' ~ sid ~ '_b1_long') }}"
+      b2s: "{{ states('input_select.sl_' ~ sid ~ '_b2_short') }}"
+      b2l: "{{ states('input_select.sl_' ~ sid ~ '_b2_long') }}"
+      b3s: "{{ states('input_select.sl_' ~ sid ~ '_b3_short') }}"
+      b3l: "{{ states('input_select.sl_' ~ sid ~ '_b3_long') }}"
+      b4s: "{{ states('input_select.sl_' ~ sid ~ '_b4_short') }}"
+      b4l: "{{ states('input_select.sl_' ~ sid ~ '_b4_long') }}"
 
   - variables:
       # Map action string → payload for the choose below
@@ -164,7 +172,7 @@ action:
               for_each: >
                 {% set ns = namespace(rooms=[]) %}
                 {% for r in ['living_room','bedroom','bathroom','kitchen','hallway'] %}
-                  {% if is_state('input_boolean.sl_' ~ room ~ '_multi_' ~ r, 'on') %}
+                  {% if is_state('input_boolean.sl_' ~ sid ~ '_multi_' ~ r, 'on') %}
                     {% set ns.rooms = ns.rooms + [r] %}
                   {% endif %}
                 {% endfor %}
