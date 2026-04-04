@@ -49,7 +49,7 @@ sl_rebuild_scenes:
                           entity_id: "{{ repeat.item }}"
                         data:
                           brightness: "{{ brightness }}"
-                          kelvin: "{{ kelvin }}"
+                          color_temp_kelvin: "{{ kelvin }}"
                 - delay:
                     milliseconds: 500
                 # Snapshot current state as scene
