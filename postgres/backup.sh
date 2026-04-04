@@ -4,7 +4,8 @@
 set -e
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-DATABASES="todo agent_kb argo_workflows"
+# Databases on unified postgres (add agent_kb, argo_workflows when migrated)
+DATABASES="todo"
 BUCKET="${BACKUP_BUCKET:-amerenda-backups}"
 BUCKET_PATH="${BACKUP_BUCKET_PATH:-us/mac-mini/dean}"
 ENDPOINT="${BACKUP_ENDPOINT}"
