@@ -258,8 +258,7 @@ services:
     command: >
       sh -c "
         apk add --no-cache postgresql16-client aws-cli &&
-        chmod +x /backup.sh &&
-        echo '0 2 * * * /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+        echo '0 2 * * * sh /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
         crond -f -l 8
       "
 
