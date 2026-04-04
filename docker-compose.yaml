@@ -233,6 +233,37 @@ services:
       TZ: "America/New_York"
 
   # ============================================================
+  # Postgres Backup — pg_dump | gzip → GCS via HMAC (S3-compat)
+  # Runs daily at 02:00. Retention: 7 backups per database.
+  # Databases: todo, agent_kb, argo_workflows
+  # ============================================================
+  postgres-backup:
+    image: alpine:3
+    container_name: postgres-backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./postgres/backup.sh:/backup.sh:ro
+    environment:
+      PGHOST: "10.100.20.18"
+      PGPORT: "5432"
+      PGUSER: "postgres"
+      PGPASSWORD: "${MINI_POSTGRES_PASSWORD}"
+      AWS_ACCESS_KEY_ID: "${BACKUP_ACCESS_KEY}"
+      AWS_SECRET_ACCESS_KEY: "${BACKUP_SECRET_KEY}"
+      BACKUP_ENDPOINT: "${BACKUP_ENDPOINT}"
+      BACKUP_BUCKET: "amerenda-db-backups"
+    command: >
+      sh -c "
+        apk add --no-cache postgresql16-client aws-cli &&
+        chmod +x /backup.sh &&
+        echo '0 2 * * * /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+        crond -f -l 8
+      "
+
+  # ============================================================
   # Monitoring exporters — scraped by Prometheus on k3s
   # ============================================================
   node-exporter:
