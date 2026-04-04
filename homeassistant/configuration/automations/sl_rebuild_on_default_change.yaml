@@ -25,6 +25,6 @@ trigger:
     event: start
 action:
   - delay:
-      seconds: 5
+      seconds: 30
   - service: script.sl_rebuild_scenes
-mode: restart
+mode: single
