@@ -183,6 +183,28 @@ services:
 
 
   # ============================================================
+  # MongoDB — UniFi Network Application database
+  # ============================================================
+  mongo-unifi:
+    image: mongo:4.4.10
+    container_name: mongo-unifi
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-unifi-data:/data/db
+      - ./mongo/init-unifi.sh:/docker-entrypoint-initdb.d/init-unifi.sh:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD}"
+      MONGO_INITDB_DATABASE: unifi
+    healthcheck:
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
   # Mosquitto — MQTT broker (used by Zigbee2MQTT + HA)
   # ============================================================
   mosquitto:
@@ -277,6 +299,7 @@ volumes:
   # pihole-data:
   # pihole-dnsmasq:
   technitium-data:
+  mongo-unifi-data:
   postgres-data:
   ha-config:
   whisper-data:
