@@ -271,7 +271,7 @@ services:
   # Runs daily at 02:15. Retention: 7 backups.
   # ============================================================
   mongo-backup:
-    image: mongo:4.4.10
+    image: alpine:3
     container_name: mongo-backup
     restart: unless-stopped
     depends_on:
@@ -290,10 +290,10 @@ services:
       BACKUP_BUCKET: "amerenda-backups"
       BACKUP_BUCKET_PATH: "us/mac-mini/dean"
     command: >
-      bash -c "
-        pip3 install -q s3cmd &&
-        echo '15 2 * * * bash /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
-        cron -f
+      sh -c "
+        apk add --no-cache mongodb-tools s3cmd &&
+        echo '15 2 * * * sh /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+        crond -f -l 8
       "
 
   # ============================================================

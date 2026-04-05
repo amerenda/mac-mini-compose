@@ -1,4 +1,5 @@
 #!/bin/sh
+# mongodump → gzip → GCS. Uses alpine mongodb-tools + s3cmd.
 # mongodump → gzip → GCS (S3-compatible HMAC via s3cmd)
 # Runs daily via cron. Retention: 7 daily backups.
 set -e
