@@ -183,16 +183,17 @@ services:
 
 
   # ============================================================
-  # MongoDB — UniFi Network Application database
+  # MongoDB — Shared instance (port 27017)
+  # Databases: unifi
   # ============================================================
-  mongo-unifi:
+  mongo:
     image: mongo:4.4.10
-    container_name: mongo-unifi
+    container_name: mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
-      - mongo-unifi-data:/data/db
+      - mongo-data:/data/db
       - ./mongo/init-unifi.sh:/docker-entrypoint-initdb.d/init-unifi.sh:ro
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
@@ -299,7 +300,7 @@ volumes:
   # pihole-data:
   # pihole-dnsmasq:
   technitium-data:
-  mongo-unifi-data:
+  mongo-data:
   postgres-data:
   ha-config:
   whisper-data:
