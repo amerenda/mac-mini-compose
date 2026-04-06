@@ -9,7 +9,7 @@ manage_camera_privacy:
               entity_id: group.members
               state: "home"
             - condition: state
-              entity_id: group.guests
+              entity_id: person.alex_merenda
               state: "home"
       then:
         # Someone is home - Privacy ON (Cameras OFF)
