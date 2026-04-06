@@ -58,3 +58,11 @@ services:
       REPO_URL: https://github.com/amerenda/wikimedia
       RUNNER_NAME: mini-wikimedia
       LABELS: self-hosted,linux,arm64,docker,mac-mini
+
+  runner-photos:
+    <<: *runner-common
+    container_name: runner-photos
+    environment:
+      REPO_URL: https://github.com/amerenda/photos
+      RUNNER_NAME: mini-photos
+      LABELS: self-hosted,linux,arm64,docker,mac-mini
