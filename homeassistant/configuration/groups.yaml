@@ -4,3 +4,9 @@ members:
     - device_tracker.pixel_9_pro_xl_2
     - device_tracker.eirill_iphone
   all: false
+
+guests:
+  name: Guests
+  entities:
+    - device_tracker.eirill_iphone
+  all: false
