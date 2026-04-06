@@ -2,7 +2,7 @@ alias: "Alex - Update Last Significant Zone"
 mode: queued
 triggers:
   - trigger: state
-    entity_id: device_tracker.pixel_9_pro_xl
+    entity_id: device_tracker.pixel_9_pro_xl_2
   - trigger: homeassistant
     event: start
 variables:
@@ -10,7 +10,7 @@ variables:
     {% if trigger.platform == 'state' %}
       {{ trigger.to_state.state | lower }}
     {% else %}
-      {{ states('device_tracker.pixel_9_pro_xl') | lower }}
+      {{ states('device_tracker.pixel_9_pro_xl_2') | lower }}
     {% endif %}
 actions:
   - service: logbook.log
