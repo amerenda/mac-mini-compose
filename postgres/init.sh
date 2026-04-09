@@ -17,3 +17,12 @@ EOSQL
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "agent_kb" <<-EOSQL
     CREATE EXTENSION IF NOT EXISTS vector;
 EOSQL
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    CREATE USER quiz WITH PASSWORD '${QUIZ_POSTGRES_PASSWORD}';
+    CREATE DATABASE quiz OWNER quiz;
+EOSQL
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "quiz" <<-EOSQL
+    CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+EOSQL

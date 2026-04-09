@@ -66,3 +66,11 @@ services:
       REPO_URL: https://github.com/amerenda/photos
       RUNNER_NAME: mini-photos
       LABELS: self-hosted,linux,arm64,docker,mac-mini
+
+  runner-quiz:
+    <<: *runner-common
+    container_name: runner-quiz
+    environment:
+      REPO_URL: https://github.com/amerenda/quiz
+      RUNNER_NAME: mini-quiz
+      LABELS: self-hosted,linux,arm64,docker,mac-mini
