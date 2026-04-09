@@ -1,5 +1,4 @@
 alias: "Members - Camera Privacy (Home)"
-initial_state: false
 mode: "restart"
 triggers:
   - trigger: "state"
