@@ -1,4 +1,5 @@
 alias: "Members - Camera Privacy (Away)"
+initial_state: false
 mode: "restart"
 triggers:
   - trigger: "state"

@@ -1,18 +1,13 @@
 manage_camera_privacy:
   alias: "Manage Camera Privacy"
-  description: "Checks presence of all users and toggles camera privacy mode accordingly. Privacy ON if anyone home, OFF if everyone away."
+  description: "Cameras OFF (privacy ON) when Alex is home. Cameras ON (privacy OFF) when Alex is away. Eirill's presence does not affect camera state."
   sequence:
     - if:
-        - condition: or
-          conditions:
-            - condition: state
-              entity_id: group.members
-              state: "home"
-            - condition: state
-              entity_id: person.alex_merenda
-              state: "home"
+        - condition: state
+          entity_id: device_tracker.pixel_9_pro_xl_2
+          state: "home"
       then:
-        # Someone is home - Privacy ON (Cameras OFF)
+        # Alex is home - Privacy ON (Cameras OFF)
         - action: light.turn_off
           target:
             entity_id:
@@ -24,7 +19,7 @@ manage_camera_privacy:
               - switch.bedroom_privacy_mode
               - switch.living_room_privacy_mode
       else:
-        # Everyone is away - Privacy OFF (Cameras ON)
+        # Alex is away - Privacy OFF (Cameras ON)
         - action: light.turn_on
           target:
             entity_id:
