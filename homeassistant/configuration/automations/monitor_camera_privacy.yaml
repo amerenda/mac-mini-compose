@@ -1,4 +1,5 @@
 alias: "System - Monitor Camera Privacy"
+initial_state: true
 mode: "single"
 triggers:
   - trigger: "time_pattern"
