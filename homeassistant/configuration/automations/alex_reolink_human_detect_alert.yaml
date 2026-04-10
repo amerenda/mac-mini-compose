@@ -16,15 +16,14 @@ variables:
     {{
       {
         'binary_sensor.living_room_person':
-          {'camera': 'camera.living_room_fluent','room':'Living Room','slug':'living_room','siren':'siren.living_room_siren'},
+          {'camera': 'camera.living_room_fluent','room':'Living Room','slug':'living_room'},
         'binary_sensor.bedroom_person':
-          {'camera': 'camera.bedroom_fluent',    'room':'Bedroom',    'slug':'bedroom',    'siren':'siren.bedroom_siren'}
+          {'camera': 'camera.bedroom_fluent',    'room':'Bedroom',    'slug':'bedroom'}
       }
     }}
   cam: "{{ CAM_MAP[trigger.entity_id]['camera'] }}"
   room: "{{ CAM_MAP[trigger.entity_id]['room'] }}"
   slug: "{{ CAM_MAP[trigger.entity_id]['slug'] }}"
-  siren: "{{ CAM_MAP[trigger.entity_id]['siren'] }}"
   timestamp: "{{ now().strftime('%Y%m%d_%H%M%S') }}"
   path: "/config/www/intruders/{{ slug }}_{{ timestamp }}.jpg"
   url: "/local/intruders/{{ slug }}_{{ timestamp }}.jpg"
@@ -48,11 +47,3 @@ actions:
         tag: "human-{{ slug }}"
         importance: "high"
         sticky: true
-  - if:
-      - condition: state
-        entity_id: input_boolean.security_alarm
-        state: "on"
-    then:
-      - action: siren.turn_on
-        target:
-          entity_id: "{{ siren }}"

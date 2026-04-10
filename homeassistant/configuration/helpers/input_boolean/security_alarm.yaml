@@ -1,4 +1,0 @@
-security_alarm:
-  name: "Security Alarm"
-  icon: mdi:alarm-light
-  initial: false

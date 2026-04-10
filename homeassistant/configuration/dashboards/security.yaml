@@ -16,15 +16,6 @@ views:
       - type: grid
         cards:
           - type: heading
-            heading: Alarm
-            heading_style: title
-            icon: mdi:alarm-light
-          - type: entities
-            entities:
-              - input_boolean.security_alarm
-      - type: grid
-        cards:
-          - type: heading
             heading: Camera Feeds
             heading_style: title
             icon: mdi:camera
