@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const mqtt = require('mqtt');
 
 const CACHE_FILE = path.join(__dirname, 'sl-cache.json');
@@ -24,6 +25,8 @@ class SmartLighting {
         this.settings = settings;
         this.logger = logger;
         this.config = null;
+        this.configHash = null;
+        this.lastSyncTime = null;
         this.currentWindow = null;
         this.checkInterval = null;
         this.cmdClient = null;
@@ -56,7 +59,8 @@ class SmartLighting {
         // Load cached config
         this.config = this._loadCache();
         if (this.config) {
-            this.logger.info('[SL] Loaded cached config from disk');
+            this.configHash = this._hashConfig(this.config);
+            this.logger.info(`[SL] Loaded cached config from disk (hash: ${this.configHash})`);
             this.currentWindow = this._calculateCurrentWindow();
             this.logger.info(`[SL] Current window: ${this.currentWindow}`);
         } else {
@@ -119,8 +123,9 @@ class SmartLighting {
         try {
             const newConfig = JSON.parse(data.message);
             this.config = newConfig;
+            this.configHash = this._hashConfig(newConfig);
             this._saveCache(newConfig);
-            this.logger.info('[SL] Received and cached new config from HA');
+            this.logger.info(`[SL] Received and cached new config from HA (hash: ${this.configHash})`);
             this.currentWindow = this._calculateCurrentWindow();
             this._fullScenePush();
             this._publishStatus('config_updated');
@@ -209,7 +214,8 @@ class SmartLighting {
             this._recallSceneIfOn(roomName, roomConfig, effectiveWindow);
         }
 
-        this._publishStatus(`full_push_${this.currentWindow}`);
+        this.lastSyncTime = new Date().toISOString();
+        this._publishStatus(`synced`);
     }
 
     // ── Window transition ────────────────────────────────────
@@ -340,11 +346,17 @@ class SmartLighting {
         catch (e) { this.logger.error(`[SL] Failed to save cache: ${e.message}`); }
     }
 
+    _hashConfig(config) {
+        return crypto.createHash('sha256').update(JSON.stringify(config)).digest('hex').substring(0, 12);
+    }
+
     _publishStatus(status) {
         this.z2mMqtt.publish(STATUS_TOPIC, JSON.stringify({
             status,
             current_window: this.currentWindow,
             has_config: !!this.config,
+            config_hash: this.configHash,
+            last_sync: this.lastSyncTime,
             timestamp: new Date().toISOString(),
         }), undefined, undefined, false, false);
     }

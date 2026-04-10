@@ -13,6 +13,23 @@ views:
             name: Current Window
           - entity: input_select.sl_house_mode
             name: House Mode
+          - entity: sensor.sl_z2m_sync_status
+            name: Z2M Sync
+      - type: markdown
+        content: >
+          {% set attrs = state_attr('sensor.sl_z2m_sync_status', 'last_sync') %}
+          {% set hash = state_attr('sensor.sl_z2m_sync_status', 'config_hash') %}
+          {% set window = state_attr('sensor.sl_z2m_sync_status', 'current_window') %}
+          **Z2M:** {{ window | default('unknown') }} window
+          | Hash: `{{ hash | default('none') }}`
+          | Last sync: {{ attrs | default('never') }}
+      - type: button
+        name: Force Sync to Z2M
+        icon: mdi:sync
+        show_state: false
+        tap_action:
+          action: call-service
+          service: script.sl_push_config
 
       # ── Schedule (collapsible) ─────────────────────────────
       - type: entities

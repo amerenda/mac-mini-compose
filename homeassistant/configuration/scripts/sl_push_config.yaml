@@ -1,6 +1,6 @@
 sl_push_config:
   alias: "SL: Push Config to Z2M"
-  description: "Publishes schedule + scene config to zigbee2mqtt/sl/config (retained) for the Z2M extension"
+  description: "Reads schedule + scene helpers, publishes to zigbee2mqtt/sl/config (retained)"
   mode: single
   sequence:
     - variables:
@@ -40,50 +40,59 @@ sl_push_config:
             'saturday': states('input_select.sl_profile_saturday'),
             'sunday': states('input_select.sl_profile_sunday')
           } %}
+          {% macro scene(room, window) %}
+            {% set b = states('input_number.sl_' ~ room ~ '_' ~ window ~ '_brightness') | int(200) %}
+            {% set ct = states('input_number.sl_' ~ room ~ '_' ~ window ~ '_color_temp') %}
+            {% if ct not in ['unknown', 'unavailable', ''] %}
+              {"brightness": {{ b }}, "color_temp": {{ ct | int(370) }}}
+            {% else %}
+              {"brightness": {{ b }}}
+            {% endif %}
+          {% endmacro %}
           {% set rooms = {
             'Living Room': {
               'lights': ['living_room_1'],
               'scenes': {
-                'morning': {'brightness': state_attr('scene.living_room_morning', 'brightness') | default(200), 'color_temp': state_attr('scene.living_room_morning', 'color_temp') | default(300)},
-                'day': {'brightness': state_attr('scene.living_room_day', 'brightness') | default(254), 'color_temp': state_attr('scene.living_room_day', 'color_temp') | default(250)},
-                'evening': {'brightness': state_attr('scene.living_room_evening', 'brightness') | default(180), 'color_temp': state_attr('scene.living_room_evening', 'color_temp') | default(400)},
-                'night': {'brightness': state_attr('scene.living_room_night', 'brightness') | default(80), 'color_temp': state_attr('scene.living_room_night', 'color_temp') | default(500)}
+                'morning': scene('living_room', 'morning') | from_json,
+                'day': scene('living_room', 'day') | from_json,
+                'evening': scene('living_room', 'evening') | from_json,
+                'night': scene('living_room', 'night') | from_json
               }
             },
             'Bedroom': {
               'lights': ['bedroom_1', 'bedroom_2', 'lamp_1'],
               'scenes': {
-                'morning': {'brightness': 200, 'color_temp': 300},
-                'day': {'brightness': 254, 'color_temp': 250},
-                'evening': {'brightness': 180, 'color_temp': 400},
-                'night': {'brightness': 80, 'color_temp': 500}
+                'morning': scene('bedroom', 'morning') | from_json,
+                'day': scene('bedroom', 'day') | from_json,
+                'evening': scene('bedroom', 'evening') | from_json,
+                'night': scene('bedroom', 'night') | from_json
               }
             },
             'Bathroom': {
               'lights': ['bathroom_1'],
               'scenes': {
-                'morning': {'brightness': 200, 'color_temp': 300},
-                'day': {'brightness': 254, 'color_temp': 250},
-                'evening': {'brightness': 180, 'color_temp': 400},
-                'night': {'brightness': 80, 'color_temp': 500}
+                'morning': scene('bathroom', 'morning') | from_json,
+                'day': scene('bathroom', 'day') | from_json,
+                'evening': scene('bathroom', 'evening') | from_json,
+                'night': scene('bathroom', 'night') | from_json
               }
             },
             'Kitchen': {
               'lights': ['kitchen_1', 'kitchen_2'],
               'scenes': {
-                'morning': {'brightness': 200},
-                'day': {'brightness': 254},
-                'evening': {'brightness': 150},
-                'night': {'brightness': 50}
+                'morning': scene('kitchen', 'morning') | from_json,
+                'day': scene('kitchen', 'day') | from_json,
+                'evening': scene('kitchen', 'evening') | from_json,
+                'night': scene('kitchen', 'night') | from_json
               }
             },
             'Hallway': {
               'lights': ['hallway_1'],
               'scenes': {
-                'morning': {'brightness': 200},
-                'day': {'brightness': 254},
-                'evening': {'brightness': 150},
-                'night': {'brightness': 50}
+                'morning': scene('hallway', 'morning') | from_json,
+                'day': scene('hallway', 'day') | from_json,
+                'evening': scene('hallway', 'evening') | from_json,
+                'night': scene('hallway', 'night') | from_json
               }
             }
           } %}
@@ -93,7 +102,3 @@ sl_push_config:
         topic: "zigbee2mqtt/sl/config"
         payload: "{{ config }}"
         retain: true
-    - service: logbook.log
-      data:
-        name: "SL Config Push"
-        message: "Published config to zigbee2mqtt/sl/config"

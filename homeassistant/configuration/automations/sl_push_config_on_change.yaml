@@ -1,6 +1,6 @@
 alias: "SL: Push Config to Z2M on Change"
 id: sl_push_config_on_change
-description: "Pushes schedule + scene config to Z2M whenever a schedule helper changes or HA starts"
+description: "Pushes schedule + scene config to Z2M on startup or any schedule/scene change"
 mode: single
 trigger:
   - platform: homeassistant
@@ -32,6 +32,43 @@ trigger:
       - input_select.sl_profile_friday
       - input_select.sl_profile_saturday
       - input_select.sl_profile_sunday
+      # Scene values — Living Room
+      - input_number.sl_living_room_morning_brightness
+      - input_number.sl_living_room_morning_color_temp
+      - input_number.sl_living_room_day_brightness
+      - input_number.sl_living_room_day_color_temp
+      - input_number.sl_living_room_evening_brightness
+      - input_number.sl_living_room_evening_color_temp
+      - input_number.sl_living_room_night_brightness
+      - input_number.sl_living_room_night_color_temp
+      # Scene values — Bedroom
+      - input_number.sl_bedroom_morning_brightness
+      - input_number.sl_bedroom_morning_color_temp
+      - input_number.sl_bedroom_day_brightness
+      - input_number.sl_bedroom_day_color_temp
+      - input_number.sl_bedroom_evening_brightness
+      - input_number.sl_bedroom_evening_color_temp
+      - input_number.sl_bedroom_night_brightness
+      - input_number.sl_bedroom_night_color_temp
+      # Scene values — Bathroom
+      - input_number.sl_bathroom_morning_brightness
+      - input_number.sl_bathroom_morning_color_temp
+      - input_number.sl_bathroom_day_brightness
+      - input_number.sl_bathroom_day_color_temp
+      - input_number.sl_bathroom_evening_brightness
+      - input_number.sl_bathroom_evening_color_temp
+      - input_number.sl_bathroom_night_brightness
+      - input_number.sl_bathroom_night_color_temp
+      # Scene values — Kitchen
+      - input_number.sl_kitchen_morning_brightness
+      - input_number.sl_kitchen_day_brightness
+      - input_number.sl_kitchen_evening_brightness
+      - input_number.sl_kitchen_night_brightness
+      # Scene values — Hallway
+      - input_number.sl_hallway_morning_brightness
+      - input_number.sl_hallway_day_brightness
+      - input_number.sl_hallway_evening_brightness
+      - input_number.sl_hallway_night_brightness
 action:
   - delay:
       seconds: 5

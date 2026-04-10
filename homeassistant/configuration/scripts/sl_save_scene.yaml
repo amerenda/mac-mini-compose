@@ -1,15 +1,15 @@
 sl_save_scene:
   alias: "SL: Save Current Light State as Scene"
-  description: "Snapshot current lights and overwrite the scene. Persists until HA restart. For permanent edits, use Settings > Scenes."
+  description: "Snapshot current lights into helpers, save HA scene, sync to Z2M"
   mode: single
   fields:
     room:
-      description: "Room identifier or 'all'"
+      description: "Room identifier (e.g., living_room)"
       required: true
       selector:
         text:
     window:
-      description: "Time window (morning/day/evening/night) or custom name"
+      description: "Time window (morning/day/evening/night)"
       required: true
       selector:
         text:
@@ -21,10 +21,38 @@ sl_save_scene:
           bathroom: ["light.bathroom_1"]
           kitchen: ["light.kitchen_1", "light.kitchen_2"]
           hallway: ["light.hallway_1"]
-        all_lights: ["light.living_room_1", "light.bedroom_1", "light.bedroom_2", "light.lamp_1", "light.bathroom_1", "light.kitchen_1", "light.kitchen_2", "light.hallway_1"]
-        lights: "{{ all_lights if room == 'all' else room_lights[room] | default([]) }}"
-        scene_id: "{{ 'all_rooms_' ~ window if room == 'all' else room ~ '_' ~ window }}"
+        # Ambiance rooms have color_temp, dimmable rooms don't
+        ambiance_rooms: ["living_room", "bedroom", "bathroom"]
+        lights: "{{ room_lights[room] | default([]) }}"
+        scene_id: "{{ room ~ '_' ~ window }}"
+        # Read brightness from first light in the room
+        first_light: "{{ lights[0] if lights | length > 0 else '' }}"
+        current_brightness: "{{ state_attr(first_light, 'brightness') | int(200) }}"
+        current_color_temp: "{{ state_attr(first_light, 'color_temp') | int(370) }}"
+        brightness_helper: "input_number.sl_{{ room }}_{{ window }}_brightness"
+        color_temp_helper: "input_number.sl_{{ room }}_{{ window }}_color_temp"
+    # Save brightness to helper
+    - service: input_number.set_value
+      target:
+        entity_id: "{{ brightness_helper }}"
+      data:
+        value: "{{ current_brightness }}"
+    # Save color_temp to helper (ambiance rooms only)
+    - if:
+        - condition: template
+          value_template: "{{ room in ambiance_rooms }}"
+      then:
+        - service: input_number.set_value
+          target:
+            entity_id: "{{ color_temp_helper }}"
+          data:
+            value: "{{ current_color_temp }}"
+    # Save HA scene (for dashboard preview)
     - service: scene.create
       data:
         scene_id: "{{ scene_id }}"
         snapshot_entities: "{{ lights }}"
+    # Push full config to Z2M
+    - delay:
+        seconds: 1
+    - service: script.sl_push_config
