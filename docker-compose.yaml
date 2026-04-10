@@ -231,6 +231,7 @@ services:
       - mosquitto
     volumes:
       - zigbee2mqtt-data:/app/data
+      - ./zigbee2mqtt/external_extensions/smart-lighting.js:/app/data/external_extensions/smart-lighting.js:ro
     ports:
       - "8099:8099"
     environment:
