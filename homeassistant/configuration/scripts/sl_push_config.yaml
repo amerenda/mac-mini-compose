@@ -1,0 +1,99 @@
+sl_push_config:
+  alias: "SL: Push Config to Z2M"
+  description: "Publishes schedule + scene config to zigbee2mqtt/sl/config (retained) for the Z2M extension"
+  mode: single
+  sequence:
+    - variables:
+        config: >
+          {% set profiles = {
+            'weekday': {
+              'morning': states('input_datetime.sl_morning_start_weekday')[:5],
+              'day': states('input_datetime.sl_day_start_weekday')[:5],
+              'evening': states('input_datetime.sl_evening_start_weekday')[:5],
+              'night': states('input_datetime.sl_night_start_weekday')[:5]
+            },
+            'friday': {
+              'morning': states('input_datetime.sl_morning_start_friday')[:5],
+              'day': states('input_datetime.sl_day_start_friday')[:5],
+              'evening': states('input_datetime.sl_evening_start_friday')[:5],
+              'night': states('input_datetime.sl_night_start_friday')[:5]
+            },
+            'saturday': {
+              'morning': states('input_datetime.sl_morning_start_saturday')[:5],
+              'day': states('input_datetime.sl_day_start_saturday')[:5],
+              'evening': states('input_datetime.sl_evening_start_saturday')[:5],
+              'night': states('input_datetime.sl_night_start_saturday')[:5]
+            },
+            'sunday': {
+              'morning': states('input_datetime.sl_morning_start_sunday')[:5],
+              'day': states('input_datetime.sl_day_start_sunday')[:5],
+              'evening': states('input_datetime.sl_evening_start_sunday')[:5],
+              'night': states('input_datetime.sl_night_start_sunday')[:5]
+            }
+          } %}
+          {% set day_assignments = {
+            'monday': states('input_select.sl_profile_monday'),
+            'tuesday': states('input_select.sl_profile_tuesday'),
+            'wednesday': states('input_select.sl_profile_wednesday'),
+            'thursday': states('input_select.sl_profile_thursday'),
+            'friday': states('input_select.sl_profile_friday'),
+            'saturday': states('input_select.sl_profile_saturday'),
+            'sunday': states('input_select.sl_profile_sunday')
+          } %}
+          {% set rooms = {
+            'Living Room': {
+              'lights': ['living_room_1'],
+              'scenes': {
+                'morning': {'brightness': state_attr('scene.living_room_morning', 'brightness') | default(200), 'color_temp': state_attr('scene.living_room_morning', 'color_temp') | default(300)},
+                'day': {'brightness': state_attr('scene.living_room_day', 'brightness') | default(254), 'color_temp': state_attr('scene.living_room_day', 'color_temp') | default(250)},
+                'evening': {'brightness': state_attr('scene.living_room_evening', 'brightness') | default(180), 'color_temp': state_attr('scene.living_room_evening', 'color_temp') | default(400)},
+                'night': {'brightness': state_attr('scene.living_room_night', 'brightness') | default(80), 'color_temp': state_attr('scene.living_room_night', 'color_temp') | default(500)}
+              }
+            },
+            'Bedroom': {
+              'lights': ['bedroom_1', 'bedroom_2', 'lamp_1'],
+              'scenes': {
+                'morning': {'brightness': 200, 'color_temp': 300},
+                'day': {'brightness': 254, 'color_temp': 250},
+                'evening': {'brightness': 180, 'color_temp': 400},
+                'night': {'brightness': 80, 'color_temp': 500}
+              }
+            },
+            'Bathroom': {
+              'lights': ['bathroom_1'],
+              'scenes': {
+                'morning': {'brightness': 200, 'color_temp': 300},
+                'day': {'brightness': 254, 'color_temp': 250},
+                'evening': {'brightness': 180, 'color_temp': 400},
+                'night': {'brightness': 80, 'color_temp': 500}
+              }
+            },
+            'Kitchen': {
+              'lights': ['kitchen_1', 'kitchen_2'],
+              'scenes': {
+                'morning': {'brightness': 200},
+                'day': {'brightness': 254},
+                'evening': {'brightness': 150},
+                'night': {'brightness': 50}
+              }
+            },
+            'Hallway': {
+              'lights': ['hallway_1'],
+              'scenes': {
+                'morning': {'brightness': 200},
+                'day': {'brightness': 254},
+                'evening': {'brightness': 150},
+                'night': {'brightness': 50}
+              }
+            }
+          } %}
+          {{ {'profiles': profiles, 'day_assignments': day_assignments, 'rooms': rooms} | tojson }}
+    - service: mqtt.publish
+      data:
+        topic: "zigbee2mqtt/sl/config"
+        payload: "{{ config }}"
+        retain: true
+    - service: logbook.log
+      data:
+        name: "SL Config Push"
+        message: "Published config to zigbee2mqtt/sl/config"

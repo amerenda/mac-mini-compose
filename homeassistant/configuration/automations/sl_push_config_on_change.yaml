@@ -1,0 +1,38 @@
+alias: "SL: Push Config to Z2M on Change"
+id: sl_push_config_on_change
+description: "Pushes schedule + scene config to Z2M whenever a schedule helper changes or HA starts"
+mode: single
+trigger:
+  - platform: homeassistant
+    event: start
+  - platform: state
+    entity_id:
+      # Schedule profile times
+      - input_datetime.sl_morning_start_weekday
+      - input_datetime.sl_day_start_weekday
+      - input_datetime.sl_evening_start_weekday
+      - input_datetime.sl_night_start_weekday
+      - input_datetime.sl_morning_start_friday
+      - input_datetime.sl_day_start_friday
+      - input_datetime.sl_evening_start_friday
+      - input_datetime.sl_night_start_friday
+      - input_datetime.sl_morning_start_saturday
+      - input_datetime.sl_day_start_saturday
+      - input_datetime.sl_evening_start_saturday
+      - input_datetime.sl_night_start_saturday
+      - input_datetime.sl_morning_start_sunday
+      - input_datetime.sl_day_start_sunday
+      - input_datetime.sl_evening_start_sunday
+      - input_datetime.sl_night_start_sunday
+      # Day profile assignments
+      - input_select.sl_profile_monday
+      - input_select.sl_profile_tuesday
+      - input_select.sl_profile_wednesday
+      - input_select.sl_profile_thursday
+      - input_select.sl_profile_friday
+      - input_select.sl_profile_saturday
+      - input_select.sl_profile_sunday
+action:
+  - delay:
+      seconds: 5
+  - service: script.sl_push_config
