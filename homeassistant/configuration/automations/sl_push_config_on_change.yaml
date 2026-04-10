@@ -69,6 +69,14 @@ trigger:
       - input_number.sl_hallway_day_brightness
       - input_number.sl_hallway_evening_brightness
       - input_number.sl_hallway_night_brightness
+      # House mode
+      - input_select.sl_house_mode
+      # Smart power-on toggles
+      - input_boolean.sl_living_room_smart_power_on
+      - input_boolean.sl_bedroom_smart_power_on
+      - input_boolean.sl_bathroom_smart_power_on
+      - input_boolean.sl_kitchen_smart_power_on
+      - input_boolean.sl_hallway_smart_power_on
 action:
   - delay:
       seconds: 5

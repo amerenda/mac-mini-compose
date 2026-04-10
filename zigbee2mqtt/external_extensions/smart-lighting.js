@@ -145,6 +145,16 @@ class SmartLighting {
         const room = this._findRoomForDevice(friendlyName);
         if (!room) return;
 
+        const roomConfig = this.config.rooms[room];
+        if (!roomConfig) return;
+
+        // Only intervene if smart_power_on is enabled for this room
+        // When disabled, the bulb already boots at the correct scene values
+        if (!roomConfig.smart_power_on) {
+            this.logger.info(`[SL] Device announce: ${friendlyName} (${room}) — smart power-on disabled, skipping`);
+            return;
+        }
+
         const scene = this._getSceneForRoom(room);
         if (!scene) return;
 
@@ -190,15 +200,17 @@ class SmartLighting {
                 commands.push({ topic: `${roomName}/set`, payload: scenePayload });
             }
 
-            // Set hue_power_on_* to current window values on each bulb
+            // Set hue_power_on_* on each bulb
             const currentScene = this._getSceneForRoom(roomName);
+            const smartPowerOn = roomConfig.smart_power_on !== false;
             const lights = roomConfig.lights || [];
             for (const light of lights) {
                 commands.push({
                     topic: `${light}/set`,
                     payload: {
                         hue_power_on_behavior: 'on',
-                        hue_power_on_brightness: 1,
+                        // Smart: brightness 1 (dark boot, Z2M corrects). Normal: actual scene brightness.
+                        hue_power_on_brightness: smartPowerOn ? 1 : (currentScene ? currentScene.brightness : 200),
                         hue_power_on_color_temperature: currentScene ? (currentScene.color_temp || 500) : 500,
                     }
                 });
@@ -244,13 +256,14 @@ class SmartLighting {
             if (!scene) continue;
 
             // Update hue_power_on_* for wall switch scenario
+            const smartPowerOn = roomConfig.smart_power_on !== false;
             const lights = roomConfig.lights || [];
             for (const light of lights) {
                 commands.push({
                     topic: `${light}/set`,
                     payload: {
                         hue_power_on_behavior: 'on',
-                        hue_power_on_brightness: 1,
+                        hue_power_on_brightness: smartPowerOn ? 1 : (scene.brightness || 200),
                         hue_power_on_color_temperature: scene.color_temp || 500,
                     }
                 });

@@ -4,6 +4,8 @@ sl_push_config:
   mode: single
   sequence:
     - variables:
+        house_mode: "{{ states('input_select.sl_house_mode') }}"
+        is_guest: "{{ house_mode == 'Guest' }}"
         config: >
           {% set profiles = {
             'weekday': {
@@ -49,54 +51,27 @@ sl_push_config:
               {"brightness": {{ b }}}
             {% endif %}
           {% endmacro %}
-          {% set rooms = {
-            'Living Room': {
-              'lights': ['living_room_1'],
-              'scenes': {
-                'morning': scene('living_room', 'morning') | from_json,
-                'day': scene('living_room', 'day') | from_json,
-                'evening': scene('living_room', 'evening') | from_json,
-                'night': scene('living_room', 'night') | from_json
-              }
-            },
-            'Bedroom': {
-              'lights': ['bedroom_1', 'bedroom_2', 'lamp_1'],
-              'scenes': {
-                'morning': scene('bedroom', 'morning') | from_json,
-                'day': scene('bedroom', 'day') | from_json,
-                'evening': scene('bedroom', 'evening') | from_json,
-                'night': scene('bedroom', 'night') | from_json
-              }
-            },
-            'Bathroom': {
-              'lights': ['bathroom_1'],
-              'scenes': {
-                'morning': scene('bathroom', 'morning') | from_json,
-                'day': scene('bathroom', 'day') | from_json,
-                'evening': scene('bathroom', 'evening') | from_json,
-                'night': scene('bathroom', 'night') | from_json
-              }
-            },
-            'Kitchen': {
-              'lights': ['kitchen_1', 'kitchen_2'],
-              'scenes': {
-                'morning': scene('kitchen', 'morning') | from_json,
-                'day': scene('kitchen', 'day') | from_json,
-                'evening': scene('kitchen', 'evening') | from_json,
-                'night': scene('kitchen', 'night') | from_json
-              }
-            },
-            'Hallway': {
-              'lights': ['hallway_1'],
-              'scenes': {
-                'morning': scene('hallway', 'morning') | from_json,
-                'day': scene('hallway', 'day') | from_json,
-                'evening': scene('hallway', 'evening') | from_json,
-                'night': scene('hallway', 'night') | from_json
+          {% macro room_config(room_key, room_name, lights) %}
+            {% set spo = false if is_guest else is_state('input_boolean.sl_' ~ room_key ~ '_smart_power_on', 'on') %}
+            {
+              "lights": {{ lights | tojson }},
+              "smart_power_on": {{ spo | tojson }},
+              "scenes": {
+                "morning": {{ scene(room_key, 'morning') | from_json | tojson }},
+                "day": {{ scene(room_key, 'day') | from_json | tojson }},
+                "evening": {{ scene(room_key, 'evening') | from_json | tojson }},
+                "night": {{ scene(room_key, 'night') | from_json | tojson }}
               }
             }
+          {% endmacro %}
+          {% set rooms = {
+            'Living Room': room_config('living_room', 'Living Room', ['living_room_1']) | from_json,
+            'Bedroom': room_config('bedroom', 'Bedroom', ['bedroom_1', 'bedroom_2', 'lamp_1']) | from_json,
+            'Bathroom': room_config('bathroom', 'Bathroom', ['bathroom_1']) | from_json,
+            'Kitchen': room_config('kitchen', 'Kitchen', ['kitchen_1', 'kitchen_2']) | from_json,
+            'Hallway': room_config('hallway', 'Hallway', ['hallway_1']) | from_json
           } %}
-          {{ {'profiles': profiles, 'day_assignments': day_assignments, 'rooms': rooms} | tojson }}
+          {{ {'profiles': profiles, 'day_assignments': day_assignments, 'house_mode': house_mode, 'rooms': rooms} | tojson }}
     - service: mqtt.publish
       data:
         topic: "zigbee2mqtt/sl/config"

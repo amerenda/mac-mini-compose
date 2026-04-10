@@ -1,0 +1,25 @@
+# Smart Lighting v3 — Per-room smart power-on toggle
+# When ON: bulb boots dark (brightness=1), Z2M pushes correct scene (1-3s delay, zero flash)
+# When OFF: bulb boots at current scene values (instant, may flash if window changed while off)
+# Automatically disabled when house mode is Guest
+
+sl_living_room_smart_power_on:
+  name: "SL: Living Room Smart Power On"
+  icon: mdi:lightbulb-auto-outline
+  initial: true
+sl_bedroom_smart_power_on:
+  name: "SL: Bedroom Smart Power On"
+  icon: mdi:lightbulb-auto-outline
+  initial: true
+sl_bathroom_smart_power_on:
+  name: "SL: Bathroom Smart Power On"
+  icon: mdi:lightbulb-auto-outline
+  initial: true
+sl_kitchen_smart_power_on:
+  name: "SL: Kitchen Smart Power On"
+  icon: mdi:lightbulb-auto-outline
+  initial: true
+sl_hallway_smart_power_on:
+  name: "SL: Hallway Smart Power On"
+  icon: mdi:lightbulb-auto-outline
+  initial: true
