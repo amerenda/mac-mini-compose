@@ -116,7 +116,6 @@ services:
       - ./homeassistant/configuration/helpers/generated/timer:/config/helpers/timer:ro
       - ./homeassistant/configuration/dashboards:/config/dashboards/views:ro
       - ./homeassistant/configuration/groups.yaml:/config/groups.yaml:ro
-      - ./homeassistant/configuration/scenes:/config/scenes:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8123/manifest.json"]
       interval: 30s
