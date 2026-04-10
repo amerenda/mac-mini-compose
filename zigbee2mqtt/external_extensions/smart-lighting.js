@@ -140,35 +140,45 @@ class SmartLighting {
     // ── Device announce (bulb powered on after wall switch) ──
 
     _onDeviceAnnounce(data) {
-        if (!this.config || !this.currentWindow) return;
         const device = data.device;
-        if (!device || !device.zh || !device.zh.interviewCompleted) return;
+        const friendlyName = device ? device.name : 'unknown';
+        this.logger.info(`[SL] Device announce received: ${friendlyName}`);
 
-        const friendlyName = device.name;
+        if (!this.config || !this.currentWindow) {
+            this.logger.info(`[SL] Device announce: no config/window, skipping`);
+            return;
+        }
+
         const room = this._findRoomForDevice(friendlyName);
-        if (!room) return;
+        if (!room) {
+            this.logger.info(`[SL] Device announce: ${friendlyName} not in any room, skipping`);
+            return;
+        }
 
         const roomConfig = this.config.rooms[room];
         if (!roomConfig) return;
 
-        // Only intervene if smart_power_on is enabled for this room
-        // When disabled, the bulb already boots at the correct scene values
         if (!roomConfig.smart_power_on) {
             this.logger.info(`[SL] Device announce: ${friendlyName} (${room}) — smart power-on disabled, skipping`);
             return;
         }
 
         const scene = this._getSceneForRoom(room);
-        if (!scene) return;
+        if (!scene) {
+            this.logger.info(`[SL] Device announce: ${friendlyName} (${room}) — no scene found, skipping`);
+            return;
+        }
 
-        this.logger.info(`[SL] Device announce: ${friendlyName} (${room}) → ${this._getEffectiveWindow(room)} scene`);
+        const effectiveWindow = this._getEffectiveWindow(room);
+        this.logger.info(`[SL] Device announce: ${friendlyName} (${room}) → applying ${effectiveWindow} scene (brightness=${scene.brightness}, color_temp=${scene.color_temp || 'n/a'})`);
 
         // Delay for device init, then push correct state
         setTimeout(() => {
             const payload = { state: 'ON', brightness: scene.brightness };
             if (scene.color_temp !== undefined) payload.color_temp = scene.color_temp;
             this._sendCommand(`${friendlyName}/set`, payload);
-        }, 500);
+            this.logger.info(`[SL] Device announce: sent ${JSON.stringify(payload)} to ${friendlyName}`);
+        }, 1000);
     }
 
     // ── Full scene push (startup + config change) ────────────
