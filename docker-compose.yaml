@@ -303,7 +303,7 @@ services:
   # database, and BWS secret. Cannot read or modify existing secrets.
   # ============================================================
   pg-credential-api:
-    image: ghcr.io/amerenda/pg-credential-api:latest
+    image: amerenda/pg-credential-api:latest
     container_name: pg-credential-api
     restart: unless-stopped
     depends_on:
