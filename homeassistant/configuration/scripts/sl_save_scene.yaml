@@ -1,6 +1,6 @@
 sl_save_scene:
   alias: "SL: Save Current Light State as Scene"
-  description: "Capture the current state of lights and save as a scene"
+  description: "Snapshot current lights and overwrite the scene. Persists until HA restart. For permanent edits, use Settings > Scenes."
   mode: single
   fields:
     room:
