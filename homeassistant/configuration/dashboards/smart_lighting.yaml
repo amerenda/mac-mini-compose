@@ -1664,13 +1664,12 @@ views:
           {% set sync = state_attr('sensor.sl_z2m_sync_status', 'last_sync') %}
           {% set hash = state_attr('sensor.sl_z2m_sync_status', 'config_hash') %}
           {% set window = state_attr('sensor.sl_z2m_sync_status', 'current_window') %}
-          {% set has_config = state_attr('sensor.sl_z2m_sync_status', 'has_config') %}
-          | | |
-          |---|---|
-          | **Z2M Window** | {{ window | default('unknown') }} |
-          | **Config Hash** | `{{ hash | default('none') }}` |
-          | **Last Sync** | {{ sync | default('never') }} |
-          | **Has Config** | {{ has_config | default('unknown') }} |
+          **Z2M Window:** {{ window | default('unknown') }}
+
+          **Config Hash:** {{ hash | default('none') }}
+
+          **Last Sync:** {{ sync | default('never') }}
+
       - type: button
         name: Force Sync
         icon: mdi:sync
