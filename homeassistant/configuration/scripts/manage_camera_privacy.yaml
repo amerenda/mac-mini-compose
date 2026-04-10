@@ -7,24 +7,29 @@ manage_camera_privacy:
           entity_id: group.members
           state: "home"
       then:
-        # Someone home - Privacy ON: cameras off, status lights off
-        - action: switch.turn_on
-          target:
-            entity_id:
-              - switch.bedroom_privacy_mode
-              - switch.living_room_privacy_mode
+        # Someone home - turn off LEDs first (privacy mode blocks LED control)
         - action: light.turn_off
           target:
             entity_id:
               - light.bedroom_status_led
               - light.living_room_status_led
+        - delay: "00:00:02"
+        - condition: state
+          entity_id: light.bedroom_status_led
+          state: "off"
+        - action: switch.turn_on
+          target:
+            entity_id:
+              - switch.bedroom_privacy_mode
+              - switch.living_room_privacy_mode
       else:
-        # Everyone away - Privacy OFF: cameras on, status lights on
+        # Everyone away - disable privacy first, then turn on LEDs
         - action: switch.turn_off
           target:
             entity_id:
               - switch.bedroom_privacy_mode
               - switch.living_room_privacy_mode
+        - delay: "00:00:02"
         - action: light.turn_on
           target:
             entity_id:
