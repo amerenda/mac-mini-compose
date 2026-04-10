@@ -84,6 +84,10 @@ sl_room_on:
                     entity_id: "{{ scene_entity }}"
                   data:
                     transition: "{{ transition_secs | int }}"
+              else:
+                - service: light.turn_on
+                  target:
+                    entity_id: "light.{{ room }}"
 
         # Home or Guest mode — normal operation
         - conditions:
@@ -100,7 +104,6 @@ sl_room_on:
                   data:
                     transition: "{{ transition_secs | int }}"
               else:
-                - service: system_log.write
-                  data:
-                    message: "SL: No scene found: {{ scene_entity }}"
-                    level: warning
+                - service: light.turn_on
+                  target:
+                    entity_id: "light.{{ room }}"
