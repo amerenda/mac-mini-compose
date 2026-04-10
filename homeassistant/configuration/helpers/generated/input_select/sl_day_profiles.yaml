@@ -1,0 +1,38 @@
+# Smart Lighting v2 — Day-to-profile assignment
+# Each day picks which schedule profile to use
+
+sl_profile_monday:
+  name: "SL: Monday Profile"
+  options: [weekday, friday, saturday, sunday]
+  initial: weekday
+  icon: mdi:calendar-today
+sl_profile_tuesday:
+  name: "SL: Tuesday Profile"
+  options: [weekday, friday, saturday, sunday]
+  initial: weekday
+  icon: mdi:calendar-today
+sl_profile_wednesday:
+  name: "SL: Wednesday Profile"
+  options: [weekday, friday, saturday, sunday]
+  initial: weekday
+  icon: mdi:calendar-today
+sl_profile_thursday:
+  name: "SL: Thursday Profile"
+  options: [weekday, friday, saturday, sunday]
+  initial: weekday
+  icon: mdi:calendar-today
+sl_profile_friday:
+  name: "SL: Friday Profile"
+  options: [weekday, friday, saturday, sunday]
+  initial: friday
+  icon: mdi:calendar-today
+sl_profile_saturday:
+  name: "SL: Saturday Profile"
+  options: [weekday, friday, saturday, sunday]
+  initial: saturday
+  icon: mdi:calendar-today
+sl_profile_sunday:
+  name: "SL: Sunday Profile"
+  options: [weekday, friday, saturday, sunday]
+  initial: sunday
+  icon: mdi:calendar-today

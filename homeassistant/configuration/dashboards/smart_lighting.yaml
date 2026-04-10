@@ -28,8 +28,29 @@ views:
         card:
           type: vertical-stack
           cards:
+            # Day → Profile assignment
             - type: entities
-              title: Weekday Schedule
+              title: Day Profiles
+              show_header_toggle: false
+              entities:
+                - entity: input_select.sl_profile_monday
+                  name: Monday
+                - entity: input_select.sl_profile_tuesday
+                  name: Tuesday
+                - entity: input_select.sl_profile_wednesday
+                  name: Wednesday
+                - entity: input_select.sl_profile_thursday
+                  name: Thursday
+                - entity: input_select.sl_profile_friday
+                  name: Friday
+                - entity: input_select.sl_profile_saturday
+                  name: Saturday
+                - entity: input_select.sl_profile_sunday
+                  name: Sunday
+            # Profile schedules
+            - type: entities
+              title: "Weekday Profile"
+              show_header_toggle: false
               entities:
                 - entity: input_datetime.sl_morning_start_weekday
                   name: Morning
@@ -40,45 +61,41 @@ views:
                 - entity: input_datetime.sl_night_start_weekday
                   name: Night
             - type: entities
-              title: Weekend Schedule
+              title: "Friday Profile"
+              show_header_toggle: false
               entities:
-                - entity: input_datetime.sl_morning_start_weekend
+                - entity: input_datetime.sl_morning_start_friday
                   name: Morning
-                - entity: input_datetime.sl_day_start_weekend
+                - entity: input_datetime.sl_day_start_friday
                   name: Day
-                - entity: input_datetime.sl_evening_start_weekend
+                - entity: input_datetime.sl_evening_start_friday
                   name: Evening
-                - entity: input_datetime.sl_night_start_weekend
+                - entity: input_datetime.sl_night_start_friday
                   name: Night
-
-      # ── Weekend Days (collapsible) ─────────────────────────
-      - type: entities
-        entities:
-          - entity: input_boolean.sl_show_weekend_config
-            name: Configure Weekend Days
-            icon: mdi:calendar-weekend
-
-      - type: conditional
-        conditions:
-          - entity: input_boolean.sl_show_weekend_config
-            state: "on"
-        card:
-          type: entities
-          entities:
-            - entity: input_boolean.sl_weekend_monday
-              name: Monday
-            - entity: input_boolean.sl_weekend_tuesday
-              name: Tuesday
-            - entity: input_boolean.sl_weekend_wednesday
-              name: Wednesday
-            - entity: input_boolean.sl_weekend_thursday
-              name: Thursday
-            - entity: input_boolean.sl_weekend_friday
-              name: Friday
-            - entity: input_boolean.sl_weekend_saturday
-              name: Saturday
-            - entity: input_boolean.sl_weekend_sunday
-              name: Sunday
+            - type: entities
+              title: "Saturday Profile"
+              show_header_toggle: false
+              entities:
+                - entity: input_datetime.sl_morning_start_saturday
+                  name: Morning
+                - entity: input_datetime.sl_day_start_saturday
+                  name: Day
+                - entity: input_datetime.sl_evening_start_saturday
+                  name: Evening
+                - entity: input_datetime.sl_night_start_saturday
+                  name: Night
+            - type: entities
+              title: "Sunday Profile"
+              show_header_toggle: false
+              entities:
+                - entity: input_datetime.sl_morning_start_sunday
+                  name: Morning
+                - entity: input_datetime.sl_day_start_sunday
+                  name: Day
+                - entity: input_datetime.sl_evening_start_sunday
+                  name: Evening
+                - entity: input_datetime.sl_night_start_sunday
+                  name: Night
 
       # ── Room Selector ──────────────────────────────────────
       - type: entities

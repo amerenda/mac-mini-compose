@@ -34,32 +34,30 @@ template:
         state: >
           {% set day_names = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] %}
           {% set today = day_names[now().weekday()] %}
-          {% set is_weekend = is_state('input_boolean.sl_weekend_' ~ today, 'on') %}
-          {% set suffix = 'weekend' if is_weekend else 'weekday' %}
-          {% set morning = states('input_datetime.sl_morning_start_' ~ suffix) | default('06:00:00') %}
-          {% set day_start = states('input_datetime.sl_day_start_' ~ suffix) | default('09:00:00') %}
-          {% set evening = states('input_datetime.sl_evening_start_' ~ suffix) | default('17:00:00') %}
-          {% set night = states('input_datetime.sl_night_start_' ~ suffix) | default('22:00:00') %}
+          {% set profile = states('input_select.sl_profile_' ~ today) | default('weekday') %}
+          {% set morning = states('input_datetime.sl_morning_start_' ~ profile) | default('06:00:00') %}
+          {% set day_start = states('input_datetime.sl_day_start_' ~ profile) | default('09:00:00') %}
+          {% set evening = states('input_datetime.sl_evening_start_' ~ profile) | default('17:00:00') %}
+          {% set night = states('input_datetime.sl_night_start_' ~ profile) | default('22:00:00') %}
           {% set t = now().strftime('%H:%M:%S') %}
           {% if morning <= t < day_start %}morning
           {% elif day_start <= t < evening %}day
           {% elif evening <= t < night %}evening
           {% else %}night{% endif %}
         attributes:
-          day_type: >
+          profile: >
             {% set day_names = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] %}
             {% set today = day_names[now().weekday()] %}
-            {{ 'weekend' if is_state('input_boolean.sl_weekend_' ~ today, 'on') else 'weekday' }}
+            {{ states('input_select.sl_profile_' ~ today) | default('weekday') }}
           next_transition: >
             {% set day_names = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'] %}
             {% set today = day_names[now().weekday()] %}
-            {% set is_weekend = is_state('input_boolean.sl_weekend_' ~ today, 'on') %}
-            {% set suffix = 'weekend' if is_weekend else 'weekday' %}
+            {% set profile = states('input_select.sl_profile_' ~ today) | default('weekday') %}
             {% set times = {
-              'morning': states('input_datetime.sl_morning_start_' ~ suffix),
-              'day': states('input_datetime.sl_day_start_' ~ suffix),
-              'evening': states('input_datetime.sl_evening_start_' ~ suffix),
-              'night': states('input_datetime.sl_night_start_' ~ suffix)
+              'morning': states('input_datetime.sl_morning_start_' ~ profile),
+              'day': states('input_datetime.sl_day_start_' ~ profile),
+              'evening': states('input_datetime.sl_evening_start_' ~ profile),
+              'night': states('input_datetime.sl_night_start_' ~ profile)
             } %}
             {% set t = now().strftime('%H:%M:%S') %}
             {% set upcoming = times | dictsort(by='value') | selectattr('1', 'gt', t) | first | default(none) %}

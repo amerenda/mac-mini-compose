@@ -5,29 +5,6 @@ sl_enabled:
   name: "SL: Smart Lighting Enabled"
   icon: mdi:lightbulb-auto
 
-# Weekend day configuration
-sl_weekend_monday:
-  name: "SL: Monday is Weekend"
-  icon: mdi:calendar
-sl_weekend_tuesday:
-  name: "SL: Tuesday is Weekend"
-  icon: mdi:calendar
-sl_weekend_wednesday:
-  name: "SL: Wednesday is Weekend"
-  icon: mdi:calendar
-sl_weekend_thursday:
-  name: "SL: Thursday is Weekend"
-  icon: mdi:calendar
-sl_weekend_friday:
-  name: "SL: Friday is Weekend"
-  icon: mdi:calendar
-sl_weekend_saturday:
-  name: "SL: Saturday is Weekend"
-  icon: mdi:calendar
-sl_weekend_sunday:
-  name: "SL: Sunday is Weekend"
-  icon: mdi:calendar
-
 # Dashboard UI toggles
 sl_show_button_config:
   name: "SL: Show Button Config"
@@ -38,6 +15,3 @@ sl_show_defaults:
 sl_show_schedule:
   name: "SL: Show Schedule"
   icon: mdi:clock-edit-outline
-sl_show_weekend_config:
-  name: "SL: Configure Weekend Days"
-  icon: mdi:calendar-edit
