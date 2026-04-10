@@ -15,21 +15,6 @@ views:
             name: House Mode
           - entity: sensor.sl_z2m_sync_status
             name: Z2M Sync
-      - type: markdown
-        content: >
-          {% set attrs = state_attr('sensor.sl_z2m_sync_status', 'last_sync') %}
-          {% set hash = state_attr('sensor.sl_z2m_sync_status', 'config_hash') %}
-          {% set window = state_attr('sensor.sl_z2m_sync_status', 'current_window') %}
-          **Z2M:** {{ window | default('unknown') }} window
-          | Hash: `{{ hash | default('none') }}`
-          | Last sync: {{ attrs | default('never') }}
-      - type: button
-        name: Force Sync to Z2M
-        icon: mdi:sync
-        show_state: false
-        tap_action:
-          action: call-service
-          service: script.sl_push_config
 
       # ── Schedule (collapsible) ─────────────────────────────
       - type: entities
@@ -1660,3 +1645,36 @@ views:
                     name: Short Press
                   - entity: input_select.sl_hallway_s2_b4_long
                     name: Long Press
+
+  # ════════════════════════════════════════════════════════════
+  # Z2M Sync Tab
+  # ════════════════════════════════════════════════════════════
+  - title: Z2M Sync
+    path: sync
+    icon: mdi:sync
+    cards:
+      - type: entities
+        title: Sync Status
+        show_header_toggle: false
+        entities:
+          - entity: sensor.sl_z2m_sync_status
+            name: Status
+      - type: markdown
+        content: >
+          {% set sync = state_attr('sensor.sl_z2m_sync_status', 'last_sync') %}
+          {% set hash = state_attr('sensor.sl_z2m_sync_status', 'config_hash') %}
+          {% set window = state_attr('sensor.sl_z2m_sync_status', 'current_window') %}
+          {% set has_config = state_attr('sensor.sl_z2m_sync_status', 'has_config') %}
+          | | |
+          |---|---|
+          | **Z2M Window** | {{ window | default('unknown') }} |
+          | **Config Hash** | `{{ hash | default('none') }}` |
+          | **Last Sync** | {{ sync | default('never') }} |
+          | **Has Config** | {{ has_config | default('unknown') }} |
+      - type: button
+        name: Force Sync
+        icon: mdi:sync
+        show_state: false
+        tap_action:
+          action: call-service
+          service: script.sl_push_config

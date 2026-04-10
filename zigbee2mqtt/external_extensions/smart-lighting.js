@@ -364,14 +364,17 @@ class SmartLighting {
     }
 
     _publishStatus(status) {
-        this.z2mMqtt.publish(STATUS_TOPIC, JSON.stringify({
+        const payload = JSON.stringify({
             status,
             current_window: this.currentWindow,
             has_config: !!this.config,
             config_hash: this.configHash,
             last_sync: this.lastSyncTime,
             timestamp: new Date().toISOString(),
-        }), undefined, undefined, false, false);
+        });
+        if (this.cmdClient && this.cmdClient.connected) {
+            this.cmdClient.publish(STATUS_TOPIC, payload, { retain: true });
+        }
     }
 }
 
