@@ -8,11 +8,9 @@ triggers:
     from: "off"
     to: "on"
 conditions:
-  - condition: "not"
-    conditions:
-      - condition: "state"
-        entity_id: "person.alex_merenda"
-        state: "home"
+  - condition: "state"
+    entity_id: "group.members"
+    state: "not_home"
 variables:
   CAM_MAP: >
     {{
