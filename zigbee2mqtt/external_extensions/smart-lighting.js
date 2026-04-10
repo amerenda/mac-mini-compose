@@ -73,6 +73,9 @@ class SmartLighting {
 
         this.eventBus.onMQTTMessage(this, this._onMQTTMessage.bind(this));
         this.eventBus.onDeviceAnnounce(this, this._onDeviceAnnounce.bind(this));
+        // Note: Z2M auto-discovers scene entities to HA via MQTT.
+        // These are disabled in HA's entity registry to avoid duplicates.
+        // Our HA scenes (from scenes.yaml) are the canonical ones.
 
         // Check window transitions every 30s
         this.checkInterval = setInterval(() => this._checkWindowTransition(), 30000);
