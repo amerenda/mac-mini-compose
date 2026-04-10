@@ -298,24 +298,20 @@ services:
       "
 
   # ============================================================
-  # PG Credential API — write-only secret + db user provisioning
-  # POST /credentials {"app_name":"myapp"} → creates PG user,
-  # database, and BWS secret. Cannot read or modify existing secrets.
+  # Secrets API — write-only BWS secret provisioning
+  # POST /secrets → create secret. GET /secrets → list names/UUIDs.
+  # Cannot read secret values or modify existing secrets.
   # ============================================================
-  pg-credential-api:
-    image: amerenda/pg-credential-api:latest
-    container_name: pg-credential-api
+  secrets-api:
+    image: amerenda/secrets-api:latest
+    container_name: secrets-api
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     ports:
       - "8090:8090"
     environment:
-      BEARER_TOKEN: "${PG_CREDENTIAL_API_BEARER_TOKEN}"
-      BWS_ACCESS_TOKEN: "${PG_CREDENTIAL_API_BWS_TOKEN}"
+      BEARER_TOKEN: "${SECRETS_API_BEARER_TOKEN}"
+      BWS_ACCESS_TOKEN: "${SECRETS_API_BWS_TOKEN}"
       BWS_PROJECT_ID: "6353f589-39c0-45f2-9e9c-b36f00e0c282"
-      DATABASE_URL: "postgres://postgres:${MINI_POSTGRES_PASSWORD}@postgres:5432/postgres"
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8090/health"]
       interval: 30s

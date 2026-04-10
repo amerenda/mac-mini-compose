@@ -75,10 +75,10 @@ services:
       RUNNER_NAME: mini-quiz
       LABELS: self-hosted,linux,arm64,docker,mac-mini
 
-  runner-pg-credential-api:
+  runner-secrets-api:
     <<: *runner-common
-    container_name: runner-pg-credential-api
+    container_name: runner-secrets-api
     environment:
-      REPO_URL: https://github.com/amerenda/pg-credential-api
-      RUNNER_NAME: mini-pg-credential-api
+      REPO_URL: https://github.com/amerenda/secrets-api
+      RUNNER_NAME: mini-secrets-api
       LABELS: self-hosted,linux,arm64,docker,mac-mini
