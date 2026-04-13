@@ -79,17 +79,6 @@ mqtt:
       json_attributes_template: "{{ value_json | tojson }}"
       icon: mdi:sync
 
-# NYC Subway status — polls subwaynow.app API every 2 minutes
-command_line:
-  - sensor:
-      name: "Subway Status"
-      command: "sh /config/scripts_shell/subway_status.sh"
-      value_template: "{{ value_json.state }}"
-      json_attributes:
-        - details
-        - lines
-      scan_interval: 120
-
 # Lovelace: storage mode + YAML dashboards
 lovelace:
   mode: storage
@@ -164,3 +153,4 @@ media_source: {}
 # Shell commands
 shell_command:
   cleanup_old_photos: 'find /config/www/pets -name "*.jpg" -mtime +30 -delete && find /config/www/intruders -name "*.jpg" -mtime +30 -delete'
+  subway_status_update: 'sh /config/scripts_shell/subway_status.sh'

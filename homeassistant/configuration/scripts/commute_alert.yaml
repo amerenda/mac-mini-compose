@@ -1,30 +1,20 @@
 commute_alert:
   alias: "Commute: Check Subway Status and Notify"
-  description: "Checks N, Q, 4, 5 subway lines for delays and sends push notification"
+  description: "Fetches N, Q, 4, 5 subway status and sends push notification"
   mode: single
   sequence:
+    - service: shell_command.subway_status_update
+      response_variable: result
     - variables:
-        status: "{{ states('sensor.subway_status') }}"
-        details: "{{ state_attr('sensor.subway_status', 'details') | default([]) }}"
-        has_delays: "{{ status == 'Delays' and details | length > 0 }}"
-    - choose:
-        - conditions: "{{ has_delays }}"
-          sequence:
-            - service: notify.mobile_app_pixel_9_pro_xl
-              data:
-                title: "🚇 Commute Alert"
-                message: >
-                  {% for line in details %}{{ line }}
-                  {% endfor %}
-                data:
-                  tag: "commute-alert"
-                  importance: "high"
-                  sticky: true
-      default:
-        - service: notify.mobile_app_pixel_9_pro_xl
-          data:
-            title: "🚇 Commute"
-            message: "N, Q, 4, 5 — all running normally"
-            data:
-              tag: "commute-alert"
-              importance: "default"
+        status: "{{ (result.stdout | from_json) if result.stdout else {} }}"
+        state: "{{ status.get('state', 'Error') if status is mapping else 'Error' }}"
+        title: "{{ status.get('title', '🚇 Commute') if status is mapping else '🚇 Commute' }}"
+        message: "{{ status.get('message', 'Could not check status') if status is mapping else 'Could not check status' }}"
+    - service: notify.mobile_app_pixel_9_pro_xl
+      data:
+        title: "{{ title }}"
+        message: "{{ message }}"
+        data:
+          tag: "commute-alert"
+          importance: "{{ 'high' if state == 'Delays' else 'default' }}"
+          sticky: true
