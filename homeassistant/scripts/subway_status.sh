@@ -5,9 +5,10 @@ curl -sf https://api.subwaynow.app/routes 2>/dev/null | python3 -c '
 import json, sys
 try:
     d = json.load(sys.stdin)
+    routes = d.get("routes", d)
     lines = {}
     for k in ["N", "Q", "4", "5"]:
-        lines[k] = d.get(k, {})
+        lines[k] = routes.get(k, {})
     bad = []
     for k, v in lines.items():
         status = v.get("status", "Unknown")
