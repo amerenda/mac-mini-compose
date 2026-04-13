@@ -83,7 +83,6 @@ mqtt:
 command_line:
   - sensor:
       name: "Subway Status"
-      unique_id: subway_status
       command: "sh /config/scripts_shell/subway_status.sh"
       value_template: "{{ value_json.state }}"
       json_attributes:
