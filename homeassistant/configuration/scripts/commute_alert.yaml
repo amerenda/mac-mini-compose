@@ -1,0 +1,41 @@
+commute_alert:
+  alias: "Commute: Check Subway Status and Notify"
+  description: "Checks N, Q, 4, 5 subway lines for delays and sends push notification"
+  mode: single
+  sequence:
+    - variables:
+        my_lines: ["N", "Q", "4", "5"]
+        alerts: >
+          {% set ns = namespace(lines=[]) %}
+          {% for line in my_lines %}
+            {% set route = state_attr('sensor.subway_status', line) %}
+            {% if route is mapping %}
+              {% set status = route.get('status', 'Unknown') %}
+              {% if status != 'Good Service' %}
+                {% set ns.lines = ns.lines + [line ~ ' train: ' ~ status] %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.lines }}
+        all_good: "{{ alerts | length == 0 }}"
+    - choose:
+        - conditions: "{{ not all_good }}"
+          sequence:
+            - service: notify.mobile_app_pixel_9_pro_xl
+              data:
+                title: "🚇 Commute Alert"
+                message: >
+                  {% for alert in alerts %}{{ alert }}
+                  {% endfor %}
+                data:
+                  tag: "commute-alert"
+                  importance: "high"
+                  sticky: true
+      default:
+        - service: notify.mobile_app_pixel_9_pro_xl
+          data:
+            title: "🚇 Commute"
+            message: "N, Q, 4, 5 — all running normally"
+            data:
+              tag: "commute-alert"
+              importance: "default"

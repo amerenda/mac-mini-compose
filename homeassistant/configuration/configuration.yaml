@@ -79,6 +79,33 @@ mqtt:
       json_attributes_template: "{{ value_json | tojson }}"
       icon: mdi:sync
 
+# REST sensor — NYC Subway status from subwaynow.app API
+# The API returns {"N": {"status": "..."}, "Q": {...}, ...}
+# We extract the lines we care about as attributes
+rest:
+  - resource: "https://api.subwaynow.app/routes"
+    scan_interval: 120
+    sensor:
+      - name: "Subway Status"
+        unique_id: subway_status
+        value_template: >
+          {% set lines = ['N', 'Q', '4', '5'] %}
+          {% set ns = namespace(bad=[]) %}
+          {% for line in lines %}
+            {% set route = value_json.get(line, {}) %}
+            {% if route.get('status', 'Unknown') != 'Good Service' %}
+              {% set ns.bad = ns.bad + [line] %}
+            {% endif %}
+          {% endfor %}
+          {{ 'Delays: ' ~ ns.bad | join(', ') if ns.bad else 'All Clear' }}
+        json_attributes_path: "$"
+        json_attributes:
+          - "N"
+          - "Q"
+          - "4"
+          - "5"
+        icon: mdi:subway
+
 # Lovelace: storage mode + YAML dashboards
 lovelace:
   mode: storage

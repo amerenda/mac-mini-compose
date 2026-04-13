@@ -1,0 +1,28 @@
+alias: "Commute: Alert on Leaving Home"
+id: commute_alert_on_leave
+description: "When phone disconnects from WiFi on a weekday morning, check subway and notify"
+mode: single
+trigger:
+  # Phone WiFi disconnects (earliest signal of leaving)
+  - platform: state
+    entity_id: sensor.pixel_9_pro_xl_wi_fi_bssid
+    to: "unavailable"
+  # Fallback: device tracker leaves home
+  - platform: state
+    entity_id: device_tracker.pixel_9_pro_xl_2
+    from: "home"
+    to: "not_home"
+condition:
+  # Weekday only (Mon=0 through Fri=4)
+  - condition: template
+    value_template: "{{ now().weekday() < 5 }}"
+  # Morning window (6:00 - 10:00)
+  - condition: time
+    after: "06:00:00"
+    before: "10:00:00"
+  # Phone was recently home (don't fire on random WiFi blips)
+  - condition: state
+    entity_id: person.alex_merenda
+    state: "home"
+action:
+  - service: script.commute_alert
