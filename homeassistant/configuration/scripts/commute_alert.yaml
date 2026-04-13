@@ -4,28 +4,17 @@ commute_alert:
   mode: single
   sequence:
     - variables:
-        my_lines: ["N", "Q", "4", "5"]
-        alerts: >
-          {% set ns = namespace(lines=[]) %}
-          {% for line in my_lines %}
-            {% set route = state_attr('sensor.subway_status', line) %}
-            {% if route is mapping %}
-              {% set status = route.get('status', 'Unknown') %}
-              {% if status != 'Good Service' %}
-                {% set ns.lines = ns.lines + [line ~ ' train: ' ~ status] %}
-              {% endif %}
-            {% endif %}
-          {% endfor %}
-          {{ ns.lines }}
-        all_good: "{{ alerts | length == 0 }}"
+        status: "{{ states('sensor.subway_status') }}"
+        details: "{{ state_attr('sensor.subway_status', 'details') | default([]) }}"
+        has_delays: "{{ status == 'Delays' and details | length > 0 }}"
     - choose:
-        - conditions: "{{ not all_good }}"
+        - conditions: "{{ has_delays }}"
           sequence:
             - service: notify.mobile_app_pixel_9_pro_xl
               data:
                 title: "🚇 Commute Alert"
                 message: >
-                  {% for alert in alerts %}{{ alert }}
+                  {% for line in details %}{{ line }}
                   {% endfor %}
                 data:
                   tag: "commute-alert"

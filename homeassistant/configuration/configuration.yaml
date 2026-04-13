@@ -79,32 +79,26 @@ mqtt:
       json_attributes_template: "{{ value_json | tojson }}"
       icon: mdi:sync
 
-# REST sensor — NYC Subway status from subwaynow.app API
-# The API returns {"N": {"status": "..."}, "Q": {...}, ...}
-# We extract the lines we care about as attributes
-rest:
-  - resource: "https://api.subwaynow.app/routes"
-    scan_interval: 120
-    sensor:
-      - name: "Subway Status"
-        unique_id: subway_status
-        value_template: >
-          {% set lines = ['N', 'Q', '4', '5'] %}
-          {% set ns = namespace(bad=[]) %}
-          {% for line in lines %}
-            {% set route = value_json.get(line, {}) %}
-            {% if route.get('status', 'Unknown') != 'Good Service' %}
-              {% set ns.bad = ns.bad + [line] %}
-            {% endif %}
-          {% endfor %}
-          {{ 'Delays: ' ~ ns.bad | join(', ') if ns.bad else 'All Clear' }}
-        json_attributes_path: "$"
-        json_attributes:
-          - "N"
-          - "Q"
-          - "4"
-          - "5"
-        icon: mdi:subway
+# NYC Subway status — polls subwaynow.app API every 2 minutes
+command_line:
+  - sensor:
+      name: "Subway Status"
+      unique_id: subway_status
+      command: >
+        curl -sf https://api.subwaynow.app/routes 2>/dev/null | python3 -c "
+        import json,sys
+        try:
+          d=json.load(sys.stdin)
+          lines={'N':d.get('N',{}),'Q':d.get('Q',{}),'4':d.get('4',{}),'5':d.get('5',{})}
+          bad=[k+': '+v.get('status','?') for k,v in lines.items() if v.get('status','')!='Good Service']
+          print(json.dumps({'state':'Delays' if bad else 'All Clear','details':bad,'lines':lines}))
+        except: print(json.dumps({'state':'Error','details':[],'lines':{}}))" 2>/dev/null
+      value_template: "{{ value_json.state }}"
+      json_attributes:
+        - details
+        - lines
+      scan_interval: 120
+      icon: mdi:subway
 
 # Lovelace: storage mode + YAML dashboards
 lovelace:
