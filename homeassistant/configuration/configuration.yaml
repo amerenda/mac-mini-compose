@@ -84,21 +84,12 @@ command_line:
   - sensor:
       name: "Subway Status"
       unique_id: subway_status
-      command: >
-        curl -sf https://api.subwaynow.app/routes 2>/dev/null | python3 -c "
-        import json,sys
-        try:
-          d=json.load(sys.stdin)
-          lines={'N':d.get('N',{}),'Q':d.get('Q',{}),'4':d.get('4',{}),'5':d.get('5',{})}
-          bad=[k+': '+v.get('status','?') for k,v in lines.items() if v.get('status','')!='Good Service']
-          print(json.dumps({'state':'Delays' if bad else 'All Clear','details':bad,'lines':lines}))
-        except: print(json.dumps({'state':'Error','details':[],'lines':{}}))" 2>/dev/null
+      command: "sh /config/scripts_shell/subway_status.sh"
       value_template: "{{ value_json.state }}"
       json_attributes:
         - details
         - lines
       scan_interval: 120
-      icon: mdi:subway
 
 # Lovelace: storage mode + YAML dashboards
 lovelace:
