@@ -7,6 +7,7 @@ name = "mac-mini-compose"
 description = "GitOps sync for mac-mini-compose stacks"
 tags = ["mac-mini"]
 [resource_sync.config]
+managed = true
 repo = "amerenda/mac-mini-compose"
 branch = "main"
 resource_path = ["resource-sync/stacks.toml"]
