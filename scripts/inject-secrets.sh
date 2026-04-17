@@ -134,8 +134,6 @@ log "Injecting services secrets..."
 
 TECHNITIUM_PW=$("$BWS_BIN" secret get "ae363b89-3fd6-43e3-9a83-b42100e7aed3" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
 PIHOLE_PW=$("$BWS_BIN" secret get "c8157be0-0195-41f3-b3c6-b37100d27645" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
-QUIZ_PG_PW=$("$BWS_BIN" secret get "21a4484a-65a0-4e25-b201-b4270127ec8b" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
-
 {
     if [[ -n "$TECHNITIUM_PW" ]] && [[ "$TECHNITIUM_PW" != "null" ]]; then
         echo "TECHNITIUM_ADMIN_PASSWORD=$TECHNITIUM_PW"
@@ -147,12 +145,6 @@ QUIZ_PG_PW=$("$BWS_BIN" secret get "21a4484a-65a0-4e25-b201-b4270127ec8b" 2>/dev
         echo "PIHOLE_WEBPASSWORD=$PIHOLE_PW"
     else
         log "WARN: failed to fetch pihole password"
-        ERRORS=$((ERRORS + 1))
-    fi
-    if [[ -n "$QUIZ_PG_PW" ]] && [[ "$QUIZ_PG_PW" != "null" ]]; then
-        echo "QUIZ_POSTGRES_PASSWORD=$QUIZ_PG_PW"
-    else
-        log "WARN: failed to fetch quiz postgres password"
         ERRORS=$((ERRORS + 1))
     fi
 } > "$COMPOSE_DIR/.env"
