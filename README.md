@@ -14,13 +14,17 @@ the Mac Mini — run the playbook instead.
 | Service | Network | Port | Purpose |
 |---------|---------|------|---------|
 | Home Assistant | host | 8123 | Smart home hub |
+| Technitium | host | 53, 5380 | DNS server (replaced Pi-hole + BIND9) |
 | Whisper | bridge | 10300 | Speech-to-text (Wyoming protocol) |
 | Piper | bridge | 10200 | Text-to-speech (Wyoming protocol) |
 | OpenWakeWord | bridge | 10400 | Wake word detection |
+| Mosquitto | bridge | 1883 | MQTT broker (Zigbee2MQTT, HA) |
+| Zigbee2MQTT | bridge | 8080 | Zigbee coordinator bridge |
+| Postgres | bridge | 5432 | Primary database (pgvector/pg16) |
+| MongoDB | bridge | 27017 | Secondary database (UniFi) |
 | Node Exporter | bridge | 9100 | Host metrics for Prometheus |
-| HACS init | — | — | One-shot: installs HACS into HA config volume |
-
-BIND9 and Pihole are defined but disabled (commented out) — not yet migrated.
+| Postgres backup | — | — | Daily backup to GCS |
+| MongoDB backup | — | — | Daily backup to GCS |
 
 ### Runners stack (`runners/compose.yaml`)
 
@@ -30,15 +34,19 @@ BIND9 and Pihole are defined but disabled (commented out) — not yet migrated.
 | runner-ecdysis | GitHub Actions runner for ecdysis repo |
 | runner-llm-manager | GitHub Actions runner for llm-manager repo |
 | runner-llm-agents | GitHub Actions runner for llm-agents repo |
+| runner-photos | GitHub Actions runner for photos repo |
 
 ### Komodo stack (`komodo/compose.yaml`)
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Komodo Core | 9120 | GitOps UI and API |
-| Komodo Periphery | 8120 (internal) | Agent for managing Docker on the host |
+| Komodo Core | 9120 | GitOps UI and API (v2.1.2) |
+| Komodo Periphery | 8120 (internal) | Agent for managing Docker on the host (v2.1.2) |
 | FerretDB | 27017 (internal) | MongoDB-compatible database for Komodo |
 | Postgres (DocumentDB) | 5432 (internal) | Storage backend for FerretDB |
+
+Periphery uses a custom image (`Dockerfile.periphery`) that adds the `bws` CLI
+for pre_deploy secret injection.
 
 ### Other (not in Compose)
 
@@ -67,18 +75,92 @@ Komodo + GitOps bootstrap, Tailscale, BlueBubbles install.
 
 ## GitOps Flow
 
+### Architecture
+
 ```
-Push to main → Komodo polls (5 min) → ResourceSync updates stacks
-→ pre_deploy fetches secrets from BWS → docker compose up
+GitHub push → pubhooks.amer.dev (k3s Traefik proxy) → Komodo Core (Mac Mini:9120)
+                                                        ├─ /sync/.../sync    → ResourceSync executes
+                                                        ├─ /stack/.../deploy → services stack deploys
+                                                        └─ /stack/.../deploy → runners stack deploys
 ```
 
-1. Komodo Core polls `amerenda/mac-mini-compose` on `main` every 5 minutes (`KOMODO_RESOURCE_POLL_INTERVAL=5-min`)
-2. ResourceSync reads `resource-sync/stacks.toml` which defines the services and runners stacks
-3. Each stack has a `pre_deploy` script that fetches secrets from BWS via the `bws` CLI (installed in the periphery container)
-4. Stacks with `deploy = true` auto-deploy after sync
+### How it works
+
+1. Push to `amerenda/mac-mini-compose` on `main`
+2. Three GitHub webhooks fire simultaneously:
+   - **ResourceSync webhook** (`/listener/github/sync/mac-mini-compose/sync`) — tells Komodo to re-read `resource-sync/stacks.toml` and update stack definitions
+   - **Services stack deploy** (`/listener/github/stack/<id>/deploy`) — triggers `docker compose up` for the services stack
+   - **Runners stack deploy** (`/listener/github/stack/<id>/deploy`) — triggers `docker compose up` for the runners stack
+3. Each stack's `pre_deploy` script runs first, fetching secrets from BWS via `bws` CLI
+4. Komodo runs `docker compose up -d` with the updated compose files
+
+### Webhook configuration
+
+All webhooks are configured on the GitHub repo (`amerenda/mac-mini-compose`
+Settings > Webhooks) and proxy through `pubhooks.amer.dev` (a k3s Traefik
+IngressRoute that forwards `/listener/github/*` to the Mac Mini's Komodo Core).
+
+| Webhook | GitHub Hook ID | Endpoint | Purpose |
+|---------|---------------|----------|---------|
+| ResourceSync | `606876027` | `.../sync/mac-mini-compose/sync` | Sync stack definitions from TOML |
+| Services deploy | `605400567` | `.../stack/69c4863a9781f84b58ffd7a6/deploy` | Deploy services stack |
+| Runners deploy | `606895878` | `.../stack/69c4863a9781f84b58ffd7a8/deploy` | Deploy runners stack |
+
+All webhooks use the `komodo-dean-webhook-secret` from BWS as the HMAC secret.
+
+### Known issue: ResourceSync webhook does not auto-execute
+
+As of Komodo v2.1.2, the ResourceSync `/sync` webhook authenticates successfully
+but does not trigger a `RunSync` execution. This appears to be a Komodo bug
+(see [moghtech/komodo#1120](https://github.com/moghtech/komodo/issues/1120)).
+The stack deploy webhooks work independently, so deployments still trigger on push.
+ResourceSync still runs on the 5-minute poll interval (`KOMODO_RESOURCE_POLL_INTERVAL=5-min`)
+as a fallback.
+
+### Fallback: 5-minute polling
+
+Komodo Core polls the git repo every 5 minutes regardless of webhooks. If a
+webhook fails or is missed, the sync will still happen within 5 minutes.
+
+### Resource sync files
+
+| File | Purpose |
+|------|---------|
+| `resource-sync/sync.toml` | Defines the ResourceSync resource itself (repo, branch, resource path) |
+| `resource-sync/stacks.toml` | Defines the two stacks (services + runners) with pre_deploy scripts |
 
 Stack definitions: `resource-sync/stacks.toml`
 Sync definition: `resource-sync/sync.toml`
+
+## Komodo Administration
+
+### Upgrading Komodo
+
+1. Update `COMPOSE_KOMODO_IMAGE_TAG` in `komodo/compose.env`
+2. Update the base image tag in `komodo/Dockerfile.periphery`
+3. On the Mac Mini: `cd ~/mac-mini-compose/komodo && docker compose --env-file compose.env build periphery && docker compose --env-file compose.env up -d`
+
+Note: The Komodo stack is self-managed (has `komodo.skip` labels) — it does NOT
+auto-deploy via webhooks. You must restart it manually or via SSH after changing
+the compose.env or Dockerfile.
+
+### Manually triggering a sync
+
+If the ResourceSync shows "Pending" in the Komodo UI and the Execute button is
+unavailable, use the API:
+
+```bash
+ssh mini
+export PATH="$HOME/.orbstack/bin:$PATH"
+ADMIN_PASS=$(cat ~/mac-mini-compose/komodo/secrets/komodo-dean-admin-password)
+JWT=$(curl -sf http://localhost:9120/auth/login/LoginLocalUser \
+  -H "Content-Type: application/json" \
+  -d "{\"username\":\"admin\",\"password\":\"$ADMIN_PASS\"}" | jq -r ".data.jwt")
+curl -sf http://localhost:9120/execute/RunSync \
+  -H "Content-Type: application/json" \
+  -H "Authorization: $JWT" \
+  -d '{"sync":"mac-mini-compose"}'
+```
 
 ## Secrets
 
@@ -110,14 +192,14 @@ All three paths write to the same locations. The script is idempotent.
 | `/etc/komodo/runner-secrets/` | GitHub App keys, DockerHub token, GitOps PAT | Runner containers (mounted as `/run/secrets`) |
 | `komodo/secrets/` | DB password, passkey, JWT secret, webhook secret, admin password | Komodo Core (via `_FILE` pattern) |
 | `komodo/compose.env` | Injected DB password, admin password, passkey | Komodo Compose (plaintext, required by Postgres/FerretDB) |
-| `.env` | Pihole admin password | Services Compose |
+| `.env` | Service passwords (Pihole, Postgres, MongoDB, backups) | Services Compose |
 | `bind9/keys/key.conf` | BIND9 TSIG key | BIND9 container |
 | Komodo database | Git provider PAT | Komodo Core (updated via API by inject-secrets.sh) |
 
 Generated files (not in git, created by inject-secrets.sh):
 - `runners/compose.env` — non-secret runner config
 - `komodo/secrets/*` — Komodo secret files
-- `.env` — pihole password
+- `.env` — service passwords
 - `bind9/keys/key.conf` — TSIG key
 
 ### Rotating a secret
@@ -142,17 +224,17 @@ BWS secret IDs are defined in `ansible-playbooks/group_vars/macmini_hosts.yml`.
 
 ```
 .
-├── docker-compose.yaml          # Services stack (HA, whisper, piper, node-exporter)
+├── docker-compose.yaml          # Services stack (HA, Technitium, Postgres, MongoDB, etc.)
 ├── homeassistant/               # HA configuration (gitops-managed)
 │   ├── configuration/           # Mounted read-only into HA container
 │   └── scripts/                 # Setup/migration scripts
-├── komodo/                      # Komodo stack
+├── komodo/                      # Komodo stack (self-managed, not auto-deployed)
 │   ├── compose.yaml             # Core + Periphery + FerretDB + Postgres
 │   ├── compose.env              # Config (secrets injected by script)
-│   ├── Dockerfile.periphery     # Periphery + bws CLI
+│   ├── Dockerfile.periphery     # Periphery v2.1.2 + bws CLI
 │   └── secrets/                 # (gitignored) secret files on disk
 ├── runners/                     # GitHub Actions runners stack
-│   ├── compose.yaml             # 4 repo-scoped runners
+│   ├── compose.yaml             # 5 repo-scoped runners
 │   ├── compose.env.example      # Template for non-secret config
 │   └── entrypoint-wrapper.sh    # Reads secrets from /run/secrets into env
 ├── resource-sync/               # Komodo GitOps definitions
@@ -160,32 +242,29 @@ BWS secret IDs are defined in `ansible-playbooks/group_vars/macmini_hosts.yml`.
 │   └── sync.toml                # ResourceSync self-definition
 ├── scripts/
 │   ├── inject-secrets.sh        # BWS → disk + Komodo API (boot, ansible, manual)
+│   ├── sync-stacks.sh           # Host-side git sync (OrbStack VirtFS workaround)
 │   ├── backup.sh                # Backup HA, pihole, bind9 data
 │   ├── healthcheck.sh           # Verify services are running
-│   └── migrate-ha-data.sh       # One-time HA data migration from k3s
+│   └── dns-udp-proxy.py         # UDP DNS proxy with EDNS Client Subnet
 ├── launchd/
-│   └── com.local.inject-secrets.plist  # Boot-time secret injection daemon
+│   ├── com.local.inject-secrets.plist          # Boot-time secret injection
+│   ├── com.local.komodo-stack-sync.plist       # Host-side git sync (every 60s)
+│   ├── com.local.pf-dns-redirect.plist         # pf DNS redirect for Technitium
+│   └── com.local.dns-udp-proxy.plist           # UDP DNS proxy daemon
+├── zigbee2mqtt/                 # Zigbee2MQTT config + smart-lighting extension
+├── mosquitto/                   # MQTT broker config
 ├── bind9/                       # BIND9 config + zone files (disabled)
 ├── pihole/                      # Pihole config (disabled)
+├── mongo/                       # MongoDB init scripts
+├── postgres/                    # Postgres init scripts (todo, agent_kb databases)
 └── whisper/                     # Whisper model cache
 ```
 
-## Zigbee (ser2net)
+## Zigbee (Zigbee2MQTT)
 
-The Zigbee USB stick stays on rpi5-1. Install ser2net there:
-
-```bash
-sudo apt install ser2net
-# /etc/ser2net.yaml:
-# connection: &zigbee
-#   accepter: tcp,3333
-#   connector: serialdev,/dev/ttyUSB0,115200n81,local
-#   options:
-#     kickolduser: true
-sudo systemctl enable --now ser2net
-```
-
-In Home Assistant ZHA integration, use: `socket://rpi5-1.amer.home:3333`
+Zigbee2MQTT connects to the SMLIGHT coordinator on the local network. The
+smart-lighting Z2M extension (`zigbee2mqtt/external_extensions/smart-lighting.js`)
+manages scene storage and wall switch behavior.
 
 ## Known Issues
 
@@ -201,8 +280,23 @@ the Ansible playbook. It waits for OrbStack to start, tests LAN connectivity
 from a container, and restarts OrbStack if broken. No-op if networking is
 already working.
 
-**Affected version:** OrbStack 2.0.5 (2000500). Remove the workaround if a
-future OrbStack update fixes this.
+### OrbStack VirtFS directory cache staleness
+
+OrbStack's VirtFS does not reliably propagate new directory entries created by
+`git pull` inside containers to the host (and vice versa). This can cause
+Komodo Periphery's git operations to fail silently.
+
+**Workaround:** A LaunchAgent (`com.local.komodo-stack-sync.plist`) runs
+`scripts/sync-stacks.sh` every 60 seconds on the host. It does `git fetch &&
+reset --hard` on the local checkout and restarts Periphery if the directory
+structure changed.
+
+### Komodo ResourceSync webhook does not auto-execute
+
+The ResourceSync `/sync` webhook endpoint authenticates but does not trigger
+execution. This is tracked upstream at
+[moghtech/komodo#1120](https://github.com/moghtech/komodo/issues/1120).
+Stack deploy webhooks work correctly. ResourceSync falls back to 5-minute polling.
 
 ## Health Check
 
