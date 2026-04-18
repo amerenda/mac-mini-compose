@@ -1,4 +1,4 @@
-FROM ghcr.io/moghtech/komodo-periphery:2
+FROM ghcr.io/moghtech/komodo-periphery:2.1.2
 
 # Install bws CLI (Bitwarden Secrets Manager) for pre_deploy secret injection
 RUN apt-get update && apt-get install -y --no-install-recommends curl unzip jq ca-certificates \
