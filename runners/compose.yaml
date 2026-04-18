@@ -67,10 +67,3 @@ services:
       RUNNER_NAME: mini-photos
       LABELS: self-hosted,linux,arm64,docker,mac-mini
 
-  runner-secrets-api:
-    <<: *runner-common
-    container_name: runner-secrets-api
-    environment:
-      REPO_URL: https://github.com/amerenda/secrets-api
-      RUNNER_NAME: mini-secrets-api
-      LABELS: self-hosted,linux,arm64,docker,mac-mini

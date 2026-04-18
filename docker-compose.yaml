@@ -300,27 +300,6 @@ services:
       "
 
   # ============================================================
-  # Secrets API — write-only BWS secret provisioning
-  # POST /secrets → create secret. GET /secrets → list names/UUIDs.
-  # Cannot read secret values or modify existing secrets.
-  # ============================================================
-  secrets-api:
-    image: amerenda/secrets-api:latest
-    container_name: secrets-api
-    restart: unless-stopped
-    ports:
-      - "8090:8090"
-    environment:
-      BEARER_TOKEN: "${SECRETS_API_BEARER_TOKEN}"
-      BWS_ACCESS_TOKEN: "${SECRETS_API_BWS_TOKEN}"
-      BWS_PROJECT_ID: "6353f589-39c0-45f2-9e9c-b36f00e0c282"
-    healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:8090/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-  # ============================================================
   # Monitoring exporters — scraped by Prometheus on k3s
   # ============================================================
   node-exporter:
