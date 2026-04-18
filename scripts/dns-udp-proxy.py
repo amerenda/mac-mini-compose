@@ -19,6 +19,7 @@ import struct
 import threading
 import syslog
 import sys
+import ipaddress
 
 LISTEN_IP    = "10.100.20.240"
 LISTEN_PORT  = 15354
@@ -38,13 +39,79 @@ def en0_bound_socket(kind: int) -> socket.socket:
     return s
 
 
+# ── EDNS Client Subnet ───────────────────────────────────────────────────────
+
+def _build_ecs_option(client_ip: str) -> bytes:
+    """Build an EDNS Client Subnet option (RFC 7871) for an IPv4 address."""
+    addr = ipaddress.IPv4Address(client_ip)
+    prefix_len = 32
+    addr_bytes = addr.packed
+    # OPTION-CODE=8 (CLIENT-SUBNET), FAMILY=1 (IPv4), SOURCE PREFIX, SCOPE=0
+    option_data = struct.pack("!HBB", 1, prefix_len, 0) + addr_bytes
+    return struct.pack("!HH", 8, len(option_data)) + option_data
+
+
+def _add_ecs_to_query(data: bytes, client_ip: str) -> bytes:
+    """Inject EDNS Client Subnet into a DNS query so the backend sees the real client IP."""
+    if len(data) < 12:
+        return data
+    # Parse header
+    qdcount = struct.unpack("!H", data[4:6])[0]
+    arcount = struct.unpack("!H", data[10:12])[0]
+
+    # Walk past question section to find additional section
+    offset = 12
+    for _ in range(qdcount):
+        while offset < len(data) and data[offset] != 0:
+            if (data[offset] & 0xC0) == 0xC0:
+                offset += 2
+                break
+            offset += 1 + data[offset]
+        else:
+            offset += 1  # skip null terminator
+        offset += 4  # QTYPE + QCLASS
+
+    ecs_opt = _build_ecs_option(client_ip)
+
+    # Check if an OPT record already exists
+    saved = offset
+    for _ in range(arcount if qdcount else 0):
+        # Skip answer + authority sections (we only parsed questions)
+        break
+
+    # Simple approach: if there's already an OPT RR (arcount > 0 and last record
+    # is type 41), we'd need to splice into it. For simplicity, if no OPT exists,
+    # append one. If one exists, skip ECS injection rather than risk corruption.
+    if arcount > 0:
+        return data
+
+    # Build OPT pseudo-RR: NAME=0, TYPE=41, UDP=4096, RCODE=0, VERSION=0, FLAGS=0
+    opt_rr = b'\x00'  # NAME (root)
+    opt_rr += struct.pack("!H", 41)  # TYPE = OPT
+    opt_rr += struct.pack("!H", 4096)  # UDP payload size
+    opt_rr += struct.pack("!I", 0)  # extended RCODE + flags
+    opt_rr += struct.pack("!H", len(ecs_opt))  # RDLENGTH
+    opt_rr += ecs_opt
+
+    # Update ARCOUNT
+    new_arcount = arcount + 1
+    data = data[:10] + struct.pack("!H", new_arcount) + data[12:]
+    return data + opt_rr
+
+
+def _strip_ecs_from_response(data: bytes) -> bytes:
+    """Pass response through unchanged — Technitium may echo ECS back, clients handle it fine."""
+    return data
+
+
 # ── UDP ───────────────────────────────────────────────────────────────────────
 
 def handle_udp(data: bytes, client_addr: tuple, listen_sock: socket.socket) -> None:
     try:
+        tagged = _add_ecs_to_query(data, client_addr[0])
         be = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         be.settimeout(TIMEOUT)
-        be.sendto(data, (BACKEND_IP, BACKEND_PORT))
+        be.sendto(tagged, (BACKEND_IP, BACKEND_PORT))
         resp, _ = be.recvfrom(4096)
         listen_sock.sendto(resp, client_addr)
     except Exception as e:

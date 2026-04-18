@@ -1,9 +1,0 @@
-alias: "Members - Camera Privacy (Home)"
-mode: "restart"
-triggers:
-  - trigger: "state"
-    entity_id: "group.members"
-    to: "home"
-    from: "not_home"
-actions:
-  - action: script.manage_camera_privacy
