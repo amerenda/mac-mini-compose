@@ -6,13 +6,36 @@ views:
       - type: grid
         cards:
           - type: heading
-            heading: Camera Controls
+            heading: Privacy Mode
             heading_style: title
             icon: mdi:camera-lock
+          - type: horizontal-stack
+            cards:
+              - type: button
+                name: Cameras Off
+                icon: mdi:camera-off
+                show_state: false
+                tap_action:
+                  action: call-service
+                  service: script.camera_privacy_on
+              - type: button
+                name: Cameras On
+                icon: mdi:camera
+                show_state: false
+                tap_action:
+                  action: call-service
+                  service: script.camera_privacy_off
           - type: entities
+            show_header_toggle: false
             entities:
-              - switch.bedroom_privacy_mode
-              - switch.living_room_privacy_mode
+              - entity: switch.bedroom_privacy_mode
+                name: Bedroom Privacy
+              - entity: switch.living_room_privacy_mode
+                name: Living Room Privacy
+              - entity: light.bedroom_status_led
+                name: Bedroom LED
+              - entity: light.living_room_status_led
+                name: Living Room LED
       - type: grid
         cards:
           - type: heading
@@ -40,7 +63,7 @@ views:
               {% set ts = states('input_text.intruder_image_timestamp') %}
               {% if loc and loc not in ['unknown', 'unavailable', ''] %}
                 ![Intruder](/local/intruders/{{ loc }}_{{ ts }}.jpg)
-                
+
                 **Location:** {{ loc | replace('_', ' ') | title }}
                 **Time:** {{ strptime(ts, '%Y%m%d_%H%M%S').strftime('%-I:%M %p on %b %d') if ts and ts not in ['unknown', 'unavailable'] else 'Unknown' }}
               {% else %}
