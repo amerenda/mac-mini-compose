@@ -1,0 +1,43 @@
+alias: "Security: Privacy Monitor (Drift Correction)"
+id: security_privacy_monitor
+mode: single
+trigger:
+  - platform: time_pattern
+    minutes: "/1"
+condition:
+  # Only run if cameras are available (not disabled)
+  - condition: template
+    value_template: >
+      {{ states('switch.bedroom_privacy_mode') not in ['unavailable', 'unknown']
+         or states('switch.living_room_privacy_mode') not in ['unavailable', 'unknown'] }}
+action:
+  - choose:
+      # Someone home → privacy on, LEDs off
+      - conditions:
+          - condition: state
+            entity_id: group.members
+            state: "home"
+        sequence:
+          # Check if privacy is already correct
+          - condition: template
+            value_template: >
+              {{ is_state('switch.bedroom_privacy_mode', 'off')
+                 or is_state('switch.living_room_privacy_mode', 'off')
+                 or is_state('light.bedroom_status_led', 'on')
+                 or is_state('light.living_room_status_led', 'on') }}
+          - service: script.camera_privacy_on
+
+      # Nobody home → privacy off, LEDs on
+      - conditions:
+          - condition: state
+            entity_id: group.members
+            state: "not_home"
+        sequence:
+          # Check if privacy is already correct
+          - condition: template
+            value_template: >
+              {{ is_state('switch.bedroom_privacy_mode', 'on')
+                 or is_state('switch.living_room_privacy_mode', 'on')
+                 or is_state('light.bedroom_status_led', 'off')
+                 or is_state('light.living_room_status_led', 'off') }}
+          - service: script.camera_privacy_off

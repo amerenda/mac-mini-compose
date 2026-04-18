@@ -1,0 +1,10 @@
+alias: "Security: Someone Home — Cameras Off"
+id: security_someone_home
+mode: restart
+trigger:
+  - platform: state
+    entity_id: group.members
+    to: "home"
+    from: "not_home"
+action:
+  - service: script.camera_privacy_on

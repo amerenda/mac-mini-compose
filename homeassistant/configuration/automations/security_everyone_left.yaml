@@ -1,0 +1,15 @@
+alias: "Security: Everyone Left — Cameras On"
+id: security_everyone_left
+mode: restart
+trigger:
+  - platform: state
+    entity_id: group.members
+    to: "not_home"
+    from: "home"
+    for: "00:05:00"
+condition:
+  - condition: state
+    entity_id: group.members
+    state: "not_home"
+action:
+  - service: script.camera_privacy_off
