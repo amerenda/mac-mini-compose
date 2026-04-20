@@ -1,0 +1,75 @@
+set_bulb_defaults:
+  alias: "Z2M: Set Power-On Defaults for All Bulbs"
+  description: "Pushes hue_power_on brightness/color_temp to all bulbs firmware"
+  mode: single
+  fields:
+    brightness:
+      description: "Brightness (1-254)"
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 254
+    color_temp:
+      description: "Color temp in mired (153=cool, 250=neutral, 370=warm, 500=warmest). Leave 0 for dimmable-only bulbs."
+      required: false
+      default: 250
+      selector:
+        number:
+          min: 153
+          max: 500
+  sequence:
+    - variables:
+        ambiance_bulbs: ["living_room_1", "bedroom_1", "bedroom_2", "lamp_1", "bathroom_1"]
+        dimmable_bulbs: ["kitchen_1", "kitchen_2", "hallway_1"]
+        bri: "{{ brightness | int(254) }}"
+        ct: "{{ color_temp | int(250) }}"
+    # Ambiance bulbs (brightness + color_temp)
+    - repeat:
+        for_each: "{{ ambiance_bulbs }}"
+        sequence:
+          - service: mqtt.publish
+            data:
+              topic: "zigbee2mqtt/{{ repeat.item }}/set"
+              payload: "{{ {'hue_power_on_behavior': 'on', 'hue_power_on_brightness': bri | int, 'hue_power_on_color_temperature': ct | int} | tojson }}"
+          - delay: { milliseconds: 300 }
+    # Dimmable bulbs (brightness only)
+    - repeat:
+        for_each: "{{ dimmable_bulbs }}"
+        sequence:
+          - service: mqtt.publish
+            data:
+              topic: "zigbee2mqtt/{{ repeat.item }}/set"
+              payload: "{{ {'hue_power_on_behavior': 'on', 'hue_power_on_brightness': bri | int, 'hue_power_on_color_temperature': ct | int} | tojson }}"
+          - delay: { milliseconds: 300 }
+
+set_single_bulb_default:
+  alias: "Z2M: Set Power-On Default for One Bulb"
+  description: "Pushes hue_power_on to a specific bulb"
+  mode: single
+  fields:
+    bulb:
+      description: "Bulb friendly name (e.g., living_room_1)"
+      required: true
+      selector:
+        text:
+    brightness:
+      description: "Brightness (1-254)"
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 254
+    color_temp:
+      description: "Color temp in mired (153-500)"
+      required: false
+      default: 250
+      selector:
+        number:
+          min: 153
+          max: 500
+  sequence:
+    - service: mqtt.publish
+      data:
+        topic: "zigbee2mqtt/{{ bulb }}/set"
+        payload: "{{ {'hue_power_on_behavior': 'on', 'hue_power_on_brightness': brightness | int, 'hue_power_on_color_temperature': color_temp | int} | tojson }}"

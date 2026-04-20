@@ -1,0 +1,155 @@
+{
+  "day_assignments": {
+    "friday": "friday",
+    "monday": "weekday",
+    "saturday": "saturday",
+    "sunday": "sunday",
+    "thursday": "weekday",
+    "tuesday": "weekday",
+    "wednesday": "weekday"
+  },
+  "house_mode": "Home",
+  "profiles": {
+    "friday": {
+      "day": "09:00",
+      "evening": "17:00",
+      "morning": "06:00",
+      "night": "23:00"
+    },
+    "saturday": {
+      "day": "10:00",
+      "evening": "18:00",
+      "morning": "08:00",
+      "night": "23:30"
+    },
+    "sunday": {
+      "day": "10:00",
+      "evening": "17:00",
+      "morning": "08:30",
+      "night": "22:00"
+    },
+    "weekday": {
+      "day": "09:00",
+      "evening": "17:00",
+      "morning": "06:00",
+      "night": "22:00"
+    }
+  },
+  "rooms": {
+    "Bathroom": {
+      "lights": [
+        "bathroom_1"
+      ],
+      "scenes": {
+        "day": {
+          "brightness": 254,
+          "color_temp": 250
+        },
+        "evening": {
+          "brightness": 180,
+          "color_temp": 400
+        },
+        "morning": {
+          "brightness": 200,
+          "color_temp": 300
+        },
+        "night": {
+          "brightness": 80,
+          "color_temp": 500
+        }
+      },
+      "smart_power_on": true
+    },
+    "Bedroom": {
+      "lights": [
+        "bedroom_1",
+        "bedroom_2",
+        "lamp_1"
+      ],
+      "scenes": {
+        "day": {
+          "brightness": 254,
+          "color_temp": 250
+        },
+        "evening": {
+          "brightness": 180,
+          "color_temp": 400
+        },
+        "morning": {
+          "brightness": 200,
+          "color_temp": 300
+        },
+        "night": {
+          "brightness": 80,
+          "color_temp": 500
+        }
+      },
+      "smart_power_on": true
+    },
+    "Hallway": {
+      "lights": [
+        "hallway_1"
+      ],
+      "scenes": {
+        "day": {
+          "brightness": 254
+        },
+        "evening": {
+          "brightness": 150
+        },
+        "morning": {
+          "brightness": 200
+        },
+        "night": {
+          "brightness": 50
+        }
+      },
+      "smart_power_on": true
+    },
+    "Kitchen": {
+      "lights": [
+        "kitchen_1",
+        "kitchen_2"
+      ],
+      "scenes": {
+        "day": {
+          "brightness": 254
+        },
+        "evening": {
+          "brightness": 150
+        },
+        "morning": {
+          "brightness": 200
+        },
+        "night": {
+          "brightness": 50
+        }
+      },
+      "smart_power_on": true
+    },
+    "Living Room": {
+      "lights": [
+        "living_room_1"
+      ],
+      "scenes": {
+        "day": {
+          "brightness": 254,
+          "color_temp": 250
+        },
+        "evening": {
+          "brightness": 180,
+          "color_temp": 400
+        },
+        "morning": {
+          "brightness": 200,
+          "color_temp": 300
+        },
+        "night": {
+          "brightness": 80,
+          "color_temp": 500
+        }
+      },
+      "smart_power_on": true
+    }
+  }
+}

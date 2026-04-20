@@ -1,0 +1,18 @@
+# Bulb power-on default values (used by set_bulb_defaults script)
+bulb_default_brightness:
+  name: "Bulb Default Brightness"
+  min: 1
+  max: 254
+  step: 1
+  initial: 254
+  mode: slider
+  icon: mdi:brightness-6
+
+bulb_default_color_temp:
+  name: "Bulb Default Color Temp"
+  min: 153
+  max: 500
+  step: 1
+  initial: 250
+  mode: slider
+  icon: mdi:thermometer
