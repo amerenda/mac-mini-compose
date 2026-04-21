@@ -562,6 +562,15 @@ views:
                 data:
                   room: living_room
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: button
+              name: Save as Firmware Default
+              icon: mdi:chip
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.set_bulb_defaults
+                data:
+                  room: living_room
 
       # ── Bedroom ─────────────────────────────────────────────
       - type: conditional
@@ -678,6 +687,15 @@ views:
                 data:
                   room: bedroom
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: button
+              name: Save as Firmware Default
+              icon: mdi:chip
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.set_bulb_defaults
+                data:
+                  room: bedroom
 
       # ── Bathroom ────────────────────────────────────────────
       - type: conditional
@@ -791,6 +809,15 @@ views:
                 data:
                   room: bathroom
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: button
+              name: Save as Firmware Default
+              icon: mdi:chip
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.set_bulb_defaults
+                data:
+                  room: bathroom
 
       # ── Kitchen ─────────────────────────────────────────────
       - type: conditional
@@ -906,6 +933,15 @@ views:
                 data:
                   room: kitchen
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: button
+              name: Save as Firmware Default
+              icon: mdi:chip
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.set_bulb_defaults
+                data:
+                  room: kitchen
 
       # ── Hallway ─────────────────────────────────────────────
       - type: conditional
@@ -1004,6 +1040,15 @@ views:
                     data:
                       room: hallway
                       window: night
+            - type: button
+              name: Save as Firmware Default
+              icon: mdi:chip
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.set_bulb_defaults
+                data:
+                  room: hallway
 
   # ════════════════════════════════════════════════════════════
   # Custom Scenes Tab
@@ -1678,32 +1723,3 @@ views:
           action: call-service
           service: script.sl_push_config
 
-  # ════════════════════════════════════════════════════════════
-  # Bulb Defaults Tab
-  # ════════════════════════════════════════════════════════════
-  - title: Bulb Defaults
-    path: bulb-defaults
-    icon: mdi:lightbulb-cfl
-    cards:
-      - type: markdown
-        content: >
-          Set the firmware power-on defaults for all bulbs. This is what
-          lights boot to on a wall switch power cycle.
-      - type: entities
-        title: All Bulbs
-        show_header_toggle: false
-        entities:
-          - entity: input_number.bulb_default_brightness
-            name: Brightness
-          - entity: input_number.bulb_default_color_temp
-            name: Color Temperature
-      - type: button
-        name: Push to All Bulbs
-        icon: mdi:upload
-        show_state: false
-        tap_action:
-          action: call-service
-          service: script.set_bulb_defaults
-          data:
-            brightness: "{{ states('input_number.bulb_default_brightness') | int }}"
-            color_temp: "{{ states('input_number.bulb_default_color_temp') | int }}"

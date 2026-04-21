@@ -1,75 +1,52 @@
 set_bulb_defaults:
-  alias: "Z2M: Set Power-On Defaults for All Bulbs"
-  description: "Pushes hue_power_on brightness/color_temp to all bulbs firmware"
+  alias: "Z2M: Save Current State as Firmware Default"
+  description: "Reads current brightness/color_temp from lights in a room and writes as hue_power_on firmware defaults"
   mode: single
   fields:
-    brightness:
-      description: "Brightness (1-254)"
+    room:
+      description: "Room identifier (e.g., living_room)"
       required: true
       selector:
-        number:
-          min: 1
-          max: 254
-    color_temp:
-      description: "Color temp in mired (153=cool, 250=neutral, 370=warm, 500=warmest). Leave 0 for dimmable-only bulbs."
-      required: false
-      default: 250
-      selector:
-        number:
-          min: 153
-          max: 500
+        text:
   sequence:
     - variables:
-        ambiance_bulbs: ["living_room_1", "bedroom_1", "bedroom_2", "lamp_1", "bathroom_1"]
-        dimmable_bulbs: ["kitchen_1", "kitchen_2", "hallway_1"]
-        bri: "{{ brightness | int(254) }}"
-        ct: "{{ color_temp | int(250) }}"
-    # Ambiance bulbs (brightness + color_temp)
+        room_lights:
+          living_room: ["living_room_1"]
+          bedroom: ["bedroom_1", "bedroom_2", "lamp_1"]
+          bathroom: ["bathroom_1"]
+          kitchen: ["kitchen_1", "kitchen_2"]
+          hallway: ["hallway_1"]
+        lights: "{{ room_lights[room] | default([]) }}"
     - repeat:
-        for_each: "{{ ambiance_bulbs }}"
+        for_each: "{{ lights }}"
         sequence:
-          - service: mqtt.publish
-            data:
-              topic: "zigbee2mqtt/{{ repeat.item }}/set"
-              payload: "{{ {'hue_power_on_behavior': 'on', 'hue_power_on_brightness': bri | int, 'hue_power_on_color_temperature': ct | int} | tojson }}"
-          - delay: { milliseconds: 300 }
-    # Dimmable bulbs (brightness only)
-    - repeat:
-        for_each: "{{ dimmable_bulbs }}"
-        sequence:
+          - variables:
+              light_entity: "light.{{ repeat.item }}"
+              bri: "{{ state_attr(light_entity, 'brightness') | int(254) }}"
+              ct: "{{ state_attr(light_entity, 'color_temp') | int(250) }}"
           - service: mqtt.publish
             data:
               topic: "zigbee2mqtt/{{ repeat.item }}/set"
               payload: "{{ {'hue_power_on_behavior': 'on', 'hue_power_on_brightness': bri | int, 'hue_power_on_color_temperature': ct | int} | tojson }}"
           - delay: { milliseconds: 300 }
 
-set_single_bulb_default:
-  alias: "Z2M: Set Power-On Default for One Bulb"
-  description: "Pushes hue_power_on to a specific bulb"
+set_all_bulb_defaults:
+  alias: "Z2M: Save All Rooms Current State as Firmware Default"
+  description: "Reads current state from ALL lights and writes as firmware defaults"
   mode: single
-  fields:
-    bulb:
-      description: "Bulb friendly name (e.g., living_room_1)"
-      required: true
-      selector:
-        text:
-    brightness:
-      description: "Brightness (1-254)"
-      required: true
-      selector:
-        number:
-          min: 1
-          max: 254
-    color_temp:
-      description: "Color temp in mired (153-500)"
-      required: false
-      default: 250
-      selector:
-        number:
-          min: 153
-          max: 500
   sequence:
-    - service: mqtt.publish
+    - service: script.set_bulb_defaults
       data:
-        topic: "zigbee2mqtt/{{ bulb }}/set"
-        payload: "{{ {'hue_power_on_behavior': 'on', 'hue_power_on_brightness': brightness | int, 'hue_power_on_color_temperature': color_temp | int} | tojson }}"
+        room: living_room
+    - service: script.set_bulb_defaults
+      data:
+        room: bedroom
+    - service: script.set_bulb_defaults
+      data:
+        room: bathroom
+    - service: script.set_bulb_defaults
+      data:
+        room: kitchen
+    - service: script.set_bulb_defaults
+      data:
+        room: hallway
