@@ -24,7 +24,7 @@ file_paths = ["core/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
-export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
+export BWS_ACCESS_TOKEN=$(cat /Users/alex/.bws-secret)
 printf 'TECHNITIUM_ADMIN_PASSWORD=%s\n' "$(bws secret get ae363b89-3fd6-43e3-9a83-b42100e7aed3 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > core/.env
 printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
 printf 'MINI_POSTGRES_TODO_PASSWORD=%s\n' "$(bws secret get 081051dc-3adb-4499-ad0f-b421014a114f --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
@@ -65,7 +65,7 @@ file_paths = ["monitoring/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
-export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
+export BWS_ACCESS_TOKEN=$(cat /Users/alex/.bws-secret)
 printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > monitoring/.env
 printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
 printf 'TECHNITIUM_API_TOKEN=%s\n' "$(bws secret get 4645ac46-3955-4e6e-8558-b434015613a7 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
@@ -87,7 +87,7 @@ file_paths = ["runners/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
-export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
+export BWS_ACCESS_TOKEN=$(cat /Users/alex/.bws-secret)
 printf 'DOCKERHUB_USERNAME=amerenda\nRUNNER_SCOPE=repo\nRUNNER_WORKDIR=/_work\nRANDOM_RUNNER_SUFFIX=false\n' > runners/compose.env
 mkdir -p /etc/komodo/runner-secrets
 bws secret get 2c57558f-d185-4410-ad9d-b385015c9302 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > /etc/komodo/runner-secrets/github-app-arc-id
