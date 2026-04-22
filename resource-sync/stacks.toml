@@ -2,38 +2,77 @@
 # Synced automatically when changes are pushed to main.
 # Secrets are fetched from Bitwarden Secrets Manager at deploy time via pre_deploy.
 #
+# Secrets remain in the existing k3s BWS project. A mac-mini machine account
+# has read access to that project. Secrets are fetched by UUID.
+#
 # NOTE: Komodo joins multi-line pre_deploy commands with ' && ' so bash
 # function definitions and if/then/else blocks cannot be used directly.
 # Use simple sequential commands or call an external script instead.
 
+# ── Core: DNS, Postgres, MongoDB, Backups ──────────────────────────────────
+
 [[stack]]
-name = "services"
-description = "Core services: Home Assistant, Pi-hole, BIND9, exporters"
+name = "core"
+description = "Technitium DNS, PostgreSQL, MongoDB, database backups"
 tags = ["mac-mini"]
 deploy = true
 [stack.config]
 server = "mac-mini-m4"
 repo = "amerenda/mac-mini-compose"
 branch = "main"
-file_paths = ["docker-compose.yaml"]
+file_paths = ["core/compose.yaml"]
 git_account = "amerenda"
-ignore_services = ["hacs-init"]
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-PIHOLE_PW=$(bws secret get c8157be0-0195-41f3-b3c6-b37100d27645 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-AGENT_KB_PW=$(bws secret get 549c2404-4417-48bd-9fa1-b41c00e6365c --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-MINI_POSTGRES_PW=$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-MINI_POSTGRES_TODO_PW=$(bws secret get 081051dc-3adb-4499-ad0f-b421014a114f --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-MONGO_PW=$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-BACKUP_ACCESS_KEY=$(bws secret get af4a292f-1f9f-45b1-9c56-b37300df69dc --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-BACKUP_SECRET_KEY=$(bws secret get d2d87681-b2e3-4a3e-b821-b37300df7ce5 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-BACKUP_ENDPOINT=$(bws secret get 2c95ebd0-9330-455b-abbd-b37300e580b0 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-printf 'PIHOLE_WEBPASSWORD=%s\nAGENT_KB_PASSWORD=%s\nMINI_POSTGRES_PASSWORD=%s\nMINI_POSTGRES_TODO_PASSWORD=%s\nBACKUP_ACCESS_KEY=%s\nBACKUP_SECRET_KEY=%s\nBACKUP_ENDPOINT=%s\nMONGO_PASSWORD=%s\n' "$PIHOLE_PW" "$AGENT_KB_PW" "$MINI_POSTGRES_PW" "$MINI_POSTGRES_TODO_PW" "$BACKUP_ACCESS_KEY" "$BACKUP_SECRET_KEY" "$BACKUP_ENDPOINT" "$MONGO_PW" > .env
-mkdir -p bind9/keys
-BIND_KEY=$(bws secret get 9904dc3d-6dd4-4727-907e-b3700178ea19 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-printf 'key "externaldns-key." { algorithm hmac-sha256; secret "%s"; };\n' "$BIND_KEY" > bind9/keys/key.conf
+printf 'TECHNITIUM_ADMIN_PASSWORD=%s\n' "$(bws secret get ae363b89-3fd6-43e3-9a83-b42100e7aed3 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > core/.env
+printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
+printf 'MINI_POSTGRES_TODO_PASSWORD=%s\n' "$(bws secret get 081051dc-3adb-4499-ad0f-b421014a114f --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
+printf 'AGENT_KB_PASSWORD=%s\n' "$(bws secret get 549c2404-4417-48bd-9fa1-b41c00e6365c --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
+printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
+printf 'BACKUP_ACCESS_KEY=%s\n' "$(bws secret get af4a292f-1f9f-45b1-9c56-b37300df69dc --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
+printf 'BACKUP_SECRET_KEY=%s\n' "$(bws secret get d2d87681-b2e3-4a3e-b821-b37300df7ce5 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
+printf 'BACKUP_ENDPOINT=%s\n' "$(bws secret get 2c95ebd0-9330-455b-abbd-b37300e580b0 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
 """
+
+# ── Automation: Home Assistant, Voice Pipeline, Zigbee, MQTT ───────────────
+
+[[stack]]
+name = "automation"
+description = "Home Assistant, Whisper, Piper, OpenWakeWord, Mosquitto, Zigbee2MQTT"
+tags = ["mac-mini"]
+deploy = true
+[stack.config]
+server = "mac-mini-m4"
+repo = "amerenda/mac-mini-compose"
+branch = "main"
+file_paths = ["automation/compose.yaml"]
+git_account = "amerenda"
+ignore_services = ["hacs-init"]
+
+# ── Monitoring: Prometheus, Node Exporter, DB Exporters ────────────────────
+
+[[stack]]
+name = "monitoring"
+description = "Prometheus, node-exporter, postgres/mongo/technitium exporters"
+tags = ["mac-mini"]
+deploy = true
+[stack.config]
+server = "mac-mini-m4"
+repo = "amerenda/mac-mini-compose"
+branch = "main"
+file_paths = ["monitoring/compose.yaml"]
+git_account = "amerenda"
+[stack.config.pre_deploy]
+command = """
+export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
+printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > monitoring/.env
+printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
+printf 'TECHNITIUM_API_TOKEN=%s\n' "$(bws secret get 4645ac46-3955-4e6e-8558-b434015613a7 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
+bws secret get c7ccdb87-b04e-428e-bbcf-b4340156edf6 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > monitoring/ha-token
+"""
+
+# ── Runners: GitHub Actions self-hosted runners ───────────────────────────
 
 [[stack]]
 name = "runners"
