@@ -139,8 +139,11 @@ services:
 
 volumes:
   technitium-data:
+    name: services_technitium-data
   postgres-data:
+    name: services_postgres-data
   mongo-data:
+    name: services_mongo-data
 
 networks:
   shared:
