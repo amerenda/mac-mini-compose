@@ -70,8 +70,8 @@ command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
 printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > monitoring/.env
 printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
-printf 'TECHNITIUM_API_TOKEN=%s\n' "$(bws secret get PLACEHOLDER_TECHNITIUM_API_TOKEN --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
-bws secret get PLACEHOLDER_HA_PROMETHEUS_TOKEN --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > monitoring/ha-token
+printf 'TECHNITIUM_API_TOKEN=%s\n' "$(bws secret get 4645ac46-3955-4e6e-8558-b434015613a7 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
+bws secret get c7ccdb87-b04e-428e-bbcf-b4340156edf6 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > monitoring/ha-token
 """
 
 # ── Runners: GitHub Actions self-hosted runners ───────────────────────────
