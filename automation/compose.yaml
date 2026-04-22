@@ -116,12 +116,17 @@ services:
 
 volumes:
   ha-config:
+    external: true
     name: services_ha-config
   whisper-data:
+    external: true
     name: services_whisper-data
   piper-data:
+    external: true
     name: services_piper-data
   mosquitto-data:
+    external: true
     name: services_mosquitto-data
   zigbee2mqtt-data:
+    external: true
     name: services_zigbee2mqtt-data
