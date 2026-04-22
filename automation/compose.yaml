@@ -1,0 +1,122 @@
+services:
+  # ============================================================
+  # HA Init — one-shot: installs HACS + frontend cards
+  # To update: bump versions in homeassistant/scripts/ha-init.sh
+  # ============================================================
+  hacs-init:
+    image: alpine:3
+    container_name: hacs-init
+    volumes:
+      - ha-config:/config
+      - ../homeassistant/scripts/ha-init.sh:/ha-init.sh:ro
+    command: ["sh", "/ha-init.sh"]
+    labels:
+      komodo.skip:
+
+  # ============================================================
+  # Home Assistant — Smart home hub
+  # Uses host networking for mDNS/SSDP device discovery
+  # ============================================================
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:2026.3.4
+    container_name: homeassistant
+    restart: unless-stopped
+    depends_on:
+      hacs-init:
+        condition: service_completed_successfully
+    network_mode: host
+    environment:
+      TZ: "America/New_York"
+    volumes:
+      - ha-config:/config
+      - ../homeassistant/configuration/configuration.yaml:/config/configuration.yaml:ro
+      - ../homeassistant/configuration/automations:/config/automations:ro
+      - ../homeassistant/configuration/blueprints/automation:/config/blueprints/automation/_defaults:ro
+      - ../homeassistant/configuration/scripts:/config/scripts:ro
+      - ../homeassistant/configuration/helpers/generated/input_boolean:/config/helpers/input_boolean:ro
+      - ../homeassistant/configuration/helpers/generated/input_datetime:/config/helpers/input_datetime:ro
+      - ../homeassistant/configuration/helpers/generated/input_select:/config/helpers/input_select:ro
+      - ../homeassistant/configuration/helpers/generated/input_number:/config/helpers/input_number:ro
+      - ../homeassistant/configuration/helpers/generated/input_text:/config/helpers/input_text:ro
+      - ../homeassistant/configuration/helpers/generated/timer:/config/helpers/timer:ro
+      - ../homeassistant/configuration/dashboards:/config/dashboards/views:ro
+      - ../homeassistant/configuration/scenes.yaml:/config/scenes.yaml
+      - ../homeassistant/scripts/subway_status.sh:/config/scripts_shell/subway_status.sh:ro
+      - ../homeassistant/configuration/groups.yaml:/config/groups.yaml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8123/manifest.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # ============================================================
+  # Voice Pipeline — Wyoming protocol services for HA Assist
+  # Ollama runs natively on macOS for Metal GPU acceleration
+  # (not in Docker — Docker on Mac has no GPU access)
+  # ============================================================
+  whisper:
+    image: rhasspy/wyoming-whisper
+    container_name: whisper
+    restart: unless-stopped
+    ports:
+      - "10300:10300"
+    volumes:
+      - whisper-data:/data
+    command: --model tiny-int8 --language en --beam-size 1
+
+  piper:
+    image: rhasspy/wyoming-piper
+    container_name: piper
+    restart: unless-stopped
+    ports:
+      - "10200:10200"
+    volumes:
+      - piper-data:/data
+    command: --voice en_US-lessac-medium
+
+  openwakeword:
+    image: rhasspy/wyoming-openwakeword
+    container_name: openwakeword
+    restart: unless-stopped
+    ports:
+      - "10400:10400"
+    command: --preload-model ok_nabu
+
+  # ============================================================
+  # Mosquitto — MQTT broker (used by Zigbee2MQTT + HA)
+  # ============================================================
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    restart: unless-stopped
+    volumes:
+      - mosquitto-data:/mosquitto/data
+      - ../mosquitto/config:/mosquitto/config:ro
+    ports:
+      - "1883:1883"
+
+  # ============================================================
+  # Zigbee2MQTT — Zigbee coordinator bridge
+  # Connects to SMLIGHT SLZB-06MG24 at 10.100.20.179:6638
+  # ============================================================
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt:latest
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    volumes:
+      - zigbee2mqtt-data:/app/data
+      - ../zigbee2mqtt/external_extensions/smart-lighting.js:/app/data/external_extensions/smart-lighting.js:ro
+    ports:
+      - "8099:8099"
+    environment:
+      TZ: "America/New_York"
+
+volumes:
+  ha-config:
+  whisper-data:
+  piper-data:
+  mosquitto-data:
+  zigbee2mqtt-data:

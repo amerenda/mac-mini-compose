@@ -1,0 +1,148 @@
+services:
+  # ============================================================
+  # Technitium DNS — authoritative + ad-blocking
+  # Replaces Pi-hole + BIND9 on k3s
+  # OrbStack intercepts *:53 and *:5353 (mDNS) and doesn't forward LAN
+  # UDP to port-mapped containers. Using network_mode: host with Technitium
+  # configured to listen on 5354 (set via web UI) bypasses both issues.
+  # A macOS pf rule will redirect 10.100.20.18:53 → 5354 at cutover.
+  # ============================================================
+  technitium:
+    image: technitium/dns-server:latest
+    container_name: technitium
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TZ: "America/New_York"
+      DNS_SERVER_DOMAIN: "dns.amer.home"
+      DNS_SERVER_ADMIN_PASSWORD: "${TECHNITIUM_ADMIN_PASSWORD}"
+    volumes:
+      - technitium-data:/etc/dns
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:5380/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
+  # Postgres — Unified PostgreSQL instance (pgvector/pg16)
+  # Port 5432 (standard).
+  # ============================================================
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    networks:
+      - shared
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ../postgres/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "${MINI_POSTGRES_PASSWORD}"
+      MINI_POSTGRES_TODO_PASSWORD: "${MINI_POSTGRES_TODO_PASSWORD}"
+      AGENT_KB_PASSWORD: "${AGENT_KB_PASSWORD}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
+  # MongoDB — Shared instance (port 27017)
+  # Databases: unifi
+  # ============================================================
+  mongo:
+    image: mongo:4.4.10
+    container_name: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    networks:
+      - shared
+    volumes:
+      - mongo-data:/data/db
+      - ../mongo/init-unifi.sh:/docker-entrypoint-initdb.d/init-unifi.sh:ro
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD}"
+      MONGO_INITDB_DATABASE: unifi
+    healthcheck:
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
+  # Postgres Backup — pg_dump | gzip → GCS via HMAC (S3-compat)
+  # Runs daily at 02:00. Retention: 7 backups per database.
+  # Databases: todo, agent_kb, argo_workflows
+  # ============================================================
+  postgres-backup:
+    image: alpine:3
+    container_name: postgres-backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ../postgres/backup.sh:/backup.sh:ro
+    environment:
+      PGHOST: "10.100.20.18"
+      PGPORT: "5432"
+      PGUSER: "postgres"
+      PGPASSWORD: "${MINI_POSTGRES_PASSWORD}"
+      AWS_ACCESS_KEY_ID: "${BACKUP_ACCESS_KEY}"
+      AWS_SECRET_ACCESS_KEY: "${BACKUP_SECRET_KEY}"
+      BACKUP_ENDPOINT: "${BACKUP_ENDPOINT}"
+      BACKUP_BUCKET: "amerenda-backups"
+      BACKUP_BUCKET_PATH: "us/mac-mini/dean"
+    command: >
+      sh -c "
+        apk add --no-cache postgresql16-client s3cmd &&
+        echo '0 2 * * * sh /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+        crond -f -l 8
+      "
+
+  # ============================================================
+  # MongoDB Backup — mongodump | gzip → GCS via HMAC (s3cmd)
+  # Runs daily at 02:15. Retention: 7 backups.
+  # ============================================================
+  mongo-backup:
+    image: alpine:3
+    container_name: mongo-backup
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ../mongo/backup.sh:/backup.sh:ro
+    environment:
+      MONGO_HOST: "mongo"
+      MONGO_PORT: "27017"
+      MONGO_USER: "root"
+      MONGO_PASSWORD: "${MONGO_PASSWORD}"
+      AWS_ACCESS_KEY_ID: "${BACKUP_ACCESS_KEY}"
+      AWS_SECRET_ACCESS_KEY: "${BACKUP_SECRET_KEY}"
+      BACKUP_ENDPOINT: "${BACKUP_ENDPOINT}"
+      BACKUP_BUCKET: "amerenda-backups"
+      BACKUP_BUCKET_PATH: "us/mac-mini/dean"
+    command: >
+      sh -c "
+        apk add --no-cache mongodb-tools s3cmd &&
+        echo '15 2 * * * sh /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+        crond -f -l 8
+      "
+
+volumes:
+  technitium-data:
+  postgres-data:
+  mongo-data:
+
+networks:
+  shared:
+    external: true
+    name: mac-mini-shared

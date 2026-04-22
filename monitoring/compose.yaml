@@ -1,0 +1,102 @@
+services:
+  # ============================================================
+  # Prometheus — Central metrics store
+  # Receives remote_write from k3s Prometheus + scrapes local exporters.
+  # Grafana on k3s queries this instance.
+  # ============================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    networks:
+      - shared
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./ha-token:/etc/prometheus/ha-token:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-remote-write-receiver'
+      - '--web.enable-lifecycle'
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
+  # Node Exporter — Host metrics (CPU, memory, disk, network)
+  # ============================================================
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /:/host:ro,rslave
+    pid: host
+
+  # ============================================================
+  # Postgres Exporter — PostgreSQL metrics
+  # Connects to postgres in the core stack via shared network
+  # ============================================================
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: postgres-exporter
+    restart: unless-stopped
+    ports:
+      - "9187:9187"
+    networks:
+      - shared
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:${MINI_POSTGRES_PASSWORD}@postgres:5432/postgres?sslmode=disable"
+
+  # ============================================================
+  # MongoDB Exporter — MongoDB metrics
+  # Connects to mongo in the core stack via shared network
+  # ============================================================
+  mongodb-exporter:
+    image: percona/mongodb_exporter:0.40
+    container_name: mongodb-exporter
+    restart: unless-stopped
+    ports:
+      - "9216:9216"
+    networks:
+      - shared
+    command:
+      - '--mongodb.uri=mongodb://root:${MONGO_PASSWORD}@mongo:27017/'
+      - '--compatible-mode'
+      - '--collect-all'
+
+  # ============================================================
+  # Technitium Exporter — DNS metrics
+  # Technitium runs on host network, accessed via host.docker.internal
+  # ============================================================
+  technitium-exporter:
+    image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:latest
+    container_name: technitium-exporter
+    restart: unless-stopped
+    ports:
+      - "9105:9105"
+    environment:
+      TECHNITIUM_BASE_URL: "http://host.docker.internal:5380"
+      TECHNITIUM_TOKEN: "${TECHNITIUM_API_TOKEN}"
+      SERVER_LABEL: "technitium"
+      TECHNITIUM_STATS_RANGE: "LastHour"
+      EXPORTER_PORT: "9105"
+
+volumes:
+  prometheus-data:
+
+networks:
+  shared:
+    external: true
+    name: mac-mini-shared

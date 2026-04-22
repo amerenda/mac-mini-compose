@@ -1,5 +1,9 @@
 # Secrets — never commit
 .env
+core/.env
+automation/.env
+monitoring/.env
+monitoring/ha-token
 runners/compose.env
 bind9/keys/key.conf
 komodo/secrets/
