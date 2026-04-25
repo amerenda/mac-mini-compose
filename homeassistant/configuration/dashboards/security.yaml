@@ -25,17 +25,13 @@ views:
                 tap_action:
                   action: call-service
                   service: script.camera_privacy_off
-          - type: entities
-            show_header_toggle: false
-            entities:
-              - entity: switch.bedroom_privacy_mode
-                name: Bedroom Privacy
-              - entity: switch.living_room_privacy_mode
-                name: Living Room Privacy
-              - entity: light.bedroom_status_led
-                name: Bedroom LED
-              - entity: light.living_room_status_led
-                name: Living Room LED
+          - type: button
+            name: Drift Correction
+            entity: automation.security_privacy_monitor
+            show_state: true
+            tap_action:
+              action: toggle
+            icon: mdi:sync-alert
       - type: grid
         cards:
           - type: heading
