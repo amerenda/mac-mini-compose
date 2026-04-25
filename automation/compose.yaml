@@ -86,7 +86,7 @@ services:
   # Mosquitto — MQTT broker (used by Zigbee2MQTT + HA)
   # ============================================================
   mosquitto:
-    image: eclipse-mosquitto:2.1.2
+    image: eclipse-mosquitto@sha256:a908c65cc8e67ec9d292ef27c2c0360dbaaee7eb1b935cdd194e67697f15dea1
     container_name: mosquitto
     restart: unless-stopped
     volumes:
