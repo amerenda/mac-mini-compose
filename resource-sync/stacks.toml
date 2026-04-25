@@ -87,7 +87,7 @@ file_paths = ["runners/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
-export BWS_ACCESS_TOKEN=$(cat /Users/alex/.bws-secret)
+export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
 printf 'DOCKERHUB_USERNAME=amerenda\nRUNNER_SCOPE=repo\nRUNNER_WORKDIR=/_work\nRANDOM_RUNNER_SUFFIX=false\n' > runners/compose.env
 mkdir -p /etc/komodo/runner-secrets
 bws secret get 2c57558f-d185-4410-ad9d-b385015c9302 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > /etc/komodo/runner-secrets/github-app-arc-id
