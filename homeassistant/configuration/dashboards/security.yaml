@@ -27,7 +27,7 @@ views:
                   service: script.camera_privacy_off
           - type: button
             name: Drift Correction
-            entity: automation.security_privacy_monitor
+            entity: automation.security_privacy_monitor_drift_correction
             show_state: true
             tap_action:
               action: toggle
