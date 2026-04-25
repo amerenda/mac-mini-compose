@@ -139,10 +139,13 @@ services:
 
 volumes:
   technitium-data:
+    external: true
     name: services_technitium-data
   postgres-data:
+    external: true
     name: services_postgres-data
   mongo-data:
+    external: true
     name: services_mongo-data
 
 networks:

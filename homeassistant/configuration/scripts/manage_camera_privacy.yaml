@@ -1,6 +1,6 @@
 camera_privacy_on:
   alias: "Security: Cameras Off (Privacy On)"
-  description: "Turn off LEDs (verified), then enable privacy mode"
+  description: "Turn off LEDs (verified), then enable privacy mode (verified)"
   mode: single
   sequence:
     # ── Bedroom Camera ──
@@ -22,6 +22,18 @@ camera_privacy_on:
     - service: switch.turn_on
       target:
         entity_id: switch.bedroom_privacy_mode
+    - repeat:
+        while:
+          - condition: state
+            entity_id: switch.bedroom_privacy_mode
+            state: "off"
+          - condition: template
+            value_template: "{{ repeat.index <= 5 }}"
+        sequence:
+          - delay: { seconds: 2 }
+          - service: switch.turn_on
+            target:
+              entity_id: switch.bedroom_privacy_mode
 
     # ── Living Room Camera ──
     - service: light.turn_off
@@ -42,17 +54,40 @@ camera_privacy_on:
     - service: switch.turn_on
       target:
         entity_id: switch.living_room_privacy_mode
+    - repeat:
+        while:
+          - condition: state
+            entity_id: switch.living_room_privacy_mode
+            state: "off"
+          - condition: template
+            value_template: "{{ repeat.index <= 5 }}"
+        sequence:
+          - delay: { seconds: 2 }
+          - service: switch.turn_on
+            target:
+              entity_id: switch.living_room_privacy_mode
 
 camera_privacy_off:
   alias: "Security: Cameras On (Privacy Off)"
-  description: "Disable privacy mode, then turn on LEDs (verified)"
+  description: "Disable privacy mode (verified), then turn on LEDs (verified)"
   mode: single
   sequence:
     # ── Bedroom Camera ──
     - service: switch.turn_off
       target:
         entity_id: switch.bedroom_privacy_mode
-    - delay: { seconds: 2 }
+    - repeat:
+        while:
+          - condition: state
+            entity_id: switch.bedroom_privacy_mode
+            state: "on"
+          - condition: template
+            value_template: "{{ repeat.index <= 5 }}"
+        sequence:
+          - delay: { seconds: 2 }
+          - service: switch.turn_off
+            target:
+              entity_id: switch.bedroom_privacy_mode
     - service: light.turn_on
       target:
         entity_id: light.bedroom_status_led
@@ -73,7 +108,18 @@ camera_privacy_off:
     - service: switch.turn_off
       target:
         entity_id: switch.living_room_privacy_mode
-    - delay: { seconds: 2 }
+    - repeat:
+        while:
+          - condition: state
+            entity_id: switch.living_room_privacy_mode
+            state: "on"
+          - condition: template
+            value_template: "{{ repeat.index <= 5 }}"
+        sequence:
+          - delay: { seconds: 2 }
+          - service: switch.turn_off
+            target:
+              entity_id: switch.living_room_privacy_mode
     - service: light.turn_on
       target:
         entity_id: light.living_room_status_led

@@ -25,3 +25,7 @@ scrape_configs:
   - job_name: mac-mini-dns
     static_configs:
       - targets: ["technitium-exporter:9105"]
+
+  - job_name: mac-mini-komodo
+    static_configs:
+      - targets: ["host.docker.internal:9120"]
