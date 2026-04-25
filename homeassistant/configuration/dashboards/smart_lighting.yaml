@@ -4,6 +4,15 @@ views:
     path: schedule
     icon: mdi:lightbulb-auto
     cards:
+      # ── Scene Setup ────────────────────────────────────────
+      - type: button
+        name: Create Default Scenes
+        icon: mdi:palette-outline
+        show_state: false
+        tap_action:
+          action: call-service
+          service: script.create_default_scenes
+
       # ── Top Bar ────────────────────────────────────────────
       - type: entities
         entities:
