@@ -81,7 +81,7 @@ services:
   # Technitium runs on host network, accessed via host.docker.internal
   # ============================================================
   technitium-exporter:
-    image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:1.0.0
+    image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter@sha256:b6154a161987443d8ec6bbf272f0064bf825f109f5845acfa90d8ee580be542b
     container_name: technitium-exporter
     restart: unless-stopped
     ports:
