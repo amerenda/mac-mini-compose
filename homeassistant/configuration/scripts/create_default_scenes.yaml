@@ -1,211 +1,294 @@
 create_default_scenes:
   alias: "SL: Create Default Scenes"
-  description: "Creates default morning/day/evening/night scenes for all rooms. Safe to re-run — overwrites with defaults. Edit scenes via UI afterwards."
+  description: "Sets each light to the default state, then snapshots it as a scene. Lights will briefly cycle through defaults. Edit scenes via UI afterwards."
   mode: single
   sequence:
 
-    # ── Living Room (White + Color Ambiance) ─────────────────────────────────
+    # ── Living Room ───────────────────────────────────────────────────────────
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_1
+      data:
+        brightness: 180
+        color_temp: 320
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: living_room_morning
-        entities:
-          light.living_room_1:
-            state: "on"
-            brightness: 180
-            color_temp: 320
+        snapshot_entities:
+          - light.living_room_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_1
+      data:
+        brightness: 254
+        color_temp: 250
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: living_room_day
-        entities:
-          light.living_room_1:
-            state: "on"
-            brightness: 254
-            color_temp: 250
+        snapshot_entities:
+          - light.living_room_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_1
+      data:
+        brightness: 160
+        color_temp: 380
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: living_room_evening
-        entities:
-          light.living_room_1:
-            state: "on"
-            brightness: 160
-            color_temp: 380
+        snapshot_entities:
+          - light.living_room_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.living_room_1
+      data:
+        brightness: 60
+        color_temp: 454
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: living_room_night
-        entities:
-          light.living_room_1:
-            state: "on"
-            brightness: 60
-            color_temp: 454
+        snapshot_entities:
+          - light.living_room_1
 
-    # ── Bedroom (White + Color Ambiance) ─────────────────────────────────────
+    # ── Bedroom ───────────────────────────────────────────────────────────────
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.bedroom_1
+          - light.bedroom_2
+          - light.lamp_1
+      data:
+        brightness: 180
+        color_temp: 320
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: bedroom_morning
-        entities:
-          light.bedroom_1:
-            state: "on"
-            brightness: 180
-            color_temp: 320
-          light.bedroom_2:
-            state: "on"
-            brightness: 180
-            color_temp: 320
-          light.lamp_1:
-            state: "on"
-            brightness: 180
-            color_temp: 320
+        snapshot_entities:
+          - light.bedroom_1
+          - light.bedroom_2
+          - light.lamp_1
+
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.bedroom_1
+          - light.bedroom_2
+          - light.lamp_1
+      data:
+        brightness: 254
+        color_temp: 250
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: bedroom_day
-        entities:
-          light.bedroom_1:
-            state: "on"
-            brightness: 254
-            color_temp: 250
-          light.bedroom_2:
-            state: "on"
-            brightness: 254
-            color_temp: 250
-          light.lamp_1:
-            state: "on"
-            brightness: 254
-            color_temp: 250
+        snapshot_entities:
+          - light.bedroom_1
+          - light.bedroom_2
+          - light.lamp_1
+
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.bedroom_1
+          - light.bedroom_2
+          - light.lamp_1
+      data:
+        brightness: 140
+        color_temp: 400
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: bedroom_evening
-        entities:
-          light.bedroom_1:
-            state: "on"
-            brightness: 140
-            color_temp: 400
-          light.bedroom_2:
-            state: "on"
-            brightness: 140
-            color_temp: 400
-          light.lamp_1:
-            state: "on"
-            brightness: 140
-            color_temp: 400
+        snapshot_entities:
+          - light.bedroom_1
+          - light.bedroom_2
+          - light.lamp_1
+
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.bedroom_1
+          - light.bedroom_2
+          - light.lamp_1
+      data:
+        brightness: 40
+        color_temp: 454
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: bedroom_night
-        entities:
-          light.bedroom_1:
-            state: "on"
-            brightness: 40
-            color_temp: 454
-          light.bedroom_2:
-            state: "on"
-            brightness: 40
-            color_temp: 454
-          light.lamp_1:
-            state: "on"
-            brightness: 40
-            color_temp: 454
+        snapshot_entities:
+          - light.bedroom_1
+          - light.bedroom_2
+          - light.lamp_1
 
-    # ── Bathroom (White + Color Ambiance, 1100lm) ─────────────────────────────
+    # ── Bathroom ──────────────────────────────────────────────────────────────
+    - service: light.turn_on
+      target:
+        entity_id: light.bathroom_1
+      data:
+        brightness: 200
+        color_temp: 280
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: bathroom_morning
-        entities:
-          light.bathroom_1:
-            state: "on"
-            brightness: 200
-            color_temp: 280
+        snapshot_entities:
+          - light.bathroom_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.bathroom_1
+      data:
+        brightness: 254
+        color_temp: 250
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: bathroom_day
-        entities:
-          light.bathroom_1:
-            state: "on"
-            brightness: 254
-            color_temp: 250
+        snapshot_entities:
+          - light.bathroom_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.bathroom_1
+      data:
+        brightness: 180
+        color_temp: 350
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: bathroom_evening
-        entities:
-          light.bathroom_1:
-            state: "on"
-            brightness: 180
-            color_temp: 350
+        snapshot_entities:
+          - light.bathroom_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.bathroom_1
+      data:
+        brightness: 60
+        color_temp: 454
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: bathroom_night
-        entities:
-          light.bathroom_1:
-            state: "on"
-            brightness: 60
-            color_temp: 454
+        snapshot_entities:
+          - light.bathroom_1
 
-    # ── Kitchen (White only) ──────────────────────────────────────────────────
+    # ── Kitchen (white only — no color_temp) ─────────────────────────────────
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.kitchen_1
+          - light.kitchen_2
+      data:
+        brightness: 200
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: kitchen_morning
-        entities:
-          light.kitchen_1:
-            state: "on"
-            brightness: 200
-          light.kitchen_2:
-            state: "on"
-            brightness: 200
+        snapshot_entities:
+          - light.kitchen_1
+          - light.kitchen_2
+
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.kitchen_1
+          - light.kitchen_2
+      data:
+        brightness: 254
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: kitchen_day
-        entities:
-          light.kitchen_1:
-            state: "on"
-            brightness: 254
-          light.kitchen_2:
-            state: "on"
-            brightness: 254
+        snapshot_entities:
+          - light.kitchen_1
+          - light.kitchen_2
+
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.kitchen_1
+          - light.kitchen_2
+      data:
+        brightness: 180
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: kitchen_evening
-        entities:
-          light.kitchen_1:
-            state: "on"
-            brightness: 180
-          light.kitchen_2:
-            state: "on"
-            brightness: 180
+        snapshot_entities:
+          - light.kitchen_1
+          - light.kitchen_2
+
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.kitchen_1
+          - light.kitchen_2
+      data:
+        brightness: 80
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: kitchen_night
-        entities:
-          light.kitchen_1:
-            state: "on"
-            brightness: 80
-          light.kitchen_2:
-            state: "on"
-            brightness: 80
+        snapshot_entities:
+          - light.kitchen_1
+          - light.kitchen_2
 
-    # ── Hallway (White only) ──────────────────────────────────────────────────
+    # ── Hallway (white only — no color_temp) ─────────────────────────────────
+    - service: light.turn_on
+      target:
+        entity_id: light.hallway_1
+      data:
+        brightness: 180
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: hallway_morning
-        entities:
-          light.hallway_1:
-            state: "on"
-            brightness: 180
+        snapshot_entities:
+          - light.hallway_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.hallway_1
+      data:
+        brightness: 254
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: hallway_day
-        entities:
-          light.hallway_1:
-            state: "on"
-            brightness: 254
+        snapshot_entities:
+          - light.hallway_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.hallway_1
+      data:
+        brightness: 140
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: hallway_evening
-        entities:
-          light.hallway_1:
-            state: "on"
-            brightness: 140
+        snapshot_entities:
+          - light.hallway_1
+
+    - service: light.turn_on
+      target:
+        entity_id: light.hallway_1
+      data:
+        brightness: 60
+    - delay: { seconds: 1 }
     - service: scene.create
       data:
         scene_id: hallway_night
-        entities:
-          light.hallway_1:
-            state: "on"
-            brightness: 60
+        snapshot_entities:
+          - light.hallway_1
