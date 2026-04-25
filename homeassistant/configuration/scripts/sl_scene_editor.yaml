@@ -1,0 +1,101 @@
+sl_preview_scene:
+  alias: "SL: Preview Scene (apply stored values to lights)"
+  description: "Turns on a room's lights at the currently stored scene values so you can see them. Does NOT change any stored values."
+  mode: single
+  fields:
+    room:
+      description: "Room key (living_room, bedroom, bathroom, kitchen, hallway)"
+      required: true
+      selector:
+        select:
+          options: [living_room, bedroom, bathroom, kitchen, hallway]
+    window:
+      description: "Time window (morning, day, evening, night)"
+      required: true
+      selector:
+        select:
+          options: [morning, day, evening, night]
+  sequence:
+    - variables:
+        light_map:
+          living_room: ["light.living_room_1"]
+          bedroom: ["light.bedroom_1", "light.bedroom_2", "light.lamp_1"]
+          bathroom: ["light.bathroom_1"]
+          kitchen: ["light.kitchen_1", "light.kitchen_2"]
+          hallway: ["light.hallway_1"]
+        lights: "{{ light_map[room] }}"
+        bri: "{{ states('input_number.sl_' ~ room ~ '_' ~ window ~ '_brightness') | int(200) }}"
+        ct_state: "{{ states('input_number.sl_' ~ room ~ '_' ~ window ~ '_color_temp') }}"
+        has_ct: "{{ ct_state not in ['unknown', 'unavailable', ''] }}"
+        ct: "{{ ct_state | int(0) }}"
+    - repeat:
+        for_each: "{{ lights }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ has_ct }}"
+            then:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ repeat.item }}"
+                data:
+                  brightness: "{{ bri }}"
+                  color_temp: "{{ ct }}"
+            else:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ repeat.item }}"
+                data:
+                  brightness: "{{ bri }}"
+
+sl_save_current_as_scene:
+  alias: "SL: Save Current Light State as Scene"
+  description: "Reads current brightness/color_temp from a room's lights, saves to helpers, and pushes config to Z2M."
+  mode: single
+  fields:
+    room:
+      description: "Room key (living_room, bedroom, bathroom, kitchen, hallway)"
+      required: true
+      selector:
+        select:
+          options: [living_room, bedroom, bathroom, kitchen, hallway]
+    window:
+      description: "Time window (morning, day, evening, night)"
+      required: true
+      selector:
+        select:
+          options: [morning, day, evening, night]
+  sequence:
+    - variables:
+        # Use first light in each room as the reference
+        source_light_map:
+          living_room: "light.living_room_1"
+          bedroom: "light.bedroom_1"
+          bathroom: "light.bathroom_1"
+          kitchen: "light.kitchen_1"
+          hallway: "light.hallway_1"
+        source_light: "{{ source_light_map[room] }}"
+        bri: "{{ state_attr(source_light, 'brightness') | int(200) }}"
+        ct: "{{ state_attr(source_light, 'color_temp') }}"
+        has_ct: "{{ ct not in ['unknown', 'unavailable', '', None] }}"
+
+    # Always save brightness
+    - service: input_number.set_value
+      target:
+        entity_id: "input_number.sl_{{ room }}_{{ window }}_brightness"
+      data:
+        value: "{{ bri }}"
+
+    # Save color_temp only for ambiance rooms (helper exists)
+    - if:
+        - condition: template
+          value_template: "{{ has_ct }}"
+      then:
+        - service: input_number.set_value
+          target:
+            entity_id: "input_number.sl_{{ room }}_{{ window }}_color_temp"
+          data:
+            value: "{{ ct | int }}"
+
+    # Push full config to Z2M
+    - service: script.sl_push_config

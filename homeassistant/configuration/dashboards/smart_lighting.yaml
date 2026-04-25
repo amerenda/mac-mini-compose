@@ -4,15 +4,6 @@ views:
     path: schedule
     icon: mdi:lightbulb-auto
     cards:
-      # ── Scene Setup ────────────────────────────────────────
-      - type: button
-        name: Create Default Scenes
-        icon: mdi:palette-outline
-        show_state: false
-        tap_action:
-          action: call-service
-          service: script.create_default_scenes
-
       # ── Top Bar ────────────────────────────────────────────
       - type: entities
         entities:
@@ -474,6 +465,9 @@ views:
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
+            - type: custom:mushroom-title-card
+              title: Load Stored Scene
+              subtitle: Applies stored values to lights as a starting point
             - type: horizontal-stack
               cards:
                 - type: button
@@ -482,36 +476,40 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.living_room_morning
+                    service: script.sl_preview_scene
+                    data:
+                      room: living_room
+                      window: morning
                 - type: button
                   name: Day
                   icon: mdi:weather-sunny
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.living_room_day
+                    service: script.sl_preview_scene
+                    data:
+                      room: living_room
+                      window: day
                 - type: button
                   name: Evening
                   icon: mdi:weather-sunset-down
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.living_room_evening
+                    service: script.sl_preview_scene
+                    data:
+                      room: living_room
+                      window: evening
                 - type: button
                   name: Night
                   icon: mdi:weather-night
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.living_room_night
+                    service: script.sl_preview_scene
+                    data:
+                      room: living_room
+                      window: night
             - type: custom:mushroom-title-card
               title: Save Current State
             - type: horizontal-stack
@@ -522,7 +520,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: living_room
                       window: morning
@@ -532,7 +530,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: living_room
                       window: day
@@ -542,7 +540,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: living_room
                       window: evening
@@ -552,7 +550,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: living_room
                       window: night
@@ -567,7 +565,7 @@ views:
               show_state: false
               tap_action:
                 action: call-service
-                service: script.sl_save_scene
+                service: script.sl_save_current_as_scene
                 data:
                   room: living_room
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
@@ -599,6 +597,9 @@ views:
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
+            - type: custom:mushroom-title-card
+              title: Load Stored Scene
+              subtitle: Applies stored values to lights as a starting point
             - type: horizontal-stack
               cards:
                 - type: button
@@ -607,36 +608,40 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.bedroom_morning
+                    service: script.sl_preview_scene
+                    data:
+                      room: bedroom
+                      window: morning
                 - type: button
                   name: Day
                   icon: mdi:weather-sunny
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.bedroom_day
+                    service: script.sl_preview_scene
+                    data:
+                      room: bedroom
+                      window: day
                 - type: button
                   name: Evening
                   icon: mdi:weather-sunset-down
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.bedroom_evening
+                    service: script.sl_preview_scene
+                    data:
+                      room: bedroom
+                      window: evening
                 - type: button
                   name: Night
                   icon: mdi:weather-night
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.bedroom_night
+                    service: script.sl_preview_scene
+                    data:
+                      room: bedroom
+                      window: night
             - type: custom:mushroom-title-card
               title: Save Current State
             - type: horizontal-stack
@@ -647,7 +652,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: bedroom
                       window: morning
@@ -657,7 +662,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: bedroom
                       window: day
@@ -667,7 +672,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: bedroom
                       window: evening
@@ -677,7 +682,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: bedroom
                       window: night
@@ -692,7 +697,7 @@ views:
               show_state: false
               tap_action:
                 action: call-service
-                service: script.sl_save_scene
+                service: script.sl_save_current_as_scene
                 data:
                   room: bedroom
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
@@ -729,36 +734,40 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.bathroom_morning
+                    service: script.sl_preview_scene
+                    data:
+                      room: bathroom
+                      window: morning
                 - type: button
                   name: Day
                   icon: mdi:weather-sunny
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.bathroom_day
+                    service: script.sl_preview_scene
+                    data:
+                      room: bathroom
+                      window: day
                 - type: button
                   name: Evening
                   icon: mdi:weather-sunset-down
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.bathroom_evening
+                    service: script.sl_preview_scene
+                    data:
+                      room: bathroom
+                      window: evening
                 - type: button
                   name: Night
                   icon: mdi:weather-night
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.bathroom_night
+                    service: script.sl_preview_scene
+                    data:
+                      room: bathroom
+                      window: night
             - type: custom:mushroom-title-card
               title: Save Current State
             - type: horizontal-stack
@@ -769,7 +778,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: bathroom
                       window: morning
@@ -779,7 +788,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: bathroom
                       window: day
@@ -789,7 +798,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: bathroom
                       window: evening
@@ -799,7 +808,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: bathroom
                       window: night
@@ -814,7 +823,7 @@ views:
               show_state: false
               tap_action:
                 action: call-service
-                service: script.sl_save_scene
+                service: script.sl_save_current_as_scene
                 data:
                   room: bathroom
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
@@ -853,36 +862,40 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.kitchen_morning
+                    service: script.sl_preview_scene
+                    data:
+                      room: kitchen
+                      window: morning
                 - type: button
                   name: Day
                   icon: mdi:weather-sunny
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.kitchen_day
+                    service: script.sl_preview_scene
+                    data:
+                      room: kitchen
+                      window: day
                 - type: button
                   name: Evening
                   icon: mdi:weather-sunset-down
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.kitchen_evening
+                    service: script.sl_preview_scene
+                    data:
+                      room: kitchen
+                      window: evening
                 - type: button
                   name: Night
                   icon: mdi:weather-night
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.kitchen_night
+                    service: script.sl_preview_scene
+                    data:
+                      room: kitchen
+                      window: night
             - type: custom:mushroom-title-card
               title: Save Current State
             - type: horizontal-stack
@@ -893,7 +906,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: kitchen
                       window: morning
@@ -903,7 +916,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: kitchen
                       window: day
@@ -913,7 +926,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: kitchen
                       window: evening
@@ -923,7 +936,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: kitchen
                       window: night
@@ -938,7 +951,7 @@ views:
               show_state: false
               tap_action:
                 action: call-service
-                service: script.sl_save_scene
+                service: script.sl_save_current_as_scene
                 data:
                   room: kitchen
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
@@ -975,36 +988,40 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.hallway_morning
+                    service: script.sl_preview_scene
+                    data:
+                      room: hallway
+                      window: morning
                 - type: button
                   name: Day
                   icon: mdi:weather-sunny
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.hallway_day
+                    service: script.sl_preview_scene
+                    data:
+                      room: hallway
+                      window: day
                 - type: button
                   name: Evening
                   icon: mdi:weather-sunset-down
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.hallway_evening
+                    service: script.sl_preview_scene
+                    data:
+                      room: hallway
+                      window: evening
                 - type: button
                   name: Night
                   icon: mdi:weather-night
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: scene.turn_on
-                    target:
-                      entity_id: scene.hallway_night
+                    service: script.sl_preview_scene
+                    data:
+                      room: hallway
+                      window: night
             - type: custom:mushroom-title-card
               title: Save Current State
             - type: horizontal-stack
@@ -1015,7 +1032,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: hallway
                       window: morning
@@ -1025,7 +1042,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: hallway
                       window: day
@@ -1035,7 +1052,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: hallway
                       window: evening
@@ -1045,7 +1062,7 @@ views:
                   show_state: false
                   tap_action:
                     action: call-service
-                    service: script.sl_save_scene
+                    service: script.sl_save_current_as_scene
                     data:
                       room: hallway
                       window: night
@@ -1237,7 +1254,7 @@ views:
         icon: mdi:content-save-all
         tap_action:
           action: call-service
-          service: script.sl_save_scene
+          service: script.sl_save_current_as_scene
           data:
             room: "{{ states('input_select.sl_room_selector') | lower | replace(' ', '_') | replace('all_rooms', 'all') }}"
             window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
