@@ -5,7 +5,7 @@ services:
   # Grafana on k3s queries this instance.
   # ============================================================
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.11.2
     container_name: prometheus
     restart: unless-stopped
     ports:
@@ -32,7 +32,7 @@ services:
   # Node Exporter — Host metrics (CPU, memory, disk, network)
   # ============================================================
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:v1.11.1
     container_name: node-exporter
     restart: unless-stopped
     ports:
@@ -49,7 +49,7 @@ services:
   # Connects to postgres in the core stack via shared network
   # ============================================================
   postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
+    image: prometheuscommunity/postgres-exporter:v0.19.1
     container_name: postgres-exporter
     restart: unless-stopped
     ports:
@@ -81,7 +81,7 @@ services:
   # Technitium runs on host network, accessed via host.docker.internal
   # ============================================================
   technitium-exporter:
-    image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:latest
+    image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:1.0.0
     container_name: technitium-exporter
     restart: unless-stopped
     ports:

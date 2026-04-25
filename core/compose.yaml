@@ -8,7 +8,7 @@ services:
   # A macOS pf rule will redirect 10.100.20.18:53 → 5354 at cutover.
   # ============================================================
   technitium:
-    image: technitium/dns-server:latest
+    image: technitium/dns-server:14.3.0
     container_name: technitium
     restart: unless-stopped
     network_mode: host
@@ -29,7 +29,7 @@ services:
   # Port 5432 (standard).
   # ============================================================
   postgres:
-    image: pgvector/pgvector:pg16
+    image: pgvector/pgvector@sha256:7d400e340efb42f4d8c9c12c6427adb253f726881a9985d2a471bf0eed824dff
     container_name: postgres
     restart: unless-stopped
     ports:

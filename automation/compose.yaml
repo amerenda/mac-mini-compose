@@ -55,7 +55,7 @@ services:
   # (not in Docker — Docker on Mac has no GPU access)
   # ============================================================
   whisper:
-    image: rhasspy/wyoming-whisper
+    image: rhasspy/wyoming-whisper@sha256:9501d2659eee83b6eead98d53842193e5fed011eda6c5b1c3ad36f3146b28fed
     container_name: whisper
     restart: unless-stopped
     ports:
@@ -65,7 +65,7 @@ services:
     command: --model tiny-int8 --language en --beam-size 1
 
   piper:
-    image: rhasspy/wyoming-piper
+    image: rhasspy/wyoming-piper@sha256:c874e4a04657ae3381332ee5d0c8c70a310dae6722892840f530ac0890b44eb3
     container_name: piper
     restart: unless-stopped
     ports:
@@ -75,7 +75,7 @@ services:
     command: --voice en_US-lessac-medium
 
   openwakeword:
-    image: rhasspy/wyoming-openwakeword
+    image: rhasspy/wyoming-openwakeword@sha256:52cb1168731a1849fc28cf339c935fde58746bbabc94226668a40ef6ddf5d42b
     container_name: openwakeword
     restart: unless-stopped
     ports:
@@ -86,7 +86,7 @@ services:
   # Mosquitto — MQTT broker (used by Zigbee2MQTT + HA)
   # ============================================================
   mosquitto:
-    image: eclipse-mosquitto:2
+    image: eclipse-mosquitto:2.1.2
     container_name: mosquitto
     restart: unless-stopped
     volumes:
@@ -100,7 +100,7 @@ services:
   # Connects to SMLIGHT SLZB-06MG24 at 10.100.20.179:6638
   # ============================================================
   zigbee2mqtt:
-    image: koenkk/zigbee2mqtt:latest
+    image: koenkk/zigbee2mqtt:2.9.2
     container_name: zigbee2mqtt
     restart: unless-stopped
     depends_on:
