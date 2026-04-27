@@ -5,7 +5,7 @@ set -e
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 # Databases on unified postgres
-DATABASES="todo agent_kb"
+DATABASES="todo agent_kb llmmanager llmmanager_uat"
 BUCKET="${BACKUP_BUCKET:-amerenda-backups}"
 BUCKET_PATH="${BACKUP_BUCKET_PATH:-us/mac-mini/dean}"
 ENDPOINT="${BACKUP_ENDPOINT}"
