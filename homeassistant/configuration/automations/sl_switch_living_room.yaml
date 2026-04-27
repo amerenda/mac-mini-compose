@@ -1,0 +1,9 @@
+alias: "SL: Living Room Switch"
+id: sl_switch_living_room
+use_blueprint:
+  path: sl_hue_dimmer.yaml
+  input:
+    switch_action_topic: "zigbee2mqtt/living_room_s_1/action"
+    room: "living_room"
+    light_entity: light.living_room
+    switch_id: "living_room"

@@ -1,0 +1,9 @@
+alias: "SL: Bathroom Switch"
+id: sl_switch_bathroom
+use_blueprint:
+  path: sl_hue_dimmer.yaml
+  input:
+    switch_action_topic: "zigbee2mqtt/bathroom_s_1/action"
+    room: "bathroom"
+    light_entity: light.bathroom
+    switch_id: "bathroom"

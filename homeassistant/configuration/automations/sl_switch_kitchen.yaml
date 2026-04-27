@@ -1,0 +1,9 @@
+alias: "SL: Kitchen Switch"
+id: sl_switch_kitchen
+use_blueprint:
+  path: sl_hue_dimmer.yaml
+  input:
+    switch_action_topic: "zigbee2mqtt/kitchen_s_1/action"
+    room: "kitchen"
+    light_entity: light.kitchen
+    switch_id: "kitchen"
