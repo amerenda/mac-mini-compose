@@ -19,7 +19,7 @@ services:
     volumes:
       - technitium-data:/etc/dns
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5380/"]
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/5380'"]
       interval: 30s
       timeout: 5s
       retries: 3
