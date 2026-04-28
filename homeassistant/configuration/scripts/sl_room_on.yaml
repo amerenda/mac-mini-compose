@@ -54,7 +54,7 @@ sl_room_on:
         default_scene: "scene.{{ room }}_{{ window }}"
         scene_entity: "{{ custom_scene if use_custom_scene and custom_scene not in ['unknown', 'unavailable', ''] else default_scene }}"
         scene_exists: "{{ scene_entity in (states.scene | map(attribute='entity_id') | list) }}"
-        smooth_enabled: "{{ (is_window_transition | default(false) | bool) and is_state('input_boolean.sl_' ~ room ~ '_smooth_transition', 'on') }}"
+        smooth_enabled: "{{ is_state('input_boolean.sl_' ~ room ~ '_smooth_transition', 'on') }}"
         transition_secs: "{{ (states('input_number.sl_' ~ room ~ '_smooth_transition_duration') | float(10)) * 60 if smooth_enabled else 0 }}"
 
     - choose:

@@ -40,7 +40,7 @@ sl_preview_scene:
                   entity_id: "{{ repeat.item }}"
                 data:
                   brightness: "{{ bri }}"
-                  color_temp: "{{ ct }}"
+                  color_temp_kelvin: "{{ (1000000 / ct) | int }}"
             else:
               - service: light.turn_on
                 target:
