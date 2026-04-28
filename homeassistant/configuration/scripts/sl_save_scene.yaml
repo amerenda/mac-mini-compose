@@ -28,7 +28,8 @@ sl_save_scene:
         # Read brightness from first light in the room
         first_light: "{{ lights[0] if lights | length > 0 else '' }}"
         current_brightness: "{{ state_attr(first_light, 'brightness') | int(200) }}"
-        current_color_temp: "{{ state_attr(first_light, 'color_temp') | int(370) }}"
+        current_color_temp_kelvin: "{{ state_attr(first_light, 'color_temp_kelvin') | int(0) }}"
+        current_color_temp: "{{ (1000000 / current_color_temp_kelvin) | int if current_color_temp_kelvin > 0 else 370 }}"
         brightness_helper: "input_number.sl_{{ room }}_{{ window }}_brightness"
         color_temp_helper: "input_number.sl_{{ room }}_{{ window }}_color_temp"
     # Save brightness to helper

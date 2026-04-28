@@ -10,7 +10,7 @@ create_default_scenes:
         entity_id: light.living_room_1
       data:
         brightness: 180
-        color_temp: 320
+        color_temp_kelvin: 3125
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -23,7 +23,7 @@ create_default_scenes:
         entity_id: light.living_room_1
       data:
         brightness: 254
-        color_temp: 250
+        color_temp_kelvin: 4000
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -36,7 +36,7 @@ create_default_scenes:
         entity_id: light.living_room_1
       data:
         brightness: 160
-        color_temp: 380
+        color_temp_kelvin: 2632
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -49,7 +49,7 @@ create_default_scenes:
         entity_id: light.living_room_1
       data:
         brightness: 60
-        color_temp: 454
+        color_temp_kelvin: 2203
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -66,7 +66,7 @@ create_default_scenes:
           - light.lamp_1
       data:
         brightness: 180
-        color_temp: 320
+        color_temp_kelvin: 3125
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -84,7 +84,7 @@ create_default_scenes:
           - light.lamp_1
       data:
         brightness: 254
-        color_temp: 250
+        color_temp_kelvin: 4000
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -102,7 +102,7 @@ create_default_scenes:
           - light.lamp_1
       data:
         brightness: 140
-        color_temp: 400
+        color_temp_kelvin: 2500
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -120,7 +120,7 @@ create_default_scenes:
           - light.lamp_1
       data:
         brightness: 40
-        color_temp: 454
+        color_temp_kelvin: 2203
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -136,7 +136,7 @@ create_default_scenes:
         entity_id: light.bathroom_1
       data:
         brightness: 200
-        color_temp: 280
+        color_temp_kelvin: 3571
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -149,7 +149,7 @@ create_default_scenes:
         entity_id: light.bathroom_1
       data:
         brightness: 254
-        color_temp: 250
+        color_temp_kelvin: 4000
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -162,7 +162,7 @@ create_default_scenes:
         entity_id: light.bathroom_1
       data:
         brightness: 180
-        color_temp: 350
+        color_temp_kelvin: 2857
     - delay: { seconds: 1 }
     - service: scene.create
       data:
@@ -175,7 +175,7 @@ create_default_scenes:
         entity_id: light.bathroom_1
       data:
         brightness: 60
-        color_temp: 454
+        color_temp_kelvin: 2203
     - delay: { seconds: 1 }
     - service: scene.create
       data:
