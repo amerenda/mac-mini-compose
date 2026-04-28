@@ -1,7 +1,7 @@
 alias: "SL: Hallway Switch"
 id: sl_switch_hallway
 use_blueprint:
-  path: sl_hue_dimmer.yaml
+  path: _defaults/sl_hue_dimmer.yaml
   input:
     switch_action_topic: "zigbee2mqtt/hallway_s_1/action"
     room: "hallway"
