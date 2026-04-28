@@ -42,6 +42,7 @@ services:
       - ../homeassistant/configuration/dashboards:/config/dashboards/views:ro
       - ../homeassistant/scripts/subway_status.sh:/config/scripts_shell/subway_status.sh:ro
       - ../homeassistant/configuration/groups.yaml:/config/groups.yaml:ro
+      - ../homeassistant/configuration/scenes.yaml:/config/scenes.yaml:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8123/manifest.json"]
       interval: 30s
