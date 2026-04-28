@@ -1,294 +1,123 @@
 create_default_scenes:
-  alias: "SL: Create Default Scenes"
-  description: "Sets each light to the default state, then snapshots it as a scene. Lights will briefly cycle through defaults. Edit scenes via UI afterwards."
+  alias: "SL: Initialize Default Scene Values"
+  description: "Writes default brightness/color_temp values to all scene helpers, then syncs to Z2M. Run once to bootstrap or reset to defaults."
   mode: single
   sequence:
 
     # ── Living Room ───────────────────────────────────────────────────────────
-    - service: light.turn_on
-      target:
-        entity_id: light.living_room_1
-      data:
-        brightness: 180
-        color_temp_kelvin: 3125
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: living_room_morning
-        snapshot_entities:
-          - light.living_room_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_living_room_morning_brightness }
+      data: { value: 180 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_living_room_morning_color_temp }
+      data: { value: 320 }
 
-    - service: light.turn_on
-      target:
-        entity_id: light.living_room_1
-      data:
-        brightness: 254
-        color_temp_kelvin: 4000
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: living_room_day
-        snapshot_entities:
-          - light.living_room_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_living_room_day_brightness }
+      data: { value: 254 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_living_room_day_color_temp }
+      data: { value: 250 }
 
-    - service: light.turn_on
-      target:
-        entity_id: light.living_room_1
-      data:
-        brightness: 160
-        color_temp_kelvin: 2632
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: living_room_evening
-        snapshot_entities:
-          - light.living_room_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_living_room_evening_brightness }
+      data: { value: 160 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_living_room_evening_color_temp }
+      data: { value: 380 }
 
-    - service: light.turn_on
-      target:
-        entity_id: light.living_room_1
-      data:
-        brightness: 60
-        color_temp_kelvin: 2203
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: living_room_night
-        snapshot_entities:
-          - light.living_room_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_living_room_night_brightness }
+      data: { value: 60 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_living_room_night_color_temp }
+      data: { value: 454 }
 
     # ── Bedroom ───────────────────────────────────────────────────────────────
-    - service: light.turn_on
-      target:
-        entity_id:
-          - light.bedroom_1
-          - light.bedroom_2
-          - light.lamp_1
-      data:
-        brightness: 180
-        color_temp_kelvin: 3125
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: bedroom_morning
-        snapshot_entities:
-          - light.bedroom_1
-          - light.bedroom_2
-          - light.lamp_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bedroom_morning_brightness }
+      data: { value: 180 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bedroom_morning_color_temp }
+      data: { value: 320 }
 
-    - service: light.turn_on
-      target:
-        entity_id:
-          - light.bedroom_1
-          - light.bedroom_2
-          - light.lamp_1
-      data:
-        brightness: 254
-        color_temp_kelvin: 4000
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: bedroom_day
-        snapshot_entities:
-          - light.bedroom_1
-          - light.bedroom_2
-          - light.lamp_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bedroom_day_brightness }
+      data: { value: 254 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bedroom_day_color_temp }
+      data: { value: 250 }
 
-    - service: light.turn_on
-      target:
-        entity_id:
-          - light.bedroom_1
-          - light.bedroom_2
-          - light.lamp_1
-      data:
-        brightness: 140
-        color_temp_kelvin: 2500
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: bedroom_evening
-        snapshot_entities:
-          - light.bedroom_1
-          - light.bedroom_2
-          - light.lamp_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bedroom_evening_brightness }
+      data: { value: 140 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bedroom_evening_color_temp }
+      data: { value: 400 }
 
-    - service: light.turn_on
-      target:
-        entity_id:
-          - light.bedroom_1
-          - light.bedroom_2
-          - light.lamp_1
-      data:
-        brightness: 40
-        color_temp_kelvin: 2203
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: bedroom_night
-        snapshot_entities:
-          - light.bedroom_1
-          - light.bedroom_2
-          - light.lamp_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bedroom_night_brightness }
+      data: { value: 40 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bedroom_night_color_temp }
+      data: { value: 454 }
 
     # ── Bathroom ──────────────────────────────────────────────────────────────
-    - service: light.turn_on
-      target:
-        entity_id: light.bathroom_1
-      data:
-        brightness: 200
-        color_temp_kelvin: 3571
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: bathroom_morning
-        snapshot_entities:
-          - light.bathroom_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bathroom_morning_brightness }
+      data: { value: 200 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bathroom_morning_color_temp }
+      data: { value: 280 }
 
-    - service: light.turn_on
-      target:
-        entity_id: light.bathroom_1
-      data:
-        brightness: 254
-        color_temp_kelvin: 4000
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: bathroom_day
-        snapshot_entities:
-          - light.bathroom_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bathroom_day_brightness }
+      data: { value: 254 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bathroom_day_color_temp }
+      data: { value: 250 }
 
-    - service: light.turn_on
-      target:
-        entity_id: light.bathroom_1
-      data:
-        brightness: 180
-        color_temp_kelvin: 2857
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: bathroom_evening
-        snapshot_entities:
-          - light.bathroom_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bathroom_evening_brightness }
+      data: { value: 180 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bathroom_evening_color_temp }
+      data: { value: 350 }
 
-    - service: light.turn_on
-      target:
-        entity_id: light.bathroom_1
-      data:
-        brightness: 60
-        color_temp_kelvin: 2203
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: bathroom_night
-        snapshot_entities:
-          - light.bathroom_1
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bathroom_night_brightness }
+      data: { value: 60 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_bathroom_night_color_temp }
+      data: { value: 454 }
 
-    # ── Kitchen (white only — no color_temp) ─────────────────────────────────
-    - service: light.turn_on
-      target:
-        entity_id:
-          - light.kitchen_1
-          - light.kitchen_2
-      data:
-        brightness: 200
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: kitchen_morning
-        snapshot_entities:
-          - light.kitchen_1
-          - light.kitchen_2
+    # ── Kitchen (brightness only) ─────────────────────────────────────────────
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_kitchen_morning_brightness }
+      data: { value: 200 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_kitchen_day_brightness }
+      data: { value: 254 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_kitchen_evening_brightness }
+      data: { value: 180 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_kitchen_night_brightness }
+      data: { value: 80 }
 
-    - service: light.turn_on
-      target:
-        entity_id:
-          - light.kitchen_1
-          - light.kitchen_2
-      data:
-        brightness: 254
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: kitchen_day
-        snapshot_entities:
-          - light.kitchen_1
-          - light.kitchen_2
+    # ── Hallway (brightness only) ─────────────────────────────────────────────
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_hallway_morning_brightness }
+      data: { value: 180 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_hallway_day_brightness }
+      data: { value: 254 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_hallway_evening_brightness }
+      data: { value: 140 }
+    - service: input_number.set_value
+      target: { entity_id: input_number.sl_hallway_night_brightness }
+      data: { value: 60 }
 
-    - service: light.turn_on
-      target:
-        entity_id:
-          - light.kitchen_1
-          - light.kitchen_2
-      data:
-        brightness: 180
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: kitchen_evening
-        snapshot_entities:
-          - light.kitchen_1
-          - light.kitchen_2
-
-    - service: light.turn_on
-      target:
-        entity_id:
-          - light.kitchen_1
-          - light.kitchen_2
-      data:
-        brightness: 80
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: kitchen_night
-        snapshot_entities:
-          - light.kitchen_1
-          - light.kitchen_2
-
-    # ── Hallway (white only — no color_temp) ─────────────────────────────────
-    - service: light.turn_on
-      target:
-        entity_id: light.hallway_1
-      data:
-        brightness: 180
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: hallway_morning
-        snapshot_entities:
-          - light.hallway_1
-
-    - service: light.turn_on
-      target:
-        entity_id: light.hallway_1
-      data:
-        brightness: 254
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: hallway_day
-        snapshot_entities:
-          - light.hallway_1
-
-    - service: light.turn_on
-      target:
-        entity_id: light.hallway_1
-      data:
-        brightness: 140
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: hallway_evening
-        snapshot_entities:
-          - light.hallway_1
-
-    - service: light.turn_on
-      target:
-        entity_id: light.hallway_1
-      data:
-        brightness: 60
-    - delay: { seconds: 1 }
-    - service: scene.create
-      data:
-        scene_id: hallway_night
-        snapshot_entities:
-          - light.hallway_1
+    # Sync all values to Z2M
+    - service: script.sl_push_config

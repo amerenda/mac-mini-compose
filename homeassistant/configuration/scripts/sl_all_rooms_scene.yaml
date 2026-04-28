@@ -1,6 +1,6 @@
 sl_all_rooms_scene:
   alias: "SL: Set All Rooms to Scene"
-  description: "Activate a specific time window scene for all rooms"
+  description: "Activate a specific time window scene for all rooms using helper values"
   mode: single
   fields:
     window:
@@ -18,7 +18,24 @@ sl_all_rooms_scene:
           - hallway
         sequence:
           - variables:
-              scene_entity: "scene.{{ repeat.item }}_{{ window }}"
-          - service: scene.turn_on
-            target:
-              entity_id: "{{ scene_entity }}"
+              brightness: "{{ states('input_number.sl_' ~ repeat.item ~ '_' ~ window ~ '_brightness') | int(200) }}"
+              ct_state: "{{ states('input_number.sl_' ~ repeat.item ~ '_' ~ window ~ '_color_temp') }}"
+              has_ct: "{{ ct_state not in ['unknown', 'unavailable', ''] and ct_state | int(0) > 0 }}"
+              ct_kelvin: "{{ (1000000 / ct_state | int) | int if has_ct else 0 }}"
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ has_ct }}"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: "light.{{ repeat.item }}"
+                    data:
+                      brightness: "{{ brightness }}"
+                      color_temp_kelvin: "{{ ct_kelvin }}"
+            default:
+              - service: light.turn_on
+                target:
+                  entity_id: "light.{{ repeat.item }}"
+                data:
+                  brightness: "{{ brightness }}"

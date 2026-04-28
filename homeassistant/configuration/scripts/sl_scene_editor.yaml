@@ -74,14 +74,7 @@ sl_save_current_as_scene:
           bathroom: "light.bathroom_1"
           kitchen: "light.kitchen_1"
           hallway: "light.hallway_1"
-        room_lights:
-          living_room: ["light.living_room_1"]
-          bedroom: ["light.bedroom_1", "light.bedroom_2", "light.lamp_1"]
-          bathroom: ["light.bathroom_1"]
-          kitchen: ["light.kitchen_1", "light.kitchen_2"]
-          hallway: ["light.hallway_1"]
         source_light: "{{ source_light_map[room] }}"
-        lights: "{{ room_lights[room] | default([]) }}"
         bri: "{{ state_attr(source_light, 'brightness') | int(200) }}"
         ct: "{{ state_attr(source_light, 'color_temp') }}"
         has_ct: "{{ ct not in ['unknown', 'unavailable', '', None] }}"
@@ -103,12 +96,6 @@ sl_save_current_as_scene:
             entity_id: "input_number.sl_{{ room }}_{{ window }}_color_temp"
           data:
             value: "{{ ct | int }}"
-
-    # Update the HA runtime scene so switch buttons also get the correct color
-    - service: scene.create
-      data:
-        scene_id: "{{ room }}_{{ window }}"
-        snapshot_entities: "{{ lights }}"
 
     # Push full config to Z2M
     - service: script.sl_push_config
