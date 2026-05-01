@@ -35,6 +35,8 @@ fi
   echo "OLLAMA_URL=http://host.docker.internal:11434"
   echo "AGENT_IMAGE_TAG=${AGENT_IMAGE_TAG_RESOLVED}"
   echo "OLLAMA_MODELS_HOST_PATH=${OLLAMA_MODELS_HOST_PATH}"
+  # Host path to this llm/ directory — agent self-update + AGENT_IMAGE_TAG pin in llm/.env
+  echo "HOST_LLM_COMPOSE_DIR=${ROOT}/llm"
 } >llm/.env
 
 # Optional: operator-created file (gitignored) with extra KEY=value lines, e.g. AGENT_ADDRESS=...

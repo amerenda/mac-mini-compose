@@ -21,12 +21,16 @@ services:
       OLLAMA_URL: http://host.docker.internal:11434
       OLLAMA_CONTAINER: ""
       COMPOSE_PROFILE: ""
-      COMPOSE_DIR: ""
+      # Host filesystem path (same value as left side of bind below) for docker:cli self-update
+      COMPOSE_DIR: ${HOST_LLM_COMPOSE_DIR}
+      # Writable mount of llm/ so the agent can pin AGENT_IMAGE_TAG in llm/.env
+      COMPOSE_DIR_LOCAL: /host/llm-compose
       MODEL_STORAGE_PATH: /host-ollama-models
     volumes:
       - llm-agent-tls:/data/tls
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}:/host-ollama-models:ro
+      - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
 
 volumes:
   llm-agent-tls:
