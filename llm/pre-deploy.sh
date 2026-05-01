@@ -6,12 +6,22 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# OrbStack exposes `mac` at ~/.orbstack/bin/mac — use full path so it works from Docker.
+if [[ -n "${NATIVE_OLLAMA_RESTART_CMD:-}" ]]; then
+  RESTART_CMD="$NATIVE_OLLAMA_RESTART_CMD"
+elif [[ -x "${HOME}/.orbstack/bin/mac" ]]; then
+  RESTART_CMD="${HOME}/.orbstack/bin/mac brew services restart ollama"
+else
+  RESTART_CMD="mac brew services restart ollama"
+fi
+
 # Bitwarden Secrets Manager → secret "llm-manager-agent-psk" (same as k8s agent-psk).
 # Bitwarden secret UUID for llm-manager-agent-psk.
 BWS_LLM_AGENT_PSK_UUID="cdaa7917-3eba-44b5-a9ea-b41300f1dab5"
 
 # Host path to native Ollama's models directory (read-only in the agent container).
 OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}"
+OLLAMA_LAUNCH_AGENTS_DIR="${OLLAMA_LAUNCH_AGENTS_DIR:-$HOME/Library/LaunchAgents}"
 
 export BWS_ACCESS_TOKEN="${BWS_ACCESS_TOKEN:-$(cat /run/secrets/bws-access-token)}"
 
@@ -37,6 +47,9 @@ fi
   echo "OLLAMA_MODELS_HOST_PATH=${OLLAMA_MODELS_HOST_PATH}"
   # Host path to this llm/ directory — agent self-update + AGENT_IMAGE_TAG pin in llm/.env
   echo "HOST_LLM_COMPOSE_DIR=${ROOT}/llm"
+  # Homebrew Ollama LaunchAgent plist (native Metal Ollama — tunables + restart)
+  echo "OLLAMA_LAUNCH_AGENTS_DIR=${OLLAMA_LAUNCH_AGENTS_DIR}"
+  printf 'NATIVE_OLLAMA_RESTART_CMD=%q\n' "$RESTART_CMD"
 } >llm/.env
 
 # Optional: operator-created file (gitignored) with extra KEY=value lines, e.g. AGENT_ADDRESS=...

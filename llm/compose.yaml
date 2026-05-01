@@ -26,11 +26,15 @@ services:
       # Writable mount of llm/ so the agent can pin AGENT_IMAGE_TAG in llm/.env
       COMPOSE_DIR_LOCAL: /host/llm-compose
       MODEL_STORAGE_PATH: /host-ollama-models
+      # Native Homebrew Ollama: merge tunables into plist + brew services restart
+      OLLAMA_BREW_SERVICE_PLIST: /host/ollama-launchagents/homebrew.mxcl.ollama.plist
+      # NATIVE_OLLAMA_RESTART_CMD is set in llm/.env by pre-deploy (full path to OrbStack `mac` when available)
     volumes:
       - llm-agent-tls:/data/tls
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
+      - ${OLLAMA_LAUNCH_AGENTS_DIR}:/host/ollama-launchagents:rw
 
 volumes:
   llm-agent-tls:
