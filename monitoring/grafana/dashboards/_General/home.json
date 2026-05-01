@@ -800,12 +800,20 @@
           "expr": "60 * sum(rate(llm_fastpath_requests_total{status=\"completed\"}[5m])) or vector(0)",
           "legendFormat": "fastpath completed / min",
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "60 * sum by (runner) (rate(llm_scheduler_v2_model_swap_total{runner=~\"$runner\"}[5m])) or vector(0)",
+          "legendFormat": "{{runner}} swaps/min",
+          "refId": "C"
         }
       ]
     },
     {
       "type": "timeseries",
-      "title": "LLM \u2014 tokens / min",
+      "title": "LLM \u2014 tokens / min by runner",
       "datasource": {
         "type": "prometheus"
       },
@@ -849,16 +857,16 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "60 * ((sum(rate(llm_scheduler_job_tokens_total{type=\"completion\"}[5m]))) or (sum(rate(llm_inference_completion_tokens_total[5m])))) or vector(0)",
-          "legendFormat": "completion tokens / min",
+          "expr": "60 * ((sum by (runner) (rate(llm_scheduler_job_tokens_total{type=\"completion\"}[5m]))) or (sum by (runner) (rate(llm_inference_completion_tokens_total{runner=~\"$runner\"}[5m])))) or vector(0)",
+          "legendFormat": "{{runner}} completion / min",
           "refId": "A"
         },
         {
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "60 * ((sum(rate(llm_scheduler_job_tokens_total{type=\"prompt\"}[5m]))) or (sum(rate(llm_inference_prompt_tokens_total[5m])))) or vector(0)",
-          "legendFormat": "prompt tokens / min",
+          "expr": "60 * ((sum by (runner) (rate(llm_scheduler_job_tokens_total{type=\"prompt\"}[5m]))) or (sum by (runner) (rate(llm_inference_prompt_tokens_total{runner=~\"$runner\"}[5m])))) or vector(0)",
+          "legendFormat": "{{runner}} prompt / min",
           "refId": "B"
         }
       ]
@@ -1839,7 +1847,27 @@
     "home"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "name": "runner",
+        "label": "Runner",
+        "type": "query",
+        "definition": "label_values(llm_runner_is_idle, runner)",
+        "query": {
+          "query": "label_values(llm_runner_is_idle, runner)",
+          "refId": "StandardVariableQuery"
+        },
+        "datasource": {
+          "type": "prometheus"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "hide": 0,
+        "sort": 1
+      }
+    ]
   },
   "time": {
     "from": "now-3h",
@@ -1849,5 +1877,5 @@
   "timezone": "",
   "title": "Home",
   "uid": "home",
-  "version": 1
+  "version": 2
 }

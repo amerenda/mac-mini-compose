@@ -416,6 +416,11 @@
           "expr": "60 * ((sum(rate(llm_scheduler_job_errors_total[5m]))) or (sum(rate(llm_scheduler_v2_jobs_completed_total{status=~\"retried|failed|error\"}[5m]))))",
           "legendFormat": "errors",
           "refId": "B"
+        },
+        {
+          "expr": "60 * sum by (runner) (rate(llm_scheduler_v2_model_swap_total{runner=~\"$runner\"}[5m]))",
+          "legendFormat": "{{runner}} model swaps/min",
+          "refId": "C"
         }
       ]
     },
@@ -460,18 +465,23 @@
       "targets": [
         {
           "expr": "histogram_quantile(0.50, sum(rate(llm_scheduler_v2_job_wait_seconds_bucket[5m])) by (le)) or histogram_quantile(0.50, sum(rate(llm_agent_request_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "p50 {{model}}",
+          "legendFormat": "p50 queue (global)",
           "refId": "A"
         },
         {
           "expr": "histogram_quantile(0.95, sum(rate(llm_scheduler_v2_job_wait_seconds_bucket[5m])) by (le)) or histogram_quantile(0.95, sum(rate(llm_agent_request_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "p95 {{model}}",
+          "legendFormat": "p95 queue (global)",
           "refId": "B"
         },
         {
           "expr": "histogram_quantile(0.99, sum(rate(llm_scheduler_v2_job_wait_seconds_bucket[5m])) by (le)) or histogram_quantile(0.99, sum(rate(llm_agent_request_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "p99 {{model}}",
+          "legendFormat": "p99 queue (global)",
           "refId": "C"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(llm_scheduler_v2_model_swap_seconds_bucket{runner=~\"$runner\"}[5m])) by (le, runner))",
+          "legendFormat": "p95 swap {{runner}}",
+          "refId": "D"
         }
       ]
     },
@@ -489,7 +499,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Tokens/min by Model",
+      "title": "Tokens/min by Model & Runner",
       "id": 21,
       "datasource": {
         "type": "prometheus"
@@ -527,13 +537,13 @@
       },
       "targets": [
         {
-          "expr": "60 * ((sum(rate(llm_scheduler_job_tokens_total{type=\"completion\"}[5m])) by (model)) or (sum(rate(llm_inference_completion_tokens_total[5m])) by (model)))",
-          "legendFormat": "{{model}} completion",
+          "expr": "60 * ((sum by (model, runner) (rate(llm_scheduler_job_tokens_total{type=\"completion\"}[5m]))) or (sum by (model, runner) (rate(llm_inference_completion_tokens_total{runner=~\"$runner\"}[5m]))))",
+          "legendFormat": "{{runner}} — {{model}} completion",
           "refId": "A"
         },
         {
-          "expr": "60 * ((sum(rate(llm_scheduler_job_tokens_total{type=\"prompt\"}[5m])) by (model)) or (sum(rate(llm_inference_prompt_tokens_total[5m])) by (model)))",
-          "legendFormat": "{{model}} prompt",
+          "expr": "60 * ((sum by (model, runner) (rate(llm_scheduler_job_tokens_total{type=\"prompt\"}[5m]))) or (sum by (model, runner) (rate(llm_inference_prompt_tokens_total{runner=~\"$runner\"}[5m]))))",
+          "legendFormat": "{{runner}} — {{model}} prompt",
           "refId": "B"
         }
       ]
@@ -580,9 +590,14 @@
       },
       "targets": [
         {
-          "expr": "(rate(llm_scheduler_model_load_seconds_sum[10m]) / rate(llm_scheduler_model_load_seconds_count[10m])) or (rate(llm_scheduler_v2_model_swap_seconds_sum[10m]) / rate(llm_scheduler_v2_model_swap_seconds_count[10m]))",
-          "legendFormat": "avg load {{model}}",
+          "expr": "sum(rate(llm_scheduler_model_load_seconds_sum[10m])) by (model) / sum(rate(llm_scheduler_model_load_seconds_count[10m])) by (model)",
+          "legendFormat": "{{model}} load (legacy)",
           "refId": "A"
+        },
+        {
+          "expr": "sum(rate(llm_scheduler_v2_model_swap_seconds_sum{runner=~\"$runner\"}[10m])) by (runner) / sum(rate(llm_scheduler_v2_model_swap_seconds_count{runner=~\"$runner\"}[10m])) by (runner)",
+          "legendFormat": "{{runner}} swap avg (v2)",
+          "refId": "B"
         }
       ]
     },
@@ -654,7 +669,7 @@
       },
       "targets": [
         {
-          "expr": "max(llm_backend_runner_last_seen_seconds) by (runner)",
+          "expr": "max(llm_backend_runner_last_seen_seconds{runner=~\"$runner\"}) by (runner)",
           "legendFormat": "{{runner}}",
           "refId": "A"
         }
@@ -662,7 +677,7 @@
     },
     {
       "type": "timeseries",
-      "title": "GPU VRAM (per agent)",
+      "title": "GPU VRAM (agent + runner)",
       "id": 32,
       "datasource": {
         "type": "prometheus"
@@ -700,13 +715,23 @@
       "targets": [
         {
           "expr": "llm_agent_gpu_vram_used_bytes",
-          "legendFormat": "{{node}} used",
+          "legendFormat": "{{node}} agent used",
           "refId": "A"
         },
         {
           "expr": "llm_agent_gpu_vram_total_bytes",
-          "legendFormat": "{{node}} total",
+          "legendFormat": "{{node}} agent total",
           "refId": "B"
+        },
+        {
+          "expr": "llm_runner_vram_used_bytes{runner=~\"$runner\"}",
+          "legendFormat": "{{runner}} runner used",
+          "refId": "C"
+        },
+        {
+          "expr": "llm_runner_vram_total_bytes{runner=~\"$runner\"}",
+          "legendFormat": "{{runner}} runner capacity",
+          "refId": "D"
         }
       ]
     },
@@ -1159,7 +1184,27 @@
     "gpu"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "name": "runner",
+        "label": "Runner",
+        "type": "query",
+        "definition": "label_values(llm_runner_is_idle, runner)",
+        "query": {
+          "query": "label_values(llm_runner_is_idle, runner)",
+          "refId": "StandardVariableQuery"
+        },
+        "datasource": {
+          "type": "prometheus"
+        },
+        "refresh": 2,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "hide": 0,
+        "sort": 1
+      }
+    ]
   },
   "time": {
     "from": "now-3h",
@@ -1169,5 +1214,5 @@
   "timezone": "browser",
   "title": "LLM Manager",
   "uid": "llm-manager",
-  "version": 3
+  "version": 4
 }
