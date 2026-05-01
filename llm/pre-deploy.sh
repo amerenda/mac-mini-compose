@@ -29,3 +29,6 @@ PSK="$(bws secret get "$BWS_LLM_AGENT_PSK_UUID" --access-token "$BWS_ACCESS_TOKE
 if [[ -f llm/compose.local.env ]]; then
   cat llm/compose.local.env >>llm/.env
 fi
+
+# GitOps: native Homebrew Ollama must bind 0.0.0.0 so containers reach host.docker.internal:11434.
+bash "$ROOT/scripts/configure-native-ollama-bind.sh"

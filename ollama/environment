@@ -1,0 +1,3 @@
+# Native Homebrew Ollama on macOS — bind for Docker (host.docker.internal).
+# Applied by scripts/configure-native-ollama-bind.sh (Komodo llm pre_deploy + Ansible).
+OLLAMA_HOST=0.0.0.0:11434
