@@ -12,6 +12,10 @@ services:
     env_file:
       - .env
     environment:
+      # Stable name in llm-manager (default Docker hostname is the container id).
+      RUNNER_HOSTNAME: mac-mini-m4
+      # Metal / unified memory: report pool size from container RAM + Ollama loaded weights.
+      AGENT_UNIFIED_MEMORY_VRAM: "true"
       OLLAMA_URL: http://host.docker.internal:11434
       OLLAMA_CONTAINER: ""
       COMPOSE_PROFILE: ""
