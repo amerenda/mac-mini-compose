@@ -18,3 +18,6 @@ data/
 *.swp
 *.swo
 *~
+
+# Local tooling (dashboard extraction)
+.venv-dash-extract/
