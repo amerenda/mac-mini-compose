@@ -1,8 +1,8 @@
 services:
   # ============================================================
   # Prometheus — Central metrics store
-  # Receives remote_write from k3s Prometheus + scrapes local exporters.
-  # Grafana on k3s queries this instance.
+  # Receives remote_write from k3s Prometheus Agent + scrapes local exporters.
+  # Grafana runs locally in this stack and queries this instance.
   # ============================================================
   prometheus:
     image: prom/prometheus:v3.11.2
@@ -24,6 +24,35 @@ services:
       - '--web.enable-lifecycle'
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
+  # Grafana — Primary dashboards/UI on mac-mini
+  # Reads from local Prometheus TSDB.
+  # ============================================================
+  grafana:
+    image: grafana/grafana:12.1.1
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    networks:
+      - shared
+    environment:
+      GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER}"
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD}"
+      GF_SERVER_ROOT_URL: "https://grafana.amer.dev"
+      GF_SERVER_DOMAIN: "grafana.amer.dev"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -95,6 +124,7 @@ services:
 
 volumes:
   prometheus-data:
+  grafana-data:
 
 networks:
   shared:

@@ -22,6 +22,8 @@ the Mac Mini — run the playbook instead.
 | Zigbee2MQTT | bridge | 8080 | Zigbee coordinator bridge |
 | Postgres | bridge | 5432 | Primary database (pgvector/pg16) |
 | MongoDB | bridge | 27017 | Secondary database (UniFi) |
+| Prometheus | bridge | 9090 | Primary metrics TSDB + remote_write receiver |
+| Grafana | bridge | 3000 | Primary monitoring dashboards/UI |
 | Node Exporter | bridge | 9100 | Host metrics for Prometheus |
 | Postgres backup | — | — | Daily backup to GCS |
 | MongoDB backup | — | — | Daily backup to GCS |
@@ -80,7 +82,7 @@ Komodo + GitOps bootstrap, Tailscale, BlueBubbles install.
 ```
 GitHub push → pubhooks.amer.dev (k3s Traefik proxy) → Komodo Core (Mac Mini:9120)
                                                         ├─ /sync/.../sync    → ResourceSync executes
-                                                        ├─ /stack/.../deploy → services stack deploys
+                                                        ├─ /stack/.../deploy → core/automation/monitoring stack deploys
                                                         └─ /stack/.../deploy → runners stack deploys
 ```
 
@@ -89,7 +91,7 @@ GitHub push → pubhooks.amer.dev (k3s Traefik proxy) → Komodo Core (Mac Mini:
 1. Push to `amerenda/mac-mini-compose` on `main`
 2. Three GitHub webhooks fire simultaneously:
    - **ResourceSync webhook** (`/listener/github/sync/mac-mini-compose/sync`) — tells Komodo to re-read `resource-sync/stacks.toml` and update stack definitions
-   - **Services stack deploy** (`/listener/github/stack/<id>/deploy`) — triggers `docker compose up` for the services stack
+  - **Core/Automation/Monitoring stack deploy** (`/listener/github/stack/<id>/deploy`) — triggers `docker compose up` for those stacks
    - **Runners stack deploy** (`/listener/github/stack/<id>/deploy`) — triggers `docker compose up` for the runners stack
 3. Each stack's `pre_deploy` script runs first, fetching secrets from BWS via `bws` CLI
 4. Komodo runs `docker compose up -d` with the updated compose files
@@ -103,7 +105,7 @@ IngressRoute that forwards `/listener/github/*` to the Mac Mini's Komodo Core).
 | Webhook | GitHub Hook ID | Endpoint | Purpose |
 |---------|---------------|----------|---------|
 | ResourceSync | `606876027` | `.../sync/mac-mini-compose/sync` | Sync stack definitions from TOML |
-| Services deploy | `605400567` | `.../stack/69c4863a9781f84b58ffd7a6/deploy` | Deploy services stack |
+| Core/Automation/Monitoring deploy | `605400567` | `.../stack/69c4863a9781f84b58ffd7a6/deploy` | Deploy core, automation, and monitoring stacks |
 | Runners deploy | `606895878` | `.../stack/69c4863a9781f84b58ffd7a8/deploy` | Deploy runners stack |
 
 All webhooks use the `komodo-dean-webhook-secret` from BWS as the HMAC secret.
@@ -127,7 +129,7 @@ webhook fails or is missed, the sync will still happen within 5 minutes.
 | File | Purpose |
 |------|---------|
 | `resource-sync/sync.toml` | Defines the ResourceSync resource itself (repo, branch, resource path) |
-| `resource-sync/stacks.toml` | Defines the two stacks (services + runners) with pre_deploy scripts |
+| `resource-sync/stacks.toml` | Defines the managed stacks (core, automation, monitoring, runners) with pre_deploy scripts |
 
 Stack definitions: `resource-sync/stacks.toml`
 Sync definition: `resource-sync/sync.toml`
