@@ -3,6 +3,8 @@
 services:
   llm-agent:
     image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
+    # Align with registry on each deploy so AGENT_VERSION matches CI global target.
+    pull_policy: always
     container_name: llm-agent
     restart: unless-stopped
     ports:
