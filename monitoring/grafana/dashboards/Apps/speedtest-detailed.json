@@ -27,8 +27,7 @@
         "y": 0
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -194,8 +193,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(last_over_time(speedtest_download_bits_per_second[20m]))",
           "legendFormat": "Download",
@@ -203,8 +201,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(last_over_time(speedtest_upload_bits_per_second[20m]))",
           "legendFormat": "Upload",
@@ -212,8 +209,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "speedtest:download_bps:baseline_3w",
           "legendFormat": "Download Baseline",
@@ -221,8 +217,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "speedtest:upload_bps:baseline_3w",
           "legendFormat": "Upload Baseline",
@@ -241,8 +236,7 @@
         "y": 0
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -282,8 +276,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(max_over_time(speedtest_download_bits_per_second[1w:5m]))",
           "legendFormat": "Best",
@@ -291,8 +284,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "min(min_over_time(speedtest_download_bits_per_second[1w:5m]))",
           "legendFormat": "Worst",
@@ -300,8 +292,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "avg(avg_over_time(speedtest_download_bits_per_second[1w:5m]))",
           "legendFormat": "Avg",
@@ -320,8 +311,7 @@
         "y": 4
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -361,8 +351,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(max_over_time(speedtest_upload_bits_per_second[1w:5m]))",
           "legendFormat": "Best",
@@ -370,8 +359,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "min(min_over_time(speedtest_upload_bits_per_second[1w:5m]))",
           "legendFormat": "Worst",
@@ -379,8 +367,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "avg(avg_over_time(speedtest_upload_bits_per_second[1w:5m]))",
           "legendFormat": "Avg",
@@ -399,8 +386,7 @@
         "y": 8
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -440,8 +426,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "min(min_over_time(speedtest_ping_latency_milliseconds[1w:5m]))",
           "legendFormat": "Best",
@@ -449,8 +434,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(max_over_time(speedtest_ping_latency_milliseconds[1w:5m]))",
           "legendFormat": "Worst",
@@ -458,8 +442,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "avg(avg_over_time(speedtest_ping_latency_milliseconds[1w:5m]))",
           "legendFormat": "Avg",
@@ -478,8 +461,7 @@
         "y": 10
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -644,8 +626,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(last_over_time(speedtest_ping_latency_milliseconds[20m]))",
           "legendFormat": "Ping",
@@ -653,8 +634,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(last_over_time(speedtest_jitter_latency_milliseconds[20m]))",
           "legendFormat": "Jitter",
@@ -662,8 +642,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "speedtest:ping_ms:baseline_3w",
           "legendFormat": "Ping Baseline",
@@ -671,8 +650,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "speedtest:jitter_ms:baseline_3w",
           "legendFormat": "Jitter Baseline",
@@ -691,8 +669,7 @@
         "y": 12
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -785,8 +762,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(last_over_time(speedtest_jitter_latency_milliseconds[20m]))",
           "legendFormat": "Jitter",
@@ -794,8 +770,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "speedtest:jitter_ms:baseline_3w",
           "legendFormat": "Jitter Baseline",

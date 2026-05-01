@@ -27,8 +27,7 @@
       "title": "Source Sync Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -104,8 +103,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(external_dns_source_endpoints_total[5m])",
           "legendFormat": "endpoints",
@@ -120,8 +118,7 @@
       "title": "Registry Records",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -197,8 +194,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "external_dns_registry_endpoints_total",
           "legendFormat": "total",
@@ -208,8 +204,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "external_dns_registry_errors_total",
           "legendFormat": "errors",
@@ -224,8 +219,7 @@
       "title": "DNS Record Changes",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -301,8 +295,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(external_dns_controller_verified_records[5m])",
           "legendFormat": "A records verified",
@@ -312,8 +305,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(external_dns_controller_verified_records[5m])",
           "legendFormat": "AAAA records verified",
@@ -354,8 +346,7 @@
       "title": "Running Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -404,8 +395,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"infra-external-dns.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -418,8 +408,7 @@
       "title": "Restarts (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -472,8 +461,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"infra-external-dns.*\"}[24h]))",
           "legendFormat": "",
@@ -486,8 +474,7 @@
       "title": "Containers Ready",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -536,8 +523,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_status_ready{namespace=\"default\", pod=~\"infra-external-dns.*\"})",
           "legendFormat": "",
@@ -563,8 +549,7 @@
       "title": "CPU Usage",
       "description": "CPU usage vs limits",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -640,8 +625,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"infra-external-dns.*\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}}",
@@ -651,8 +635,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"default\", pod=~\"infra-external-dns.*\",resource=\"cpu\"}) by (container)",
           "legendFormat": "{{container}} limit",
@@ -667,8 +650,7 @@
       "title": "Memory Usage",
       "description": "Memory usage vs limits",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -744,8 +726,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"infra-external-dns.*\",container!=\"\"}) by (container)",
           "legendFormat": "{{container}}",
@@ -755,8 +736,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"default\", pod=~\"infra-external-dns.*\",resource=\"memory\"}) by (container)",
           "legendFormat": "{{container}} limit",
@@ -771,8 +751,7 @@
       "title": "Network I/O",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -848,8 +827,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"default\", pod=~\"infra-external-dns.*\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} rx",
@@ -859,8 +837,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_bytes_total{namespace=\"default\", pod=~\"infra-external-dns.*\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} tx",
@@ -875,8 +852,7 @@
       "title": "Disk I/O",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -952,8 +928,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_fs_writes_bytes_total{namespace=\"default\", pod=~\"infra-external-dns.*\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}} write",
@@ -963,8 +938,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_fs_reads_bytes_total{namespace=\"default\", pod=~\"infra-external-dns.*\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}} read",

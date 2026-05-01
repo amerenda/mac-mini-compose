@@ -27,8 +27,7 @@
       "title": "Active Runners",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -73,8 +72,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -87,8 +85,7 @@
       "title": "Pending Runners",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -137,8 +134,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Pending\"})",
           "legendFormat": "",
@@ -151,8 +147,7 @@
       "title": "Failed Runners (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -201,8 +196,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Failed\"})",
           "legendFormat": "",
@@ -215,8 +209,7 @@
       "title": "Runner Pod Count Over Time",
       "description": "Runner scaling \u2014 should scale to 0 when idle",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -292,8 +285,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Running\"})",
           "legendFormat": "Running",
@@ -303,8 +295,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Pending\"})",
           "legendFormat": "Pending",
@@ -314,8 +305,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Succeeded\"})",
           "legendFormat": "Succeeded",
@@ -330,8 +320,7 @@
       "title": "Runner CPU Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -407,8 +396,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=~\"arc-runners.*\",container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -423,8 +411,7 @@
       "title": "Runner Memory Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -500,8 +487,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=~\"arc-runners.*\",container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -516,8 +502,7 @@
       "title": "Runner Network I/O",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -593,8 +578,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_bytes_total{namespace=~\"arc-runners.*\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} rx",
@@ -604,8 +588,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_bytes_total{namespace=~\"arc-runners.*\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} tx",

@@ -26,8 +26,7 @@
       "type": "stat",
       "title": "Cluster Healthy",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -92,8 +91,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "min(etcd_server_has_leader)",
           "legendFormat": "",
@@ -105,8 +103,7 @@
       "type": "stat",
       "title": "Leader",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -151,8 +148,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(etcd_server_is_leader == 1, \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}}",
@@ -164,8 +160,7 @@
       "type": "stat",
       "title": "Leader Changes (24h)",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -218,8 +213,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(etcd_server_leader_changes_seen_total[24h]))",
           "legendFormat": "",
@@ -231,8 +225,7 @@
       "type": "stat",
       "title": "Proposals Pending",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -285,8 +278,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(etcd_server_proposals_pending)",
           "legendFormat": "",
@@ -298,8 +290,7 @@
       "type": "stat",
       "title": "Slow Applies (1h)",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -352,8 +343,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(etcd_server_slow_apply_total[1h]))",
           "legendFormat": "",
@@ -365,8 +355,7 @@
       "type": "stat",
       "title": "DB Size",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -411,8 +400,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "max(etcd_mvcc_db_total_size_in_bytes)",
           "legendFormat": "",
@@ -437,8 +425,7 @@
       "type": "timeseries",
       "title": "WAL Fsync p99",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -518,8 +505,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(histogram_quantile(0.99, sum(rate(etcd_disk_wal_fsync_duration_seconds_bucket[5m])) by (le, instance)), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}}",
@@ -533,8 +519,7 @@
       "type": "timeseries",
       "title": "Backend Commit p99",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -614,8 +599,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(histogram_quantile(0.99, sum(rate(etcd_disk_backend_commit_duration_seconds_bucket[5m])) by (le, instance)), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}}",
@@ -642,8 +626,7 @@
       "type": "timeseries",
       "title": "DB Size",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -719,8 +702,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(etcd_mvcc_db_total_size_in_bytes, \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} total",
@@ -730,8 +712,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(etcd_mvcc_db_total_size_in_use_in_bytes, \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} in use",
@@ -745,8 +726,7 @@
       "type": "timeseries",
       "title": "Keys & Compaction",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -839,8 +819,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(etcd_debugging_mvcc_keys_total, \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} keys",
@@ -850,8 +829,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(rate(etcd_debugging_mvcc_db_compaction_keys_total[5m]), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} compaction rate",
@@ -878,8 +856,7 @@
       "type": "timeseries",
       "title": "Proposal Rates",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -971,8 +948,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(sum by (instance) (rate(etcd_server_proposals_committed_total[5m])), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} committed",
@@ -982,8 +958,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(sum by (instance) (rate(etcd_server_proposals_applied_total[5m])), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} applied",
@@ -993,8 +968,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(sum by (instance) (rate(etcd_server_proposals_failed_total[5m])), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} failed",
@@ -1008,8 +982,7 @@
       "type": "timeseries",
       "title": "Slow Operations",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1116,8 +1089,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(rate(etcd_server_slow_apply_total[5m]), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} slow applies",
@@ -1127,8 +1099,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(rate(etcd_server_slow_read_indexes_total[5m]), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} slow reads",
@@ -1155,8 +1126,7 @@
       "type": "timeseries",
       "title": "Peer Round Trip p99",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1232,8 +1202,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(histogram_quantile(0.99, sum(rate(etcd_network_peer_round_trip_time_seconds_bucket[5m])) by (le, instance)), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}}",
@@ -1247,8 +1216,7 @@
       "type": "timeseries",
       "title": "Peer Traffic",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1324,8 +1292,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(sum by (instance) (rate(etcd_network_peer_sent_bytes_total[5m])), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} sent",
@@ -1335,8 +1302,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(sum by (instance) (rate(etcd_network_peer_received_bytes_total[5m])), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} received",
@@ -1363,8 +1329,7 @@
       "type": "timeseries",
       "title": "Request Rate",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1440,8 +1405,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(sum by (instance, type) (rate(etcd_server_client_requests_total[5m])), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} {{type}}",
@@ -1455,8 +1419,7 @@
       "type": "timeseries",
       "title": "MVCC Operations",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1532,8 +1495,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(rate(etcd_mvcc_put_total[5m]), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} puts",
@@ -1543,8 +1505,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(rate(etcd_mvcc_delete_total[5m]), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} deletes",
@@ -1554,8 +1515,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(rate(etcd_mvcc_range_total[5m]), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} ranges",
@@ -1565,8 +1525,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "label_replace(rate(etcd_mvcc_txn_total[5m]), \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
           "legendFormat": "{{node}} txns",

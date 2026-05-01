@@ -73,8 +73,7 @@
           "legendFormat": "max delay",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -186,8 +185,7 @@
           "refId": "A",
           "step": 60,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -299,8 +297,7 @@
           "intervalFactor": 1,
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -375,8 +372,7 @@
           "refId": "A",
           "step": 60,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -478,8 +474,7 @@
           "intervalFactor": 1,
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -545,8 +540,7 @@
           "intervalFactor": 1,
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -616,8 +610,7 @@
           "intervalFactor": 1,
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -683,8 +676,7 @@
           "refId": "A",
           "step": 40,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         },
         {
@@ -694,8 +686,7 @@
           "legendFormat": "hits: denial",
           "refId": "D",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -799,8 +790,7 @@
           "refId": "A",
           "step": 40,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -911,8 +901,7 @@
           "refId": "A",
           "step": 60,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -1014,8 +1003,7 @@
           "refId": "A",
           "step": 40,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -1130,8 +1118,7 @@
           "refId": "A",
           "step": 60,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         },
         {
@@ -1142,8 +1129,7 @@
           "refId": "B",
           "step": 60,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         },
         {
@@ -1154,8 +1140,7 @@
           "refId": "C",
           "step": 60,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -1274,8 +1259,7 @@
           "refId": "A",
           "step": 40,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         },
         {
@@ -1286,8 +1270,7 @@
           "refId": "B",
           "step": 40,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         },
         {
@@ -1299,8 +1282,7 @@
           "refId": "C",
           "step": 40,
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],

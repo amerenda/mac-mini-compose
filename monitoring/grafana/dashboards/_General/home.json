@@ -26,8 +26,7 @@
       "type": "gauge",
       "title": "GPU VRAM",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -79,8 +78,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "llm_agent_gpu_vram_utilization_pct",
           "legendFormat": "{{node}}",
@@ -93,8 +91,7 @@
       "type": "stat",
       "title": "VRAM Free",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -147,8 +144,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "llm_agent_gpu_vram_total_bytes - llm_agent_gpu_vram_used_bytes",
           "legendFormat": "{{node}}",
@@ -161,8 +157,7 @@
       "type": "stat",
       "title": "k3s Cluster",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -264,8 +259,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_node_status_condition{condition=\"Ready\",status=\"true\"})",
           "legendFormat": "Nodes Ready",
@@ -274,8 +268,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
           "legendFormat": "CPU Free (cores)",
@@ -284,8 +277,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(node_memory_MemAvailable_bytes)",
           "legendFormat": "Memory Free",
@@ -294,8 +286,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(node_filesystem_avail_bytes{mountpoint=\"/\",fstype!=\"tmpfs\"})",
           "legendFormat": "Disk Free",
@@ -308,8 +299,7 @@
       "type": "text",
       "title": "Komodo",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -346,8 +336,7 @@
       "type": "stat",
       "title": "ArgoCD",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -425,8 +414,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\"argocd.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -438,8 +426,7 @@
       "type": "stat",
       "title": "Ecdysis",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -517,8 +504,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"ecdysis\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -530,8 +516,7 @@
       "type": "stat",
       "title": "LLM Manager",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -609,8 +594,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"llm-manager\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -622,8 +606,7 @@
       "type": "stat",
       "title": "Pi-hole",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -701,8 +684,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"pihole\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -714,8 +696,7 @@
       "type": "stat",
       "title": "UniFi",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -793,8 +774,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"unifi-network-application\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -806,8 +786,7 @@
       "type": "stat",
       "title": "CI Runners",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -875,8 +854,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -888,8 +866,7 @@
       "type": "stat",
       "title": "Traefik",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -967,8 +944,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\"infra-traefik.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -980,8 +956,7 @@
       "type": "stat",
       "title": "CoreDNS",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1059,8 +1034,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"kube-system\",pod=~\"coredns.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1072,8 +1046,7 @@
       "type": "stat",
       "title": "BIND9",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1151,8 +1124,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\"bind9.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1164,8 +1136,7 @@
       "type": "stat",
       "title": "MetalLB",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1243,8 +1214,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"metallb-system\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1256,8 +1226,7 @@
       "type": "stat",
       "title": "Longhorn",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1335,8 +1304,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\"longhorn-manager.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1348,8 +1316,7 @@
       "type": "stat",
       "title": "cert-manager",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1427,8 +1394,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\"infra-cert-manager-[^w].*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1440,8 +1406,7 @@
       "type": "stat",
       "title": "External DNS",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1519,8 +1484,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\"infra-external-dns.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1532,8 +1496,7 @@
       "type": "stat",
       "title": "External Secrets",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1611,8 +1574,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\"infra-external-secrets-[^w].*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1624,8 +1586,7 @@
       "type": "stat",
       "title": "Tailscale",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1703,8 +1664,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\"tailscale.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1716,8 +1676,7 @@
       "type": "stat",
       "title": "Flannel",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1795,8 +1754,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"kube-system\",pod=~\"kube-flannel.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1808,8 +1766,7 @@
       "type": "stat",
       "title": "Reloader",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1887,8 +1844,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\",pod=~\".*reloader.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",
@@ -1900,8 +1856,7 @@
       "type": "stat",
       "title": "Prometheus",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 2,
@@ -1979,8 +1934,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"monitoring\",pod=~\"prometheus-infra.*\",phase=\"Running\"}) OR vector(0)",
           "legendFormat": "",

@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 import yaml
@@ -95,6 +97,9 @@ def main() -> None:
         lines.append("")
     prov_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     print(f"# Wrote {written} dashboard JSON files, providers -> {prov_path}")
+
+    strip_script = Path(__file__).resolve().parent / "strip-grafana-prometheus-datasource-uid.py"
+    subprocess.run([sys.executable, str(strip_script)], check=True)
 
 
 if __name__ == "__main__":

@@ -27,8 +27,7 @@
       "title": "Pod Running",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -77,8 +76,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\".*reloader.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -91,8 +89,7 @@
       "title": "Restarts (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -141,8 +138,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\".*reloader.*\"}[24h]))",
           "legendFormat": "",
@@ -155,8 +151,7 @@
       "title": "Reloader Triggered Reloads",
       "description": "Total ConfigMap/Secret change reloads performed by Reloader",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -232,8 +227,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "reloader_reloads_total",
           "legendFormat": "{{success}}",
@@ -248,8 +242,7 @@
       "title": "Watched Resources",
       "description": "Number of ConfigMaps and Secrets being watched",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -325,8 +318,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "reloader_watches",
           "legendFormat": "{{type}}",
@@ -354,8 +346,7 @@
       "title": "CPU Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -431,8 +422,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\".*reloader.*\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}}",
@@ -447,8 +437,7 @@
       "title": "Memory Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -524,8 +513,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\".*reloader.*\",container!=\"\"}) by (container)",
           "legendFormat": "{{container}}",

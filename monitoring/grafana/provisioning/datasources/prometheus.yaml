@@ -1,13 +1,9 @@
 apiVersion: 1
 
-# Drop any existing Prometheus row first so a stale uid/id from an older Grafana never blocks provisioned uid=prometheus.
-deleteDatasources:
-  - name: Prometheus
-    orgId: 1
-
+# No fixed uid: Grafana 12.x can fail provisioning with uid=prometheus + SQLite (see grafana/grafana#110740).
+# Dashboards use type-only Prometheus references; the default datasource below is resolved automatically.
 datasources:
   - name: Prometheus
-    uid: prometheus
     orgId: 1
     type: prometheus
     access: proxy

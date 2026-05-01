@@ -27,8 +27,7 @@
       "title": "Pod Running",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -77,8 +76,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"unifi-network-application\", phase=\"Running\"})",
           "legendFormat": "",
@@ -91,8 +89,7 @@
       "title": "Uptime",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -141,8 +138,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "time() - max(kube_pod_start_time{namespace=\"unifi-network-application\"})",
           "legendFormat": "",
@@ -155,8 +151,7 @@
       "title": "Restarts (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -205,8 +200,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"unifi-network-application\"}[24h]))",
           "legendFormat": "",
@@ -232,8 +226,7 @@
       "title": "Running Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -282,8 +275,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"unifi-network-application\", phase=\"Running\"})",
           "legendFormat": "",
@@ -296,8 +288,7 @@
       "title": "Restarts (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -350,8 +341,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"unifi-network-application\"}[24h]))",
           "legendFormat": "",
@@ -364,8 +354,7 @@
       "title": "Containers Ready",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -414,8 +403,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_status_ready{namespace=\"unifi-network-application\"})",
           "legendFormat": "",
@@ -441,8 +429,7 @@
       "title": "CPU Usage",
       "description": "CPU usage vs limits",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -518,8 +505,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"unifi-network-application\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}}",
@@ -529,8 +515,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"unifi-network-application\",resource=\"cpu\"}) by (container)",
           "legendFormat": "{{container}} limit",
@@ -545,8 +530,7 @@
       "title": "Memory Usage",
       "description": "Memory usage vs limits",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -622,8 +606,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"unifi-network-application\",container!=\"\"}) by (container)",
           "legendFormat": "{{container}}",
@@ -633,8 +616,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"unifi-network-application\",resource=\"memory\"}) by (container)",
           "legendFormat": "{{container}} limit",
@@ -649,8 +631,7 @@
       "title": "Network I/O",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -726,8 +707,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"unifi-network-application\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} rx",
@@ -737,8 +717,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_bytes_total{namespace=\"unifi-network-application\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} tx",
@@ -753,8 +732,7 @@
       "title": "Disk I/O",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -830,8 +808,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_fs_writes_bytes_total{namespace=\"unifi-network-application\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}} write",
@@ -841,8 +818,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_fs_reads_bytes_total{namespace=\"unifi-network-application\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}} read",
@@ -870,8 +846,7 @@
       "title": "PVC Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -947,8 +922,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "kubelet_volume_stats_used_bytes{namespace=\"unifi-network-application\"}",
           "legendFormat": "Used",
@@ -958,8 +932,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "kubelet_volume_stats_capacity_bytes{namespace=\"unifi-network-application\"}",
           "legendFormat": "Capacity",
@@ -973,8 +946,7 @@
       "type": "gauge",
       "title": "PVC Usage %",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 5,
@@ -1026,8 +998,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "kubelet_volume_stats_used_bytes{namespace=\"unifi-network-application\"} / kubelet_volume_stats_capacity_bytes{namespace=\"unifi-network-application\"}",
           "legendFormat": "",

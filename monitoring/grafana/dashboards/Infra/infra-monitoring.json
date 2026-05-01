@@ -27,8 +27,7 @@
       "title": "Prometheus Uptime",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -77,8 +76,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "time() - process_start_time_seconds{job=~\".*prometheus.*\",namespace=\"monitoring\"}",
           "legendFormat": "",
@@ -91,8 +89,7 @@
       "title": "Active Targets",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -137,8 +134,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(up{job=~\".*\"})",
           "legendFormat": "",
@@ -151,8 +147,7 @@
       "title": "Targets Down",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -201,8 +196,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(up{job=~\".*\"} == 0)",
           "legendFormat": "",
@@ -215,8 +209,7 @@
       "title": "Active Series",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -261,8 +254,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "prometheus_tsdb_head_series{namespace=\"monitoring\"}",
           "legendFormat": "",
@@ -275,8 +267,7 @@
       "title": "TSDB Size",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -329,8 +320,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "prometheus_tsdb_storage_blocks_bytes{namespace=\"monitoring\"}",
           "legendFormat": "",
@@ -343,8 +333,7 @@
       "title": "Scrape Failures (1h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -393,8 +382,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(prometheus_target_scrape_pools_failed_total{namespace=\"monitoring\"}[1h]))",
           "legendFormat": "",
@@ -407,8 +395,7 @@
       "title": "TSDB Head Series",
       "description": "Active time series in TSDB head block",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -484,8 +471,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "prometheus_tsdb_head_series{namespace=\"monitoring\"}",
           "legendFormat": "Head series",
@@ -500,8 +486,7 @@
       "title": "Samples Ingested Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -577,8 +562,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(prometheus_tsdb_head_samples_appended_total{namespace=\"monitoring\"}[5m])",
           "legendFormat": "Samples/s",
@@ -593,8 +577,7 @@
       "title": "Scrape Duration",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -670,8 +653,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "prometheus_target_interval_length_seconds{quantile=\"0.99\",namespace=\"monitoring\"}",
           "legendFormat": "p99",
@@ -681,8 +663,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "prometheus_target_interval_length_seconds{quantile=\"0.5\",namespace=\"monitoring\"}",
           "legendFormat": "p50",
@@ -697,8 +678,7 @@
       "title": "Query Duration",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -774,8 +754,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "histogram_quantile(0.99, rate(prometheus_engine_query_duration_histogram_seconds_bucket{namespace=\"monitoring\"}[5m]))",
           "legendFormat": "p99",
@@ -785,8 +764,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "histogram_quantile(0.50, rate(prometheus_engine_query_duration_histogram_seconds_bucket{namespace=\"monitoring\"}[5m]))",
           "legendFormat": "p50",
@@ -801,8 +779,7 @@
       "title": "TSDB Compactions",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -878,8 +855,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(prometheus_tsdb_compactions_total{namespace=\"monitoring\"}[5m])",
           "legendFormat": "Compactions",
@@ -889,8 +865,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(prometheus_tsdb_compactions_failed_total{namespace=\"monitoring\"}[5m])",
           "legendFormat": "Failed",
@@ -905,8 +880,7 @@
       "title": "WAL & Checkpoint",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -982,8 +956,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "prometheus_tsdb_wal_storage_size_bytes{namespace=\"monitoring\"}",
           "legendFormat": "WAL size",
@@ -993,8 +966,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(prometheus_tsdb_checkpoint_creations_total{namespace=\"monitoring\"}[5m])",
           "legendFormat": "Checkpoints/s",
@@ -1022,8 +994,7 @@
       "title": "Grafana CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1099,8 +1070,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"monitoring\",container=\"grafana\"}[5m]))",
           "legendFormat": "CPU",
@@ -1115,8 +1085,7 @@
       "title": "Grafana Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1192,8 +1161,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"monitoring\",container=\"grafana\"})",
           "legendFormat": "Memory",
@@ -1221,8 +1189,7 @@
       "title": "Prometheus CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1298,8 +1265,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"monitoring\",container=\"prometheus\"}[5m]))",
           "legendFormat": "CPU",
@@ -1309,8 +1275,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"monitoring\",container=\"prometheus\",resource=\"cpu\"})",
           "legendFormat": "Limit",
@@ -1325,8 +1290,7 @@
       "title": "Prometheus Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1402,8 +1366,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"monitoring\",container=\"prometheus\"})",
           "legendFormat": "Memory",
@@ -1413,8 +1376,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"monitoring\",container=\"prometheus\",resource=\"memory\"})",
           "legendFormat": "Limit",

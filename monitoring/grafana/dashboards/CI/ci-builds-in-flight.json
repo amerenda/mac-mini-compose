@@ -25,8 +25,7 @@
       "type": "stat",
       "title": "Active Runner Pods",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -68,8 +67,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Running\"}) or vector(0)",
           "legendFormat": "running",
@@ -81,8 +79,7 @@
       "type": "stat",
       "title": "Pending Runner Pods",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -124,8 +121,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Pending\"}) or vector(0)",
           "legendFormat": "pending",
@@ -137,8 +133,7 @@
       "type": "stat",
       "title": "Succeeded (last 1h)",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -172,8 +167,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Succeeded\"}) or vector(0)",
           "legendFormat": "succeeded",
@@ -185,8 +179,7 @@
       "type": "stat",
       "title": "Failed Pods",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -224,8 +217,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Failed\"}) or vector(0)",
           "legendFormat": "failed",
@@ -237,8 +229,7 @@
       "type": "stat",
       "title": "Runner Namespaces",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -272,8 +263,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(count by (namespace) (kube_pod_info{namespace=~\"arc-runners.*\"}))",
           "legendFormat": "",
@@ -285,8 +275,7 @@
       "type": "stat",
       "title": "Total Containers",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -320,8 +309,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_container_info{namespace=~\"arc-runners.*\"}) or vector(0)",
           "legendFormat": "",
@@ -346,8 +334,7 @@
       "title": "Runner Pod Count Over Time",
       "description": "Tracks runner scaling - should scale to 0 when idle",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -388,8 +375,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Running\"}) or vector(0)",
           "legendFormat": "Running",
@@ -397,8 +383,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Pending\"}) or vector(0)",
           "legendFormat": "Pending",
@@ -406,8 +391,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\", phase=\"Succeeded\"}) or vector(0)",
           "legendFormat": "Succeeded",
@@ -420,8 +404,7 @@
       "title": "Pod Creation Rate (pods/min)",
       "description": "Rate of new pods being created in runner namespaces",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -458,8 +441,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(kube_pod_created{namespace=~\"arc-runners.*\"}[5m])) by (namespace)",
           "legendFormat": "{{namespace}}",
@@ -483,8 +465,7 @@
       "type": "timeseries",
       "title": "Runner Pod CPU Requests",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -521,8 +502,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum by (pod) (kube_pod_container_resource_requests{namespace=~\"arc-runners.*\",resource=\"cpu\"})",
           "legendFormat": "{{pod}}",
@@ -534,8 +514,7 @@
       "type": "timeseries",
       "title": "Runner Pod Memory Requests",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -572,8 +551,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum by (pod) (kube_pod_container_resource_requests{namespace=~\"arc-runners.*\",resource=\"memory\"})",
           "legendFormat": "{{pod}}",
@@ -585,8 +563,7 @@
       "type": "timeseries",
       "title": "Runner Pod Info",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -623,8 +600,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum by (pod) (kube_pod_info{namespace=~\"arc-runners.*\"}) * 0",
           "legendFormat": "{{pod}} rx",
@@ -632,8 +608,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum by (pod) (kube_pod_info{namespace=~\"arc-runners.*\"}) * 0",
           "legendFormat": "{{pod}} tx",
@@ -646,8 +621,7 @@
       "type": "timeseries",
       "title": "Running Runner Pods",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -684,8 +658,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=~\"arc-runners.*\",phase=\"Running\"})",
           "legendFormat": "Total CPU cores",
@@ -710,8 +683,7 @@
       "title": "Pod Lifecycle Duration",
       "description": "Time from pod creation to completion, estimated from container start to now for running pods",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -750,8 +722,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "time() - kube_pod_start_time{namespace=~\"arc-runners.*\"} > 0",
           "legendFormat": "{{pod}}",
@@ -763,8 +734,7 @@
       "type": "timeseries",
       "title": "Runner Pods by Namespace",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -805,8 +775,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count by (namespace) (kube_pod_info{namespace=~\"arc-runners.*\"})",
           "legendFormat": "{{namespace}}",
@@ -830,8 +799,7 @@
       "type": "timeseries",
       "title": "Container Restarts in Runner Namespaces",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -867,8 +835,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "increase(kube_pod_container_status_restarts_total{namespace=~\"arc-runners.*\"}[1h])",
           "legendFormat": "{{namespace}}/{{pod}}",
@@ -880,8 +847,7 @@
       "type": "timeseries",
       "title": "Waiting Containers (CrashLoopBackOff / Error)",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -917,8 +883,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "kube_pod_container_status_waiting_reason{namespace=~\"arc-runners.*\", reason!=\"ContainerCreating\"}",
           "legendFormat": "{{pod}} {{reason}}",

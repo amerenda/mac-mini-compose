@@ -27,8 +27,7 @@
       "title": "Controller Pod",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -77,8 +76,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"arc-systems\", phase=\"Running\"})",
           "legendFormat": "",
@@ -91,8 +89,7 @@
       "title": "Restarts (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -141,8 +138,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"arc-systems\"}[24h]))",
           "legendFormat": "",
@@ -155,8 +151,7 @@
       "title": "Controller CPU Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -232,8 +227,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"arc-systems\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}}",
@@ -248,8 +242,7 @@
       "title": "Controller Memory Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -325,8 +318,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"arc-systems\",container!=\"\"}) by (container)",
           "legendFormat": "{{container}}",
@@ -354,8 +346,7 @@
       "title": "Reconcile Rate",
       "description": "Controller reconciliation rate",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -431,8 +422,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(controller_runtime_reconcile_total{namespace=\"arc-systems\"}[5m])",
           "legendFormat": "{{controller}} {{result}}",
@@ -447,8 +437,7 @@
       "title": "Reconcile Duration",
       "description": "Controller reconciliation latency",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -524,8 +513,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "histogram_quantile(0.95, rate(controller_runtime_reconcile_time_seconds_bucket{namespace=\"arc-systems\"}[5m]))",
           "legendFormat": "p95",
@@ -535,8 +523,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "histogram_quantile(0.50, rate(controller_runtime_reconcile_time_seconds_bucket{namespace=\"arc-systems\"}[5m]))",
           "legendFormat": "p50",
@@ -551,8 +538,7 @@
       "title": "Work Queue Depth",
       "description": "Items waiting to be reconciled",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -628,8 +614,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "workqueue_depth{namespace=\"arc-systems\"}",
           "legendFormat": "{{controller}}",
@@ -644,8 +629,7 @@
       "title": "Work Queue Latency",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -721,8 +705,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "histogram_quantile(0.95, rate(workqueue_queue_duration_seconds_bucket{namespace=\"arc-systems\"}[5m]))",
           "legendFormat": "p95 {{name}}",

@@ -27,8 +27,7 @@
       "title": "Running Workflows",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -73,8 +72,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "argo_workflows_count{status=\"Running\"}",
           "legendFormat": "",
@@ -87,8 +85,7 @@
       "title": "Succeeded (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -133,8 +130,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(argo_workflows_count{status=\"Succeeded\"}[24h]))",
           "legendFormat": "",
@@ -147,8 +143,7 @@
       "title": "Failed (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -197,8 +192,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(argo_workflows_count{status=\"Failed\"}[24h]))",
           "legendFormat": "",
@@ -211,8 +205,7 @@
       "title": "Errored (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -261,8 +254,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(argo_workflows_count{status=\"Error\"}[24h]))",
           "legendFormat": "",
@@ -288,8 +280,7 @@
       "title": "Workflow Duration p50/p95",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -365,8 +356,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "histogram_quantile(0.5, sum(rate(argo_workflow_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "p50",
@@ -376,8 +366,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(argo_workflow_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "p95",
@@ -392,8 +381,7 @@
       "title": "Workflow Queue Length",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -469,8 +457,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "argo_workflows_queue_depth",
           "legendFormat": "depth",
@@ -498,8 +485,7 @@
       "title": "Pods Created Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -575,8 +561,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(argo_workflows_pods_count[5m])) by (status)",
           "legendFormat": "{{status}}",
@@ -591,8 +576,7 @@
       "title": "Step Duration p95",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -668,8 +652,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(argo_step_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "p95",
@@ -697,8 +680,7 @@
       "title": "Error Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -774,8 +756,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(argo_workflows_error_count[5m])) by (type)",
           "legendFormat": "{{type}}",
@@ -790,8 +771,7 @@
       "title": "K8s API Errors",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -867,8 +847,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(argo_workflows_k8s_request_total{status_code=~\"5..\"}[5m]))",
           "legendFormat": "5xx errors",

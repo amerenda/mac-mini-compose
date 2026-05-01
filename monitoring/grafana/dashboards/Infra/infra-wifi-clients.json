@@ -33,8 +33,7 @@
       "type": "stat",
       "title": "Connected Clients",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -73,8 +72,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(unifipoller_client_uptime_seconds)",
           "refId": "A"
@@ -85,8 +83,7 @@
       "type": "stat",
       "title": "AP Uptime",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -129,8 +126,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "unifipoller_device_uptime_seconds{name=\"UAP-AC-Lite\"}",
           "refId": "A"
@@ -141,8 +137,7 @@
       "type": "stat",
       "title": "2.4GHz Clients",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -181,8 +176,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(unifipoller_client_uptime_seconds{radio_proto=\"ng\"})",
           "refId": "A"
@@ -193,8 +187,7 @@
       "type": "stat",
       "title": "5GHz Clients",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -233,8 +226,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(unifipoller_client_uptime_seconds{radio_proto=\"ac\"})",
           "refId": "A"
@@ -245,8 +237,7 @@
       "type": "stat",
       "title": "Total Download Rate",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -285,8 +276,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(unifipoller_client_receive_rate_bytes)",
           "refId": "A"
@@ -297,8 +287,7 @@
       "type": "stat",
       "title": "Total Upload Rate",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -337,8 +326,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(unifipoller_client_transmit_rate_bytes)",
           "refId": "A"
@@ -361,8 +349,7 @@
       "type": "timeseries",
       "title": "Download Rate by Client",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 10,
@@ -430,8 +417,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "unifipoller_client_receive_rate_bytes",
           "legendFormat": "{{name}}",
@@ -444,8 +430,7 @@
       "type": "timeseries",
       "title": "Upload Rate by Client",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 10,
@@ -513,8 +498,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "unifipoller_client_transmit_rate_bytes",
           "legendFormat": "{{name}}",
@@ -527,8 +511,7 @@
       "type": "timeseries",
       "title": "Total Bandwidth (All Clients Stacked)",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -606,8 +589,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(unifipoller_client_receive_rate_bytes)",
           "legendFormat": "Download",
@@ -616,8 +598,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(unifipoller_client_transmit_rate_bytes)",
           "legendFormat": "Upload",
@@ -642,8 +623,7 @@
       "type": "bargauge",
       "title": "Total Downloaded by Client",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -687,8 +667,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "topk(15, unifipoller_client_receive_bytes_total)",
           "legendFormat": "{{name}}",
@@ -701,8 +680,7 @@
       "type": "bargauge",
       "title": "Total Uploaded by Client",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -746,8 +724,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "topk(15, unifipoller_client_transmit_bytes_total)",
           "legendFormat": "{{name}}",
@@ -772,8 +749,7 @@
       "type": "timeseries",
       "title": "Client Signal Strength (RSSI)",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -848,8 +824,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "unifipoller_client_rssi_db",
           "legendFormat": "{{name}}",
@@ -862,8 +837,7 @@
       "type": "timeseries",
       "title": "Client Satisfaction",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -940,8 +914,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "unifipoller_client_satisfaction_ratio",
           "legendFormat": "{{name}}",
@@ -966,8 +939,7 @@
       "type": "timeseries",
       "title": "AP CPU & Memory",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1034,8 +1006,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "unifipoller_device_cpu_utilization_ratio",
           "legendFormat": "CPU",
@@ -1044,8 +1015,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "unifipoller_device_memory_utilization_ratio",
           "legendFormat": "Memory",
@@ -1058,8 +1028,7 @@
       "type": "timeseries",
       "title": "Channel Utilization",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1126,8 +1095,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "unifipoller_device_radio_channel_utilization_total_ratio",
           "legendFormat": "Ch {{channel}} ({{radio_proto}})",

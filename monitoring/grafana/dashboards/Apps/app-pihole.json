@@ -99,8 +99,7 @@
           "legendFormat": "{{ legend }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -125,8 +124,7 @@
       ],
       "valueName": "current",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -196,8 +194,7 @@
           "intervalFactor": 1,
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -217,8 +214,7 @@
       ],
       "valueName": "avg",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -286,8 +282,7 @@
           "intervalFactor": 1,
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -307,8 +302,7 @@
       ],
       "valueName": "avg",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -348,8 +342,7 @@
           "legendFormat": "{{ domain }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -360,8 +353,7 @@
       "type": "grafana-piechart-panel",
       "valueName": "current",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -401,8 +393,7 @@
           "legendFormat": "{{ type }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -413,8 +404,7 @@
       "type": "grafana-piechart-panel",
       "valueName": "current",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -453,8 +443,7 @@
           "legendFormat": "{{ domain }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -465,8 +454,7 @@
       "type": "grafana-piechart-panel",
       "valueName": "current",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -513,8 +501,7 @@
           "legendFormat": "{{ job }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -560,8 +547,7 @@
         "alignLevel": null
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -609,8 +595,7 @@
           "legendFormat": "{{ job }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -656,8 +641,7 @@
         "alignLevel": null
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -707,8 +691,7 @@
           "legendFormat": "{{ domain }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -719,8 +702,7 @@
       "transparent": true,
       "type": "table",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -771,8 +753,7 @@
           "legendFormat": "{{ domain }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -783,8 +764,7 @@
       "transparent": true,
       "type": "table",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -831,8 +811,7 @@
           "legendFormat": "{{ job }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -878,8 +857,7 @@
         "alignLevel": null
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -924,8 +902,7 @@
           "legendFormat": "Queries cached",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         },
         {
@@ -935,8 +912,7 @@
           "legendFormat": "Queries forwarded",
           "refId": "B",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -982,8 +958,7 @@
         "alignLevel": null
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -1028,8 +1003,7 @@
           "legendFormat": "{{ type }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -1075,8 +1049,7 @@
         "alignLevel": null
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -1121,8 +1094,7 @@
           "legendFormat": "{{ destination }}",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -1168,8 +1140,7 @@
         "alignLevel": null
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     },
     {
@@ -1216,8 +1187,7 @@
           "legendFormat": "",
           "refId": "A",
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           }
         }
       ],
@@ -1263,8 +1233,7 @@
         "alignLevel": null
       },
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       }
     }
   ],

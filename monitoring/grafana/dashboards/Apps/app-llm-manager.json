@@ -26,8 +26,7 @@
       "title": "Active Runners",
       "id": 2,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -74,8 +73,7 @@
       "title": "Queue Depth",
       "id": 3,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -126,8 +124,7 @@
       "title": "Active Jobs",
       "id": 4,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -170,8 +167,7 @@
       "title": "Models Loaded",
       "id": 5,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -214,8 +210,7 @@
       "title": "VRAM Used by Models",
       "id": 6,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -267,8 +262,7 @@
       "title": "Registered Apps",
       "id": 7,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -323,8 +317,7 @@
       "title": "Queue Depth Over Time",
       "id": 11,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -380,8 +373,7 @@
       "title": "Job Throughput (jobs/min)",
       "id": 12,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -432,8 +424,7 @@
       "title": "Inference Latency (p50 / p95 / p99)",
       "id": 13,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -501,8 +492,7 @@
       "title": "Tokens/min by Model",
       "id": 21,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -553,8 +543,7 @@
       "title": "Model Load Time",
       "id": 22,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -614,8 +603,7 @@
       "title": "Runner Staleness (seconds since heartbeat)",
       "id": 31,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -677,8 +665,7 @@
       "title": "GPU VRAM (per agent)",
       "id": 32,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -728,8 +715,7 @@
       "title": "Agent Request Duration",
       "id": 33,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -787,8 +773,7 @@
       "title": "Job Errors by Model",
       "id": 41,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -830,8 +815,7 @@
       "title": "Submission Rejections",
       "id": 42,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -873,8 +857,7 @@
       "title": "Backend API Errors",
       "id": 43,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -937,8 +920,7 @@
       "title": "Agents Running",
       "id": 51,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -981,8 +963,7 @@
       "title": "Heartbeat Duration by Slot",
       "id": 52,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -1028,8 +1009,7 @@
       "title": "LLM Call Latency by Slot (p95)",
       "id": 53,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -1075,8 +1055,7 @@
       "title": "LLM Calls (success / timeout / error)",
       "id": 54,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -1128,8 +1107,7 @@
       "title": "Posts Created & Heartbeats",
       "id": 55,
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 7,

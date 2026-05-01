@@ -26,8 +26,7 @@
       "type": "stat",
       "title": "Up",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -90,8 +89,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "up{job=\"mac-mini-mongodb\"}",
           "legendFormat": "",
@@ -103,8 +101,7 @@
       "type": "stat",
       "title": "MongoDB Version",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -149,8 +146,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "mongodb_version_info{job=\"mac-mini-mongodb\"}",
           "legendFormat": "{{mongodb}}",
@@ -162,8 +158,7 @@
       "type": "stat",
       "title": "Current Connections",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -216,8 +211,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "mongodb_ss_connections{job=\"mac-mini-mongodb\",conn_type=\"current\"}",
           "legendFormat": "",
@@ -229,8 +223,7 @@
       "type": "stat",
       "title": "Available Connections",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -283,8 +276,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "mongodb_ss_connections{job=\"mac-mini-mongodb\",conn_type=\"available\"}",
           "legendFormat": "",
@@ -309,8 +301,7 @@
       "type": "timeseries",
       "title": "Opcounters Rate",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -386,8 +377,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_opcounters_insert{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "insert",
@@ -395,8 +385,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_opcounters_query{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "query",
@@ -404,8 +393,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_opcounters_update{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "update",
@@ -413,8 +401,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_opcounters_delete{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "delete",
@@ -422,8 +409,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_opcounters_getmore{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "getmore",
@@ -431,8 +417,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_opcounters_command{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "command",
@@ -457,8 +442,7 @@
       "type": "timeseries",
       "title": "Memory Usage",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -534,8 +518,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "mongodb_ss_mem_resident{job=\"mac-mini-mongodb\"}",
           "legendFormat": "resident",
@@ -543,8 +526,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "mongodb_ss_mem_virtual{job=\"mac-mini-mongodb\"}",
           "legendFormat": "virtual",
@@ -552,8 +534,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "mongodb_ss_mem_mapped{job=\"mac-mini-mongodb\"}",
           "legendFormat": "mapped",
@@ -578,8 +559,7 @@
       "type": "timeseries",
       "title": "Connections Over Time",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -655,8 +635,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "mongodb_ss_connections{job=\"mac-mini-mongodb\",conn_type=\"current\"}",
           "legendFormat": "current",
@@ -664,8 +643,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "mongodb_ss_connections{job=\"mac-mini-mongodb\",conn_type=\"available\"}",
           "legendFormat": "available",
@@ -690,8 +668,7 @@
       "type": "stat",
       "title": "Data Size",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -736,8 +713,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(mongodb_dbstats_dataSize{job=\"mac-mini-mongodb\"})",
           "legendFormat": "",
@@ -749,8 +725,7 @@
       "type": "stat",
       "title": "Storage Size",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -795,8 +770,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(mongodb_dbstats_storageSize{job=\"mac-mini-mongodb\"})",
           "legendFormat": "",
@@ -808,8 +782,7 @@
       "type": "stat",
       "title": "Index Size",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -854,8 +827,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(mongodb_dbstats_indexSize{job=\"mac-mini-mongodb\"})",
           "legendFormat": "",
@@ -867,8 +839,7 @@
       "type": "stat",
       "title": "Collections",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -913,8 +884,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(mongodb_dbstats_collections{job=\"mac-mini-mongodb\"})",
           "legendFormat": "",
@@ -939,8 +909,7 @@
       "type": "timeseries",
       "title": "Network Traffic",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1016,8 +985,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_network_bytesIn{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "bytes in",
@@ -1025,8 +993,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_network_bytesOut{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "bytes out",
@@ -1038,8 +1005,7 @@
       "type": "timeseries",
       "title": "Network Requests",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1115,8 +1081,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(mongodb_ss_network_numRequests{job=\"mac-mini-mongodb\"}[5m])",
           "legendFormat": "requests",

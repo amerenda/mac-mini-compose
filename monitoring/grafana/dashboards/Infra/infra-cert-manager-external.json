@@ -27,8 +27,7 @@
       "title": "Total Certificates",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -73,8 +72,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(certmanager_certificate_ready_status)",
           "legendFormat": "",
@@ -87,8 +85,7 @@
       "title": "Certificates Not Ready",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -137,8 +134,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(certmanager_certificate_ready_status{condition=\"False\"})",
           "legendFormat": "",
@@ -151,8 +147,7 @@
       "title": "Certificate Expiration (days)",
       "description": "Days until certificate expiration. Renew threshold is typically 30 days.",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -228,8 +223,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "(certmanager_certificate_expiration_timestamp_seconds - time()) / 86400",
           "legendFormat": "{{name}} ({{namespace}})",
@@ -244,8 +238,7 @@
       "title": "Certificate Ready Status",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -321,8 +314,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "certmanager_certificate_ready_status{condition=\"True\"}",
           "legendFormat": "{{name}} ready",
@@ -337,8 +329,7 @@
       "title": "Certificate Renewal Attempts",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -414,8 +405,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(certmanager_certificate_renewal_timestamp_seconds[5m])",
           "legendFormat": "{{name}}",

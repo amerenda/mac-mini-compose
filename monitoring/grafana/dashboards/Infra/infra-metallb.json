@@ -27,8 +27,7 @@
       "title": "Configured Pools",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -73,8 +72,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(metallb_allocator_addresses_total)",
           "legendFormat": "",
@@ -87,8 +85,7 @@
       "title": "Allocated IPs",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -133,8 +130,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(metallb_allocator_addresses_in_use_total)",
           "legendFormat": "",
@@ -147,8 +143,7 @@
       "title": "Available IPs",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -201,8 +196,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(metallb_allocator_addresses_total) - sum(metallb_allocator_addresses_in_use_total)",
           "legendFormat": "",
@@ -215,8 +209,7 @@
       "title": "Services (LoadBalancer)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -261,8 +254,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_service_spec_type{type=\"LoadBalancer\"})",
           "legendFormat": "",
@@ -275,8 +267,7 @@
       "title": "IP Allocation Over Time",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -352,8 +343,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "metallb_allocator_addresses_in_use_total",
           "legendFormat": "{{pool}} in use",
@@ -363,8 +353,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "metallb_allocator_addresses_total",
           "legendFormat": "{{pool}} total",
@@ -379,8 +368,7 @@
       "title": "ARP/NDP Requests",
       "description": "Layer2 ARP gratuitous announcement rate",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -456,8 +444,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(metallb_layer2_requests_received{namespace=\"metallb-system\"}[5m])",
           "legendFormat": "{{service}} received",
@@ -467,8 +454,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "rate(metallb_layer2_responses_sent{namespace=\"metallb-system\"}[5m])",
           "legendFormat": "{{service}} sent",
@@ -509,8 +495,7 @@
       "title": "Running Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -559,8 +544,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"metallb-system\", phase=\"Running\"})",
           "legendFormat": "",
@@ -573,8 +557,7 @@
       "title": "Restarts (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -627,8 +610,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"metallb-system\"}[24h]))",
           "legendFormat": "",
@@ -641,8 +623,7 @@
       "title": "Containers Ready",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -691,8 +672,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_status_ready{namespace=\"metallb-system\"})",
           "legendFormat": "",
@@ -718,8 +698,7 @@
       "title": "CPU Usage",
       "description": "CPU usage vs limits",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -795,8 +774,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"metallb-system\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}}",
@@ -806,8 +784,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"metallb-system\",resource=\"cpu\"}) by (container)",
           "legendFormat": "{{container}} limit",
@@ -822,8 +799,7 @@
       "title": "Memory Usage",
       "description": "Memory usage vs limits",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -899,8 +875,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"metallb-system\",container!=\"\"}) by (container)",
           "legendFormat": "{{container}}",
@@ -910,8 +885,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(kube_pod_container_resource_limits{namespace=\"metallb-system\",resource=\"memory\"}) by (container)",
           "legendFormat": "{{container}} limit",
@@ -926,8 +900,7 @@
       "title": "Network I/O",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1003,8 +976,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"metallb-system\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} rx",
@@ -1014,8 +986,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_bytes_total{namespace=\"metallb-system\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} tx",
@@ -1030,8 +1001,7 @@
       "title": "Disk I/O",
       "description": "",
       "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
+        "type": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -1107,8 +1077,7 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_fs_writes_bytes_total{namespace=\"metallb-system\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}} write",
@@ -1118,8 +1087,7 @@
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
+            "type": "prometheus"
           },
           "expr": "sum(rate(container_fs_reads_bytes_total{namespace=\"metallb-system\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}} read",
