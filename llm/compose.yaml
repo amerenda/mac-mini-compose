@@ -1,0 +1,26 @@
+# llm-manager agent on Mac Mini — pairs with native Ollama (Metal, host :11434).
+# Docker only runs the agent; OLLAMA_CONTAINER is unset so the agent skips compose-Ollama checks.
+services:
+  llm-agent:
+    image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
+    container_name: llm-agent
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    environment:
+      OLLAMA_URL: http://host.docker.internal:11434
+      OLLAMA_CONTAINER: ""
+      COMPOSE_PROFILE: ""
+      COMPOSE_DIR: ""
+      MODEL_STORAGE_PATH: /host-ollama-models
+    volumes:
+      - llm-agent-tls:/data/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}:/host-ollama-models:ro
+
+volumes:
+  llm-agent-tls:

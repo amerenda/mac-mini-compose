@@ -38,6 +38,14 @@ the Mac Mini — run the playbook instead.
 | runner-llm-agents | GitHub Actions runner for llm-agents repo |
 | runner-photos | GitHub Actions runner for photos repo |
 
+### LLM stack (`llm/compose.yaml`)
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| llm-agent | 8090 | [llm-manager](https://github.com/amerenda/llm-manager) edge agent — OpenAI-compatible API, metrics, registers with the hosted backend |
+
+Runs **only** the agent container. **Ollama stays native on macOS** (Metal); the agent reaches it at `host.docker.internal:11434`. Before the first Komodo deploy, set `BWS_LLM_AGENT_PSK_UUID` in `llm/pre-deploy.sh` to the Bitwarden Secrets Manager UUID for `llm-manager-agent-psk` (same secret the k8s `agent-psk` ExternalSecret uses). Optional overrides: copy `llm/compose.local.env.example` to `llm/compose.local.env` (e.g. `AGENT_ADDRESS` if the backend cannot reach the auto-detected IP from bridge networking).
+
 ### Komodo stack (`komodo/compose.yaml`)
 
 | Service | Port | Purpose |
@@ -82,19 +90,21 @@ Komodo + GitOps bootstrap, Tailscale, BlueBubbles install.
 ```
 GitHub push → pubhooks.amer.dev (k3s Traefik proxy) → Komodo Core (Mac Mini:9120)
                                                         ├─ /sync/.../sync    → ResourceSync executes
-                                                        ├─ /stack/.../deploy → core/automation/monitoring stack deploys
-                                                        └─ /stack/.../deploy → runners stack deploys
+                                                        ├─ /stack/<id>/deploy → core/automation/monitoring (one webhook + stack id)
+                                                        ├─ /stack/<id>/deploy → runners (different stack id)
+                                                        └─ /stack/<id>/deploy → llm (optional — separate stack id, see below)
 ```
 
 ### How it works
 
 1. Push to `amerenda/mac-mini-compose` on `main`
-2. Three GitHub webhooks fire simultaneously:
+2. GitHub webhooks fire (each URL is scoped to **one** Komodo stack id — see table below):
    - **ResourceSync webhook** (`/listener/github/sync/mac-mini-compose/sync`) — tells Komodo to re-read `resource-sync/stacks.toml` and update stack definitions
-  - **Core/Automation/Monitoring stack deploy** (`/listener/github/stack/<id>/deploy`) — triggers `docker compose up` for those stacks
-   - **Runners stack deploy** (`/listener/github/stack/<id>/deploy`) — triggers `docker compose up` for the runners stack
+   - **Per-stack deploy webhooks** (`/listener/github/stack/<stack-uuid>/deploy`) — each triggers `docker compose up` only for that stack's `file_paths`
 3. Each stack's `pre_deploy` script runs first, fetching secrets from BWS via `bws` CLI
 4. Komodo runs `docker compose up -d` with the updated compose files
+
+**Keeping `llm` isolated from other deploys:** Add the `llm` stack in `resource-sync/stacks.toml` (done in-repo), let ResourceSync pick it up, then in Komodo create a **dedicated GitHub webhook** whose path is `/listener/github/stack/<llm-stack-id>/deploy` — same HMAC secret as the others. Pushes only trigger the stacks whose webhooks you configure; the `llm` webhook does **not** deploy core, automation, monitoring, or runners. Conversely, existing deploy webhooks only touch their own stack ids, so they never pull up `llm` unless you merge those stacks in Komodo (this repo keeps them separate).
 
 ### Webhook configuration
 
@@ -107,6 +117,7 @@ IngressRoute that forwards `/listener/github/*` to the Mac Mini's Komodo Core).
 | ResourceSync | `606876027` | `.../sync/mac-mini-compose/sync` | Sync stack definitions from TOML |
 | Core/Automation/Monitoring deploy | `605400567` | `.../stack/69c4863a9781f84b58ffd7a6/deploy` | Deploy core, automation, and monitoring stacks |
 | Runners deploy | `606895878` | `.../stack/69c4863a9781f84b58ffd7a8/deploy` | Deploy runners stack |
+| LLM deploy | *(add after sync)* | `.../stack/<llm-stack-uuid>/deploy` | Deploy `llm/` only — use the stack id from Komodo UI after ResourceSync imports `stacks.toml` |
 
 All webhooks use the `komodo-dean-webhook-secret` from BWS as the HMAC secret.
 
@@ -131,7 +142,7 @@ webhook fails or is missed, the sync will still happen within 5 minutes.
 | `resource-sync/sync.toml` | Defines the ResourceSync resource itself (repo, branch, resource path) |
 | `resource-sync/stacks.toml` | Defines the managed stacks (core, automation, monitoring, runners) with pre_deploy scripts |
 
-Stack definitions: `resource-sync/stacks.toml`
+Stack definitions: `resource-sync/stacks.toml` (core, automation, monitoring, runners, llm)
 Sync definition: `resource-sync/sync.toml`
 
 ## Komodo Administration
@@ -239,6 +250,9 @@ BWS secret IDs are defined in `ansible-playbooks/group_vars/macmini_hosts.yml`.
 │   ├── compose.yaml             # 5 repo-scoped runners
 │   ├── compose.env.example      # Template for non-secret config
 │   └── entrypoint-wrapper.sh    # Reads secrets from /run/secrets into env
+├── llm/                         # llm-manager agent (native Ollama + agent container)
+│   ├── compose.yaml
+│   └── pre-deploy.sh            # BWS → llm/.env for Komodo
 ├── resource-sync/               # Komodo GitOps definitions
 │   ├── stacks.toml              # Stack definitions + pre_deploy scripts
 │   └── sync.toml                # ResourceSync self-definition

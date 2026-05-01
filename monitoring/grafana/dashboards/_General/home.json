@@ -30,7 +30,7 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 6,
+        "w": 8,
         "x": 0,
         "y": 1
       },
@@ -80,7 +80,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "llm_agent_gpu_vram_utilization_pct or vector(0)",
+          "expr": "llm_agent_gpu_vram_utilization_pct",
           "legendFormat": "{{node}}",
           "refId": "A"
         }
@@ -88,81 +88,15 @@
       "description": "VRAM utilization % per GPU node (LLM agents)"
     },
     {
-      "type": "stat",
-      "title": "VRAM free",
-      "datasource": {
-        "type": "prometheus"
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 4,
-        "x": 6,
-        "y": 1
-      },
-      "id": 3,
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 2147483648
-              },
-              {
-                "color": "green",
-                "value": 4294967296
-              }
-            ]
-          },
-          "mappings": []
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "textMode": "auto",
-        "orientation": "vertical"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus"
-          },
-          "expr": "llm_agent_gpu_vram_total_bytes - llm_agent_gpu_vram_used_bytes",
-          "legendFormat": "{{node}}",
-          "refId": "A",
-          "instant": true
-        }
-      ]
-    },
-    {
       "type": "timeseries",
-      "title": "Mac Mini \u2014 CPU usage",
+      "title": "Mac Mini \u2014 CPU detail",
       "datasource": {
         "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
-        "w": 7,
-        "x": 10,
+        "w": 8,
+        "x": 8,
         "y": 1
       },
       "id": 4,
@@ -201,23 +135,47 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"idle\"}[5m])))",
-          "legendFormat": "CPU used",
+          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"user\"}[5m])) / sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m]))",
+          "legendFormat": "user",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"system\"}[5m])) / sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m]))",
+          "legendFormat": "system",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"iowait\"}[5m])) / sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m]))",
+          "legendFormat": "iowait",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"idle\"}[5m])))",
+          "legendFormat": "total used",
+          "refId": "D"
         }
       ],
       "description": "Host CPU usage (node exporter on Mac Mini)"
     },
     {
       "type": "timeseries",
-      "title": "Mac Mini \u2014 memory available",
+      "title": "Mac Mini \u2014 memory detail",
       "datasource": {
         "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
-        "w": 7,
-        "x": 17,
+        "w": 8,
+        "x": 16,
         "y": 1
       },
       "id": 5,
@@ -257,6 +215,30 @@
           "expr": "node_memory_MemAvailable_bytes{job=\"mac-mini-node\"}",
           "legendFormat": "available",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "node_memory_MemTotal_bytes{job=\"mac-mini-node\"} - node_memory_MemAvailable_bytes{job=\"mac-mini-node\"}",
+          "legendFormat": "used",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "node_memory_Cached_bytes{job=\"mac-mini-node\"}",
+          "legendFormat": "cached",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "node_memory_Buffers_bytes{job=\"mac-mini-node\"}",
+          "legendFormat": "buffers",
+          "refId": "D"
         }
       ]
     },
@@ -412,113 +394,6 @@
           "legendFormat": "Root disk free",
           "refId": "D",
           "instant": true
-        }
-      ]
-    },
-    {
-      "type": "timeseries",
-      "title": "k3s \u2014 CPU idle by node",
-      "datasource": {
-        "type": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 14
-      },
-      "id": 8,
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 2,
-            "fillOpacity": 18,
-            "showPoints": "never",
-            "spanNulls": true,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            }
-          },
-          "min": 0,
-          "max": 100
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus"
-          },
-          "expr": "100 * avg by (instance) (rate(node_cpu_seconds_total{cluster=\"k3s-dean\",mode=\"idle\"}[5m]))",
-          "legendFormat": "{{instance}}",
-          "refId": "A"
-        }
-      ],
-      "description": "Approximate share of CPU in idle; higher means more headroom."
-    },
-    {
-      "type": "timeseries",
-      "title": "k3s \u2014 memory available by node",
-      "datasource": {
-        "type": "prometheus"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 14
-      },
-      "id": 9,
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 2,
-            "fillOpacity": 18,
-            "showPoints": "never",
-            "spanNulls": true,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus"
-          },
-          "expr": "node_memory_MemAvailable_bytes{cluster=\"k3s-dean\"}",
-          "legendFormat": "{{instance}}",
-          "refId": "A"
         }
       ]
     },
@@ -940,7 +815,7 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 12,
+        "w": 6,
         "x": 12,
         "y": 35
       },
@@ -988,6 +863,66 @@
           },
           "expr": "60 * sum(rate(llm_fastpath_requests_total{status=\"completed\"}[5m])) or vector(0)",
           "legendFormat": "fastpath completed / min",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "LLM \u2014 tokens / min",
+      "datasource": {
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 6,
+        "x": 18,
+        "y": 35
+      },
+      "id": 38,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "cpm",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "60 * ((sum(rate(llm_scheduler_job_tokens_total{type=\"completion\"}[5m]))) or (sum(rate(llm_inference_completion_tokens_total[5m])))) or vector(0)",
+          "legendFormat": "completion tokens / min",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "60 * ((sum(rate(llm_scheduler_job_tokens_total{type=\"prompt\"}[5m]))) or (sum(rate(llm_inference_prompt_tokens_total[5m])))) or vector(0)",
+          "legendFormat": "prompt tokens / min",
           "refId": "B"
         }
       ]
@@ -1956,58 +1891,6 @@
           },
           "expr": "sum(increase(etcd_server_leader_changes_seen_total[24h])) or vector(0)",
           "legendFormat": "",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "type": "timeseries",
-      "title": "etcd \u2014 DB size by member",
-      "datasource": {
-        "type": "prometheus"
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 18,
-        "x": 0,
-        "y": 86
-      },
-      "id": 38,
-      "fieldConfig": {
-        "defaults": {
-          "unit": "bytes",
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 2,
-            "fillOpacity": 18,
-            "showPoints": "never",
-            "spanNulls": true,
-            "stacking": {
-              "mode": "none",
-              "group": "A"
-            }
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus"
-          },
-          "expr": "label_replace(etcd_mvcc_db_total_size_in_bytes, \"node\", \"$1\", \"instance\", \"(.*?):\\\\d+\")",
-          "legendFormat": "{{node}}",
           "refId": "A"
         }
       ]

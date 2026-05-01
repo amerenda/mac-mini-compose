@@ -101,3 +101,22 @@ bws secret get 42ea6b6b-3b1e-43d9-8743-b41301665cc9 --access-token "$BWS_ACCESS_
 cp runners/entrypoint-wrapper.sh /etc/komodo/runner-secrets/entrypoint-wrapper.sh
 chmod +x /etc/komodo/runner-secrets/entrypoint-wrapper.sh
 """
+
+# ── LLM: llm-manager agent (native Ollama on Mac Mini) ─────────────────────
+
+[[stack]]
+name = "llm"
+description = "llm-manager agent — uses host Ollama (Metal); agent API :8090"
+tags = ["mac-mini"]
+deploy = true
+[stack.config]
+server = "mac-mini-m4"
+repo = "amerenda/mac-mini-compose"
+branch = "main"
+file_paths = ["llm/compose.yaml"]
+git_account = "amerenda"
+[stack.config.pre_deploy]
+command = """
+export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
+bash llm/pre-deploy.sh
+"""
