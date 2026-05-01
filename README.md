@@ -286,12 +286,19 @@ already working.
 
 OrbStack's VirtFS does not reliably propagate new directory entries created by
 `git pull` inside containers to the host (and vice versa). This can cause
-Komodo Periphery's git operations to fail silently.
+Komodo Periphery's git operations to fail silently. The same limitation applies
+to **new files under existing folders** and **edits to existing files**: bind
+mounts (for example Grafana dashboard JSON under `monitoring/grafana/`) can
+stay stale until the **Grafana** container is restarted, so the UI may not show
+new or updated dashboards even after Komodo deploys and you `docker compose
+restart` other services.
 
 **Workaround:** A LaunchAgent (`com.local.komodo-stack-sync.plist`) runs
 `scripts/sync-stacks.sh` every 60 seconds on the host. It does `git fetch &&
-reset --hard` on the local checkout and restarts Periphery if the directory
-structure changed.
+reset --hard` on the Komodo checkout (`/etc/komodo/stacks/services`), restarts
+Periphery when the **directory tree** changes, and restarts **Grafana and
+Prometheus** when any path under `monitoring/` changed so dashboard and scrape
+config updates always take effect.
 
 ### Komodo ResourceSync webhook does not auto-execute
 

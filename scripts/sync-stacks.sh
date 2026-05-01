@@ -1,6 +1,6 @@
 #!/bin/bash
 # Keeps Komodo's stack checkout fresh from the Mac Mini host.
-# Works around OrbStack VirtFS not propagating new directories to containers.
+# Works around OrbStack VirtFS not propagating new files/dirs to containers.
 # Runs via LaunchAgent every 60 seconds.
 set -euo pipefail
 
@@ -27,6 +27,9 @@ REMOTE=$(git rev-parse origin/main)
 # Nothing to do if already at HEAD
 [ "$LOCAL" = "$REMOTE" ] && exit 0
 
+# Files that will change (for targeted container restarts)
+CHANGED=$(git diff --name-only "$LOCAL" "$REMOTE" 2>/dev/null || true)
+
 git reset --hard origin/main --quiet
 
 # Capture directory listing after pull
@@ -38,4 +41,14 @@ echo "$(date): synced $LOCAL -> $REMOTE" >> "$LOG"
 if [ "$DIRS_BEFORE" != "$DIRS_AFTER" ]; then
     echo "$(date): directory structure changed, restarting periphery" >> "$LOG"
     "$DOCKER" restart komodo-periphery-1 2>/dev/null || true
+fi
+
+# VirtFS often does not propagate new *files* or edits under existing dirs to
+# bind mounts until the consumer container restarts. Only directory-level
+# changes triggered a periphery restart before, so new dashboards (e.g.
+# Apps/*.json) never appeared until a manual grafana restart.
+if echo "$CHANGED" | grep -q '^monitoring/'; then
+    echo "$(date): monitoring stack files changed, restarting grafana (and prometheus)" >> "$LOG"
+    "$DOCKER" restart grafana 2>/dev/null || true
+    "$DOCKER" restart prometheus 2>/dev/null || true
 fi
