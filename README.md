@@ -62,7 +62,7 @@ for pre_deploy secret injection.
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Ollama | 11434 | LLM inference (native macOS, Metal GPU) |
+| Ollama | 11434 | LLM inference (native macOS, Metal GPU). For Dockerized **llm-agent**, set **`OLLAMA_HOST=0.0.0.0:11434`** (e.g. in `~/.zshrc` or the Ollama app’s environment) so Ollama listens on all interfaces; **`127.0.0.1` only** breaks pulls from the agent via `host.docker.internal`. |
 | BlueBubbles | 1234 | iMessage proxy (native macOS app) |
 
 ## Setup
