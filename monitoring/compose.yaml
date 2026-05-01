@@ -70,6 +70,8 @@ services:
     restart: unless-stopped
     ports:
       - "9100:9100"
+    networks:
+      - shared
     command:
       - '--path.rootfs=/host'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
@@ -119,6 +121,8 @@ services:
     restart: unless-stopped
     ports:
       - "9105:9105"
+    networks:
+      - shared
     environment:
       TECHNITIUM_BASE_URL: "http://host.docker.internal:5380"
       TECHNITIUM_TOKEN: "${TECHNITIUM_API_TOKEN}"

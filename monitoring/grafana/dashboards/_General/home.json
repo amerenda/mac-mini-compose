@@ -11,7 +11,7 @@
   "panels": [
     {
       "type": "row",
-      "title": "Compute & GPU",
+      "title": "Mac Mini",
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -23,80 +23,15 @@
       "panels": []
     },
     {
-      "type": "gauge",
-      "title": "GPU VRAM utilization",
-      "datasource": {
-        "type": "prometheus"
-      },
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 0,
-        "y": 1
-      },
-      "id": 2,
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent",
-          "min": 0,
-          "max": 100
-        },
-        "overrides": []
-      },
-      "options": {
-        "showThresholdLabels": true,
-        "showThresholdMarkers": true,
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus"
-          },
-          "expr": "llm_agent_gpu_vram_utilization_pct",
-          "legendFormat": "{{node}}",
-          "refId": "A"
-        }
-      ],
-      "description": "VRAM utilization % per GPU node (LLM agents)"
-    },
-    {
       "type": "timeseries",
-      "title": "Mac Mini \u2014 CPU detail",
+      "title": "Mac Mini \u2014 CPU",
       "datasource": {
         "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
-        "w": 8,
-        "x": 8,
+        "w": 12,
+        "x": 0,
         "y": 1
       },
       "id": 4,
@@ -135,47 +70,47 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"user\"}[5m])) / sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m]))",
-          "legendFormat": "user",
+          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"user\"}[5m])) / (sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m])))",
+          "legendFormat": "user %",
           "refId": "A"
         },
         {
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"system\"}[5m])) / sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m]))",
-          "legendFormat": "system",
+          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"system\"}[5m])) / (sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m])))",
+          "legendFormat": "system %",
           "refId": "B"
         },
         {
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"iowait\"}[5m])) / sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m]))",
-          "legendFormat": "iowait",
+          "expr": "100 * sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"iowait\"}[5m])) / (sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m])))",
+          "legendFormat": "iowait %",
           "refId": "C"
         },
         {
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"idle\"}[5m])))",
-          "legendFormat": "total used",
+          "expr": "100 * (1 - sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\",mode=\"idle\"}[5m])) / (sum(rate(node_cpu_seconds_total{job=\"mac-mini-node\"}[5m]))))",
+          "legendFormat": "total used %",
           "refId": "D"
         }
       ],
-      "description": "Host CPU usage (node exporter on Mac Mini)"
+      "description": "Host CPU from node_exporter (job mac-mini-node). Requires node-exporter on mac-mini-shared Docker network."
     },
     {
       "type": "timeseries",
-      "title": "Mac Mini \u2014 memory detail",
+      "title": "Mac Mini \u2014 memory",
       "datasource": {
         "type": "prometheus"
       },
       "gridPos": {
         "h": 7,
-        "w": 8,
-        "x": 16,
+        "w": 12,
+        "x": 12,
         "y": 1
       },
       "id": 5,
@@ -240,7 +175,8 @@
           "legendFormat": "buffers",
           "refId": "D"
         }
-      ]
+      ],
+      "description": "Host memory from node_exporter (job mac-mini-node)."
     },
     {
       "type": "row",
