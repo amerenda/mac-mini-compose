@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Patch Homebrew's user LaunchAgent plist so Ollama listens on all interfaces.
+# Patch Homebrew's Ollama service plist (cellar canonical copy) so Ollama listens
+# on all interfaces. brew services copies this into ~/Library/LaunchAgents on restart.
 # Idempotent; restarts ollama only when the plist changes.
 # Repo root is two levels up from this script.
 set -euo pipefail
@@ -25,22 +26,37 @@ if [[ -z "$BREW" || ! -x "$BREW" ]]; then
   fi
 fi
 
-PLIST="${HOME}/Library/LaunchAgents/homebrew.mxcl.ollama.plist"
-if [[ ! -f "$PLIST" ]]; then
-  echo "configure-native-ollama-bind: skip (no $PLIST — install Ollama and: brew services start ollama)" >&2
+PLIST_USER="${HOME}/Library/LaunchAgents/homebrew.mxcl.ollama.plist"
+PLIST_CELLAR=""
+if [[ -n "$BREW" && -x "$BREW" ]]; then
+  OLLAMA_PREFIX="$("$BREW" --prefix ollama 2>/dev/null || true)"
+  if [[ -n "$OLLAMA_PREFIX" && -f "$OLLAMA_PREFIX/homebrew.mxcl.ollama.plist" ]]; then
+    PLIST_CELLAR="$OLLAMA_PREFIX/homebrew.mxcl.ollama.plist"
+  fi
+fi
+
+# Homebrew `brew services restart ollama` re-copies the service plist from the cellar into
+# ~/Library/LaunchAgents, which would drop OLLAMA_HOST if we only patched the user copy.
+PLIST_EDIT="$PLIST_CELLAR"
+if [[ -z "$PLIST_EDIT" ]]; then
+  PLIST_EDIT="$PLIST_USER"
+fi
+
+if [[ ! -f "$PLIST_EDIT" ]]; then
+  echo "configure-native-ollama-bind: skip (no $PLIST_USER — install Ollama and: brew services start ollama)" >&2
   exit 0
 fi
 
-CURRENT="$(plutil -extract EnvironmentVariables.OLLAMA_HOST raw "$PLIST" 2>/dev/null || true)"
+CURRENT="$(plutil -extract EnvironmentVariables.OLLAMA_HOST raw "$PLIST_EDIT" 2>/dev/null || true)"
 if [[ "$CURRENT" == "$OLLAMA_HOST_VAL" ]]; then
   exit 0
 fi
 
-if plutil -extract EnvironmentVariables raw "$PLIST" &>/dev/null; then
-  plutil -replace EnvironmentVariables.OLLAMA_HOST -string "$OLLAMA_HOST_VAL" "$PLIST"
+if plutil -extract EnvironmentVariables raw "$PLIST_EDIT" &>/dev/null; then
+  plutil -replace EnvironmentVariables.OLLAMA_HOST -string "$OLLAMA_HOST_VAL" "$PLIST_EDIT"
 else
-  plutil -insert EnvironmentVariables -dictionary "$PLIST"
-  plutil -replace EnvironmentVariables.OLLAMA_HOST -string "$OLLAMA_HOST_VAL" "$PLIST"
+  plutil -insert EnvironmentVariables -dictionary "$PLIST_EDIT"
+  plutil -replace EnvironmentVariables.OLLAMA_HOST -string "$OLLAMA_HOST_VAL" "$PLIST_EDIT"
 fi
 
 if [[ -n "$BREW" && -x "$BREW" ]]; then
