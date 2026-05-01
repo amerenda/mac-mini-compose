@@ -74,7 +74,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "argo_workflows_count{status=\"Running\"}",
+          "expr": "sum(argo_workflows_count{status=\"Running\"}) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -132,7 +132,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "sum(increase(argo_workflows_count{status=\"Succeeded\"}[24h]))",
+          "expr": "sum(increase(argo_workflows_count{status=\"Succeeded\"}[24h])) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -194,7 +194,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "sum(increase(argo_workflows_count{status=\"Failed\"}[24h]))",
+          "expr": "sum(increase(argo_workflows_count{status=\"Failed\"}[24h])) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -256,7 +256,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "sum(increase(argo_workflows_count{status=\"Error\"}[24h]))",
+          "expr": "sum(increase(argo_workflows_count{status=\"Error\"}[24h])) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -358,7 +358,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "histogram_quantile(0.5, sum(rate(argo_workflow_duration_seconds_bucket[5m])) by (le))",
+          "expr": "histogram_quantile(0.5, sum(rate(argo_workflow_duration_seconds_bucket[5m])) by (le)) or vector(0)",
           "legendFormat": "p50",
           "refId": "A",
           "range": true,
@@ -368,7 +368,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(argo_workflow_duration_seconds_bucket[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(argo_workflow_duration_seconds_bucket[5m])) by (le)) or vector(0)",
           "legendFormat": "p95",
           "refId": "B",
           "range": true,
@@ -459,7 +459,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "argo_workflows_queue_depth",
+          "expr": "sum(argo_workflows_queue_depth) or vector(0)",
           "legendFormat": "depth",
           "refId": "A",
           "range": true,
@@ -563,7 +563,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "sum(rate(argo_workflows_pods_count[5m])) by (status)",
+          "expr": "sum(rate(argo_workflows_pods_count[5m])) by (status) or vector(0)",
           "legendFormat": "{{status}}",
           "refId": "A",
           "range": true,
@@ -654,7 +654,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(rate(argo_step_duration_seconds_bucket[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(argo_step_duration_seconds_bucket[5m])) by (le)) or vector(0)",
           "legendFormat": "p95",
           "refId": "A",
           "range": true,
@@ -758,7 +758,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "sum(rate(argo_workflows_error_count[5m])) by (type)",
+          "expr": "sum(rate(argo_workflows_error_count[5m])) by (type) or vector(0)",
           "legendFormat": "{{type}}",
           "refId": "A",
           "range": true,
@@ -849,7 +849,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "sum(rate(argo_workflows_k8s_request_total{status_code=~\"5..\"}[5m]))",
+          "expr": "sum(rate(argo_workflows_k8s_request_total{status_code=~\"5..\"}[5m])) or vector(0)",
           "legendFormat": "5xx errors",
           "refId": "A",
           "range": true,

@@ -81,7 +81,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_total{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_queries_total{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Total Queries",
           "refId": "A"
         }
@@ -148,7 +148,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_blocked{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_blocked{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Blocked Queries",
           "refId": "A"
         }
@@ -219,7 +219,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "(technitium_dns_blocked{job=\"mac-mini-dns\"} / technitium_dns_queries_total{job=\"mac-mini-dns\"}) * 100",
+          "expr": "((technitium_dns_blocked{job=\"mac-mini-dns\"} / technitium_dns_queries_total{job=\"mac-mini-dns\"}) * 100) or vector(0)",
           "legendFormat": "Block %",
           "refId": "A"
         }
@@ -278,7 +278,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_clients{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_clients{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Clients",
           "refId": "A"
         }
@@ -349,7 +349,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "(technitium_dns_cached{job=\"mac-mini-dns\"} / technitium_dns_queries_total{job=\"mac-mini-dns\"}) * 100",
+          "expr": "((technitium_dns_cached{job=\"mac-mini-dns\"} / technitium_dns_queries_total{job=\"mac-mini-dns\"}) * 100) or vector(0)",
           "legendFormat": "Cache Hit %",
           "refId": "A"
         }
@@ -475,7 +475,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_total{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_queries_total{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Total",
           "refId": "A"
         },
@@ -484,7 +484,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_cached{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_cached{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Cached",
           "refId": "B"
         },
@@ -493,7 +493,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_recursive{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_recursive{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Recursive",
           "refId": "C"
         },
@@ -502,7 +502,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_authoritative{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_authoritative{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Authoritative",
           "refId": "D"
         },
@@ -511,7 +511,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_blocked{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_blocked{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Blocked",
           "refId": "E"
         }
@@ -667,7 +667,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_no_error{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_no_error{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "NoError",
           "refId": "A"
         },
@@ -676,7 +676,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_server_failure{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_server_failure{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "SERVFAIL",
           "refId": "B"
         },
@@ -685,7 +685,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_nx_domain{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_nx_domain{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "NXDOMAIN",
           "refId": "C"
         },
@@ -694,7 +694,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_refused{job=\"mac-mini-dns\"}",
+          "expr": "(technitium_dns_refused{job=\"mac-mini-dns\"}) or vector(0)",
           "legendFormat": "Refused",
           "refId": "D"
         }
@@ -802,7 +802,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "topk(20, technitium_top_domains{job=\"mac-mini-dns\"})",
+          "expr": "(topk(20, technitium_top_domains{job=\"mac-mini-dns\"})) or vector(0)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -917,7 +917,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "topk(20, technitium_top_blocked_domains{job=\"mac-mini-dns\"})",
+          "expr": "(topk(20, technitium_top_blocked_domains{job=\"mac-mini-dns\"})) or vector(0)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1032,7 +1032,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "topk(20, technitium_top_clients{job=\"mac-mini-dns\"})",
+          "expr": "(topk(20, technitium_top_clients{job=\"mac-mini-dns\"})) or vector(0)",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1128,7 +1128,7 @@
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "technitium_zone_queries_total{job=\"mac-mini-dns\"}",
+              "expr": "(technitium_zone_queries_total{job=\"mac-mini-dns\"}) or vector(0)",
               "format": "table",
               "instant": true,
               "legendFormat": "",

@@ -408,12 +408,12 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(llm_scheduler_job_inference_seconds_count[5m])) * 60",
+          "expr": "60 * ((sum(rate(llm_scheduler_job_inference_seconds_count[5m]))) or (sum(rate(llm_scheduler_v2_jobs_completed_total{status=\"completed\"}[5m]))))",
           "legendFormat": "completed",
           "refId": "A"
         },
         {
-          "expr": "sum(rate(llm_scheduler_job_errors_total[5m])) * 60",
+          "expr": "60 * ((sum(rate(llm_scheduler_job_errors_total[5m]))) or (sum(rate(llm_scheduler_v2_jobs_completed_total{status=~\"retried|failed|error\"}[5m]))))",
           "legendFormat": "errors",
           "refId": "B"
         }
@@ -459,17 +459,17 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, sum(rate(llm_scheduler_job_inference_seconds_bucket[5m])) by (le, model))",
+          "expr": "histogram_quantile(0.50, sum(rate(llm_scheduler_v2_job_wait_seconds_bucket[5m])) by (le)) or histogram_quantile(0.50, sum(rate(llm_agent_request_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "p50 {{model}}",
           "refId": "A"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(llm_scheduler_job_inference_seconds_bucket[5m])) by (le, model))",
+          "expr": "histogram_quantile(0.95, sum(rate(llm_scheduler_v2_job_wait_seconds_bucket[5m])) by (le)) or histogram_quantile(0.95, sum(rate(llm_agent_request_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "p95 {{model}}",
           "refId": "B"
         },
         {
-          "expr": "histogram_quantile(0.99, sum(rate(llm_scheduler_job_inference_seconds_bucket[5m])) by (le, model))",
+          "expr": "histogram_quantile(0.99, sum(rate(llm_scheduler_v2_job_wait_seconds_bucket[5m])) by (le)) or histogram_quantile(0.99, sum(rate(llm_agent_request_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "p99 {{model}}",
           "refId": "C"
         }
@@ -527,12 +527,12 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(llm_scheduler_job_tokens_total{type=\"completion\"}[5m])) by (model) * 60",
+          "expr": "60 * ((sum(rate(llm_scheduler_job_tokens_total{type=\"completion\"}[5m])) by (model)) or (sum(rate(llm_inference_completion_tokens_total[5m])) by (model)))",
           "legendFormat": "{{model}} completion",
           "refId": "A"
         },
         {
-          "expr": "sum(rate(llm_scheduler_job_tokens_total{type=\"prompt\"}[5m])) by (model) * 60",
+          "expr": "60 * ((sum(rate(llm_scheduler_job_tokens_total{type=\"prompt\"}[5m])) by (model)) or (sum(rate(llm_inference_prompt_tokens_total[5m])) by (model)))",
           "legendFormat": "{{model}} prompt",
           "refId": "B"
         }
@@ -580,7 +580,7 @@
       },
       "targets": [
         {
-          "expr": "rate(llm_scheduler_model_load_seconds_sum[10m]) / rate(llm_scheduler_model_load_seconds_count[10m])",
+          "expr": "(rate(llm_scheduler_model_load_seconds_sum[10m]) / rate(llm_scheduler_model_load_seconds_count[10m])) or (rate(llm_scheduler_v2_model_swap_seconds_sum[10m]) / rate(llm_scheduler_v2_model_swap_seconds_count[10m]))",
           "legendFormat": "avg load {{model}}",
           "refId": "A"
         }
@@ -804,7 +804,7 @@
       },
       "targets": [
         {
-          "expr": "rate(llm_scheduler_job_errors_total[5m]) * 60",
+          "expr": "60 * ((rate(llm_scheduler_job_errors_total[5m])) or (sum(rate(llm_scheduler_v2_jobs_completed_total{status=~\"retried|failed|error\"}[5m])) by (model)))",
           "legendFormat": "{{model}} ({{reason}})",
           "refId": "A"
         }
@@ -846,7 +846,7 @@
       },
       "targets": [
         {
-          "expr": "rate(llm_scheduler_submission_rejected_total[5m]) * 60",
+          "expr": "60 * ((rate(llm_scheduler_submission_rejected_total[5m])) or (sum(rate(llm_scheduler_v2_jobs_completed_total{status=\"retried\"}[5m])) by (model)))",
           "legendFormat": "{{model}} ({{reason}})",
           "refId": "A"
         }
