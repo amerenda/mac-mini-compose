@@ -14,8 +14,8 @@ services:
       - shared
     volumes:
       - prometheus-data:/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./ha-token:/etc/prometheus/ha-token:ro
+      - ${MONITORING_DIR:-.}/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${MONITORING_DIR:-.}/ha-token:/etc/prometheus/ha-token:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -49,9 +49,9 @@ services:
       GF_USERS_HOME_PAGE: /d/home/home
     volumes:
       - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./grafana/dashboards:/etc/grafana/dashboards:ro
+      - ${MONITORING_DIR:-.}/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ${MONITORING_DIR:-.}/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ${MONITORING_DIR:-.}/grafana/dashboards:/etc/grafana/dashboards:ro
     depends_on:
       prometheus:
         condition: service_healthy

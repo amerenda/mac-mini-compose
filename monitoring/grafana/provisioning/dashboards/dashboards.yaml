@@ -6,7 +6,7 @@ providers:
     folder: "Apps"
     type: file
     disableDeletion: false
-    updateIntervalSeconds: 60
+    updateIntervalSeconds: 15
     allowUiUpdates: true
     options:
       path: "/etc/grafana/dashboards/Apps"
@@ -16,7 +16,7 @@ providers:
     folder: "CI"
     type: file
     disableDeletion: false
-    updateIntervalSeconds: 60
+    updateIntervalSeconds: 15
     allowUiUpdates: true
     options:
       path: "/etc/grafana/dashboards/CI"
@@ -26,7 +26,7 @@ providers:
     folder: "Infra"
     type: file
     disableDeletion: false
-    updateIntervalSeconds: 60
+    updateIntervalSeconds: 15
     allowUiUpdates: true
     options:
       path: "/etc/grafana/dashboards/Infra"
@@ -36,7 +36,7 @@ providers:
     folder: "Mac Mini"
     type: file
     disableDeletion: false
-    updateIntervalSeconds: 60
+    updateIntervalSeconds: 15
     allowUiUpdates: true
     options:
       path: "/etc/grafana/dashboards/Mac Mini"
@@ -46,7 +46,7 @@ providers:
     folder: ''
     type: file
     disableDeletion: false
-    updateIntervalSeconds: 60
+    updateIntervalSeconds: 15
     allowUiUpdates: true
     options:
       path: "/etc/grafana/dashboards/_General"

@@ -89,7 +89,7 @@ def main() -> None:
             lines.append("    folder: ''")
         lines.append("    type: file")
         lines.append("    disableDeletion: false")
-        lines.append("    updateIntervalSeconds: 60")
+        lines.append("    updateIntervalSeconds: 15")
         lines.append("    allowUiUpdates: true")
         lines.append("    options:")
         container_path = f"/etc/grafana/dashboards/{folder}"

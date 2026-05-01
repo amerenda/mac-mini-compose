@@ -71,6 +71,8 @@ printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb
 printf 'TECHNITIUM_API_TOKEN=%s\n' "$(bws secret get 4645ac46-3955-4e6e-8558-b434015613a7 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
 printf 'GRAFANA_ADMIN_USER=admin\n' >> monitoring/.env
 printf 'GRAFANA_ADMIN_PASSWORD=%s\n' "$(bws secret get 9a2f2c00-0cc9-4aac-91da-b43d00f980d1 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
+test -f monitoring/compose.yaml && test -d monitoring/grafana/dashboards || exit 1
+printf 'MONITORING_DIR=%s/monitoring\n' "$(pwd)" >> monitoring/.env
 bws secret get c7ccdb87-b04e-428e-bbcf-b4340156edf6 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > monitoring/ha-token
 """
 

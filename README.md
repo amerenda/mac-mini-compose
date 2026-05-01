@@ -307,6 +307,22 @@ execution. This is tracked upstream at
 [moghtech/komodo#1120](https://github.com/moghtech/komodo/issues/1120).
 Stack deploy webhooks work correctly. ResourceSync falls back to 5-minute polling.
 
+### Grafana dashboards missing or never updating
+
+Komodo `pre_deploy` now writes `MONITORING_DIR=<repo>/monitoring` into
+`monitoring/.env` so Grafana and Prometheus always bind-mount the **checked-out
+tree**, not an ambiguous relative path. If dashboards still never change after
+`docker compose restart`:
+
+1. On the Mac Mini, confirm the files exist:
+   `ls "$MONITORING_DIR/grafana/dashboards/Apps/app-mycroft.json"` (or
+   `grep Mycroft monitoring/grafana/dashboards/_General/home.json` from repo
+   root).
+2. Recreate Grafana so bind mounts and provisioning reload cleanly:
+   `docker compose -f monitoring/compose.yaml up -d --force-recreate grafana`
+3. Last resort (drops Grafana UI state, not Prometheus data):  
+   `docker compose -f monitoring/compose.yaml stop grafana && docker volume rm monitoring_grafana-data && docker compose -f monitoring/compose.yaml up -d grafana`
+
 ## Health Check
 
 ```bash
