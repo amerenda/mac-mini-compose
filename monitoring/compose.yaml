@@ -47,9 +47,6 @@ services:
       GF_SERVER_ROOT_URL: "https://grafana.amer.dev"
       GF_SERVER_DOMAIN: "grafana.amer.dev"
       GF_USERS_HOME_PAGE: /d/home/home
-      # Unified alerting / recording-rule writer initializes before datasource provisioning; avoid empty default UID.
-      GF_RECORDING_RULES_DEFAULT_DATASOURCE_UID: prometheus
-      GF_UNIFIED_ALERTING_PROMETHEUS_CONVERSION_DEFAULT_DATASOURCE_UID: prometheus
     volumes:
       - grafana-data:/var/lib/grafana
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
