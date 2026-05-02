@@ -1,0 +1,8 @@
+alias: "SL: Hallway — Window transition"
+id: sl_timer_hallway
+use_blueprint:
+  path: _defaults/room_timer_control.yaml
+  input:
+    room_key: "hallway"
+    target_lights: light.hallway
+    auto_transition_toggle: input_boolean.sl_hallway_auto_transition

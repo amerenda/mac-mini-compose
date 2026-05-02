@@ -1,0 +1,8 @@
+alias: "SL: Bathroom — Window transition"
+id: sl_timer_bathroom
+use_blueprint:
+  path: _defaults/room_timer_control.yaml
+  input:
+    room_key: "bathroom"
+    target_lights: light.bathroom
+    auto_transition_toggle: input_boolean.sl_bathroom_auto_transition

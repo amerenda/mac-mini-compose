@@ -2,7 +2,7 @@ blueprint:
   name: "Room - Timer Control (apply scene at window transition)"
   description: >
     When the SL current window changes, apply the new scene to lights
-    that are already on in this room.
+    that are already on in this room (only if the per-room Auto Transition helper is on).
   domain: "automation"
 
   input:
@@ -14,6 +14,13 @@ blueprint:
     target_lights:
       name: "Target lights (group or list)"
       selector: { target: { entity: { domain: "light" } } }
+
+    auto_transition_toggle:
+      name: "Auto transition enabled"
+      description: "input_boolean.sl_<room>_auto_transition — when ON, apply scene at window boundaries"
+      selector:
+        entity:
+          domain: input_boolean
 
 mode: "restart"
 max_exceeded: "silent"
@@ -33,7 +40,9 @@ trigger:
     entity_id: sensor.sl_current_window
 
 condition:
-  # Only apply if lights are currently on
+  - condition: state
+    entity_id: !input auto_transition_toggle
+    state: "on"
   - condition: template
     value_template: "{{ is_state(_light_id, 'on') }}"
 
