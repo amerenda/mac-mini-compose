@@ -68,7 +68,24 @@ sl_save_current_as_scene:
       selector:
         text:
   sequence:
+    # Some Lovelace cards pass service data as literal "{{ ... }}" without evaluating it.
+    # Fall back to dashboard helpers so room=all and custom slugs work.
     - variables:
+        room_in: "{{ room }}"
+        window_in: "{{ window | default('', true) }}"
+        room: >-
+          {% if room_in in ['all', 'living_room', 'bedroom', 'bathroom', 'kitchen', 'hallway'] %}
+            {{ room_in }}
+          {% else %}
+            {{ states('input_select.sl_room_selector') | lower | replace(' ', '_') | replace('all_rooms', 'all') }}
+          {% endif %}
+        window: >-
+          {% set w = window_in | string | trim %}
+          {% if '{{' in w or w == '' or w in ['unknown', 'unavailable', 'none'] %}
+            {{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}
+          {% else %}
+            {{ w | lower | replace(' ', '_') }}
+          {% endif %}
         source_light_map:
           living_room: "light.living_room_1"
           bedroom: "light.bedroom_1"
