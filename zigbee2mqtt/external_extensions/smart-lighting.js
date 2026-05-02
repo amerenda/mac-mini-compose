@@ -53,6 +53,10 @@ const DEFAULT_ACTION_BY_PAYLOAD = {
 
 // Stagger delay between Zigbee commands (ms) to avoid flooding
 const CMD_STAGGER = 200;
+// Hue dimmers are often Zigbee-bound to the same group as MQTT control. Their On
+// after mains restore can race our publish and restore white (PHY power-on state).
+// A second scene_recall after bind traffic settles fixes that class of bug.
+const ROOM_ON_REINFORCE_MS = 380;
 
 class SmartLighting {
     constructor(zigbee, mqtt, state, publishEntityState, eventBus, enableDisableExtension, restartCallback, addExtension, settings, logger) {
@@ -70,6 +74,8 @@ class SmartLighting {
         this.cmdClient = null;
         /** @type {string[]} */
         this._switchTopics = [];
+        /** @type {Record<string, ReturnType<typeof setTimeout>>} */
+        this._roomOnReinforceTimers = Object.create(null);
         this.runtime = this._loadRuntime();
     }
 
@@ -139,6 +145,10 @@ class SmartLighting {
     async stop() {
         this.logger.info('[SL] Smart Lighting extension stopping');
         if (this.checkInterval) clearInterval(this.checkInterval);
+        for (const k of Object.keys(this._roomOnReinforceTimers)) {
+            clearTimeout(this._roomOnReinforceTimers[k]);
+            delete this._roomOnReinforceTimers[k];
+        }
         if (this.cmdClient) this.cmdClient.end();
         this.checkInterval = null;
         this.cmdClient = null;
@@ -397,12 +407,40 @@ class SmartLighting {
     }
 
     _roomOff(roomKey, roomGroup) {
+        if (roomKey && this._roomOnReinforceTimers[roomKey]) {
+            clearTimeout(this._roomOnReinforceTimers[roomKey]);
+            delete this._roomOnReinforceTimers[roomKey];
+        }
         this._sendCommand(`${roomGroup}/set`, { state: 'OFF' });
         if (roomKey) {
             this.runtime.manualOverride[roomKey] = false;
             this.runtime.cycleLast[roomKey] = '';
             this._saveRuntime();
         }
+    }
+
+    /** @returns {object | null} */
+    _buildSceneRecallPayload(windowKey, roomConfig) {
+        const sid = WINDOW_SCENE_ID[windowKey];
+        if (!sid) return null;
+        const secs = Number(roomConfig.transition_secs) > 0 ? Number(roomConfig.transition_secs) : 0;
+        const payload = { scene_recall: sid };
+        if (secs > 0) payload.transition = secs;
+        return payload;
+    }
+
+    _scheduleRoomOnReinforce(roomKey, roomDisplayName, effectiveWindow, roomConfig) {
+        const prev = this._roomOnReinforceTimers[roomKey];
+        if (prev) clearTimeout(prev);
+        this._roomOnReinforceTimers[roomKey] = setTimeout(() => {
+            delete this._roomOnReinforceTimers[roomKey];
+            if (!this.config || !this.config.rooms) return;
+            if (this.runtime.manualOverride[roomKey]) return;
+            const p = this._buildSceneRecallPayload(effectiveWindow, roomConfig);
+            if (!p) return;
+            this.logger.info(`[SL] room_on reinforce (post-dimmer-bind) ${roomDisplayName}`);
+            this._sendCommand(`${roomDisplayName}/set`, p);
+        }, ROOM_ON_REINFORCE_MS);
     }
 
     _powerOffAll() {
@@ -447,11 +485,13 @@ class SmartLighting {
         const scene = roomConfig.scenes ? roomConfig.scenes[effectiveWindow] : null;
         if (!scene) return;
 
-        const transition = Number(roomConfig.transition_secs) > 0 ? Number(roomConfig.transition_secs) : undefined;
-        const payload = { state: 'ON', brightness: scene.brightness };
-        if (scene.color_temp !== undefined) payload.color_temp = scene.color_temp;
-        if (transition) payload.transition = transition;
+        // Use Zigbee scene_recall (same storage as _fullScenePush) so color matches
+        // what HA pushed; raw group brightness/color_temp can lose to Hue dimmer bind.
+        const payload = this._buildSceneRecallPayload(effectiveWindow, roomConfig);
+        if (!payload) return;
+        this.logger.info(`[SL] room_on scene_recall ${roomDisplayName} → ${effectiveWindow} (id=${payload.scene_recall})`);
         this._sendCommand(`${roomDisplayName}/set`, payload);
+        this._scheduleRoomOnReinforce(roomKey, roomDisplayName, effectiveWindow, roomConfig);
     }
 
     _multiRoomOn(sw) {
@@ -478,10 +518,8 @@ class SmartLighting {
         const scene = roomConfig.scenes[targetWindow];
         if (!scene) return;
 
-        const transition = Number(roomConfig.transition_secs) > 0 ? Number(roomConfig.transition_secs) : undefined;
-        const payload = { state: 'ON', brightness: scene.brightness };
-        if (scene.color_temp !== undefined) payload.color_temp = scene.color_temp;
-        if (transition) payload.transition = transition;
+        const payload = this._buildSceneRecallPayload(targetWindow, roomConfig);
+        if (!payload) return;
         this._sendCommand(`${roomDisplayName}/set`, payload);
 
         this.runtime.cycleLast[roomKey] = targetWindow;
@@ -653,10 +691,10 @@ class SmartLighting {
             return deviceState && deviceState.state === 'ON';
         });
         if (anyOn) {
-            const secs = Number(roomConfig.transition_secs) > 0 ? Number(roomConfig.transition_secs) : 0;
-            const payload = { scene_recall: WINDOW_SCENE_ID[window] };
-            if (secs > 0) payload.transition = secs;
-            this.logger.info(`[SL] Recalling ${window} scene on ${roomName} (lights on, transition=${secs || 'default'})`);
+            const payload = this._buildSceneRecallPayload(window, roomConfig);
+            if (!payload) return;
+            const secs = payload.transition ?? 'default';
+            this.logger.info(`[SL] Recalling ${window} scene on ${roomName} (lights on, transition=${secs})`);
             this._sendCommand(`${roomName}/set`, payload);
         }
     }
