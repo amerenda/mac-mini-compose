@@ -99,3 +99,74 @@ sl_save_current_as_scene:
 
     # Push full config to Z2M
     - service: script.sl_push_config
+
+sl_debug_save_read:
+  alias: "SL: Debug — show what save would read"
+  description: "Logs current attrs of every light in a room (or all rooms) plus the stored helper values, so we can see exactly what sl_save_current_as_scene would read. Output goes to HA log under logger 'sl.debug' (level WARNING)."
+  mode: single
+  fields:
+    room:
+      description: "Room key (or 'all')"
+      required: true
+      selector:
+        select:
+          options: [all, living_room, bedroom, bathroom, kitchen, hallway]
+  sequence:
+    - variables:
+        light_map:
+          living_room: ["light.living_room_1"]
+          bedroom: ["light.bedroom_1", "light.bedroom_2", "light.lamp_1"]
+          bathroom: ["light.bathroom_1"]
+          kitchen: ["light.kitchen_1", "light.kitchen_2"]
+          hallway: ["light.hallway_1"]
+        rooms: "{{ ['living_room','bedroom','bathroom','kitchen','hallway'] if room == 'all' else [room] }}"
+    - service: system_log.write
+      data:
+        level: warning
+        logger: sl.debug
+        message: "=== sl_debug_save_read start (rooms={{ rooms | join(',') }}) current_window={{ states('sensor.sl_current_window') }} house_mode={{ states('input_select.sl_house_mode') }} ==="
+    - repeat:
+        for_each: "{{ rooms }}"
+        sequence:
+          - variables:
+              r: "{{ repeat.item }}"
+              lights: "{{ light_map[r] }}"
+              source_light: "{{ lights[0] }}"
+          - service: system_log.write
+            data:
+              level: warning
+              logger: sl.debug
+              message: >-
+                room={{ r }}
+                source_light_for_save={{ source_light }}
+                helpers
+                morning(b={{ states('input_number.sl_' ~ r ~ '_morning_brightness') }},ct={{ states('input_number.sl_' ~ r ~ '_morning_color_temp') }})
+                day(b={{ states('input_number.sl_' ~ r ~ '_day_brightness') }},ct={{ states('input_number.sl_' ~ r ~ '_day_color_temp') }})
+                evening(b={{ states('input_number.sl_' ~ r ~ '_evening_brightness') }},ct={{ states('input_number.sl_' ~ r ~ '_evening_color_temp') }})
+                night(b={{ states('input_number.sl_' ~ r ~ '_night_brightness') }},ct={{ states('input_number.sl_' ~ r ~ '_night_color_temp') }})
+          - repeat:
+              for_each: "{{ lights }}"
+              sequence:
+                - variables:
+                    l: "{{ repeat.item }}"
+                - service: system_log.write
+                  data:
+                    level: warning
+                    logger: sl.debug
+                    message: >-
+                      light={{ l }}
+                      state={{ states(l) }}
+                      brightness={{ state_attr(l,'brightness') }}
+                      color_temp_mireds={{ state_attr(l,'color_temp') }}
+                      color_temp_kelvin={{ state_attr(l,'color_temp_kelvin') }}
+                      color_mode={{ state_attr(l,'color_mode') }}
+                      supported_color_modes={{ state_attr(l,'supported_color_modes') }}
+                      min_ct_k={{ state_attr(l,'min_color_temp_kelvin') }}
+                      max_ct_k={{ state_attr(l,'max_color_temp_kelvin') }}
+                      hs={{ state_attr(l,'hs_color') }}
+                      xy={{ state_attr(l,'xy_color') }}
+    - service: system_log.write
+      data:
+        level: warning
+        logger: sl.debug
+        message: "=== sl_debug_save_read end ==="

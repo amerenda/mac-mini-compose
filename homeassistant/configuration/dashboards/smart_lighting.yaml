@@ -16,6 +16,16 @@ views:
           - entity: sensor.sl_z2m_sync_status
             name: Z2M Sync
 
+      - type: button
+        name: Debug — read all light attrs
+        icon: mdi:bug-outline
+        show_state: false
+        tap_action:
+          action: call-service
+          service: script.sl_debug_save_read
+          data:
+            room: all
+
       # ── Schedule (collapsible) ─────────────────────────────
       - type: entities
         entities:
