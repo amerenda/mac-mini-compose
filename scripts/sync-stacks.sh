@@ -52,3 +52,10 @@ if echo "$CHANGED" | grep -q '^monitoring/'; then
     "$DOCKER" restart grafana 2>/dev/null || true
     "$DOCKER" restart prometheus 2>/dev/null || true
 fi
+
+# HA bind-mounts git-tracked YAML from the host; OrbStack VirtFS often keeps
+# stale file contents inside the container until homeassistant restarts.
+if echo "$CHANGED" | grep -q '^homeassistant/'; then
+    echo "$(date): homeassistant config changed, restarting homeassistant" >> "$LOG"
+    "$DOCKER" restart homeassistant 2>/dev/null || true
+fi
