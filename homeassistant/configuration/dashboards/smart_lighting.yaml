@@ -1277,8 +1277,8 @@ views:
           cards:
             - type: markdown
               content: >
-                **All Rooms:** Save creates five HA scenes `scene.slc_<room>_<name>` (one per room, all lights in that room).
-                **Apply** recalls all five. Scenes created this way last until HA restarts or a scene reload.
+                **All Rooms:** Save stores every light in `/config/sl_custom_scenes.json` under your scene name (slug).
+                **Apply** restores all of them. Survives HA restart; back up that file with your config.
             - type: button
               name: Apply custom scene (all rooms)
               icon: mdi:play-circle

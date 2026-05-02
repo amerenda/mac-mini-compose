@@ -52,9 +52,8 @@ sl_save_current_as_scene:
   alias: "SL: Save Current Light State as Scene"
   description: >
     Saves light state to helpers and Z2M where applicable. For Custom Scenes with room=all,
-    also creates one HA scene per room (scene.slc_<room>_<slug>) via scene.create so all
-    lights in that room are captured; use script.sl_apply_custom_scene_all_rooms to recall.
-    Dynamic scenes are cleared on full HA restart or scene reload.
+    also writes a persistent pack to /config/sl_custom_scenes.json (all lights per room) via
+    python_script.sl_custom_scenes_persist; use script.sl_apply_custom_scene_all_rooms to recall.
   mode: single
   fields:
     room:
@@ -82,35 +81,11 @@ sl_save_current_as_scene:
             - condition: template
               value_template: "{{ room == 'all' }}"
           sequence:
-            # Per-room HA scenes (full light list); entity_id scene.slc_<room>_<window>
-            - service: scene.create
+            # Full per-room light snapshots (persists across HA restart in /config/sl_custom_scenes.json)
+            - service: python_script.sl_custom_scenes_persist
               data:
-                scene_id: "slc_living_room_{{ window }}"
-                snapshot_entities:
-                  - light.living_room_1
-            - service: scene.create
-              data:
-                scene_id: "slc_bedroom_{{ window }}"
-                snapshot_entities:
-                  - light.bedroom_1
-                  - light.bedroom_2
-                  - light.lamp_1
-            - service: scene.create
-              data:
-                scene_id: "slc_bathroom_{{ window }}"
-                snapshot_entities:
-                  - light.bathroom_1
-            - service: scene.create
-              data:
-                scene_id: "slc_kitchen_{{ window }}"
-                snapshot_entities:
-                  - light.kitchen_1
-                  - light.kitchen_2
-            - service: scene.create
-              data:
-                scene_id: "slc_hallway_{{ window }}"
-                snapshot_entities:
-                  - light.hallway_1
+                action: save_all_rooms_pack
+                slug: "{{ window }}"
             # Standard time windows: mirror first-light values into helpers + Z2M
             - if:
                 - condition: template

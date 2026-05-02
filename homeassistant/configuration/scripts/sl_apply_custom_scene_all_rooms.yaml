@@ -1,9 +1,8 @@
 sl_apply_custom_scene_all_rooms:
   alias: "SL: Apply custom scene (all rooms)"
   description: >
-    Activates one HA scene per room created by Save (All Rooms + custom name).
-    Scene entity IDs are scene.slc_<room>_<slug>, e.g. scene.slc_living_room_movie_night.
-    Dynamic scenes from scene.create last until Home Assistant restarts or reloads.
+    Restores lights from the pack saved in /config/sl_custom_scenes.json for this slug
+    (Save with All Rooms + same custom name). Survives Home Assistant restarts.
   mode: single
   fields:
     window:
@@ -12,16 +11,7 @@ sl_apply_custom_scene_all_rooms:
       selector:
         text:
   sequence:
-    - repeat:
-        for_each:
-          - living_room
-          - bedroom
-          - bathroom
-          - kitchen
-          - hallway
-        sequence:
-          - variables:
-              rid: "{{ repeat.item }}"
-          - service: scene.turn_on
-            target:
-              entity_id: "scene.slc_{{ rid }}_{{ window }}"
+    - service: python_script.sl_custom_scenes_persist
+      data:
+        action: apply_all_rooms_pack
+        slug: "{{ window }}"

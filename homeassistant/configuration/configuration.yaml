@@ -14,6 +14,9 @@ group: !include groups.yaml
 # Scripts managed as separate files under /config/scripts/*.yaml (dict merge)
 script: !include_dir_merge_named scripts
 
+# Persistent custom scene packs (All Rooms) — python_scripts/sl_custom_scenes_persist.py
+python_script:
+
 # Input helpers (split by domain)
 input_boolean:  !include_dir_merge_named helpers/input_boolean/
 input_datetime: !include_dir_merge_named helpers/input_datetime/

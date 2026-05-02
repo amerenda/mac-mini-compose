@@ -74,6 +74,7 @@ mkdir -p "${CONFIG_DIR}/www/pets"
 mkdir -p "${CONFIG_DIR}/www/intruders"
 mkdir -p "${CONFIG_DIR}/www/calendar_cache"
 mkdir -p "${CONFIG_DIR}/scripts"
+mkdir -p "${CONFIG_DIR}/python_scripts"
 mkdir -p "${CONFIG_DIR}/automations"
 mkdir -p "${CONFIG_DIR}/scenes"
 mkdir -p "${CONFIG_DIR}/dashboards/views"
@@ -100,6 +101,8 @@ group: !include groups.yaml
 
 # Scripts managed as separate files under /config/scripts/*.yaml (dict merge)
 script: !include_dir_merge_named scripts
+
+python_script:
 
 # Input helpers (split by domain)
 input_boolean:  !include_dir_merge_named helpers/input_boolean/
