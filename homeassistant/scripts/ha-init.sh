@@ -12,10 +12,11 @@ CARD_MOD_VERSION="v4.2.1"
 VSTACK_VERSION="v1.0.1"
 STREAMLINE_VERSION="v0.2.0"
 HUE_LIGHT_VERSION="v1.9.0"
+MIDEA_AC_LAN_VERSION="v0.6.11"
 
 # Combined marker for all components
 MARKER=/config/.ha-init-versions
-EXPECTED="${HACS_VERSION}|${MUSHROOM_VERSION}|${BUBBLE_VERSION}|${CARD_MOD_VERSION}|${VSTACK_VERSION}|${STREAMLINE_VERSION}|${HUE_LIGHT_VERSION}"
+EXPECTED="${HACS_VERSION}|${MUSHROOM_VERSION}|${BUBBLE_VERSION}|${CARD_MOD_VERSION}|${VSTACK_VERSION}|${STREAMLINE_VERSION}|${HUE_LIGHT_VERSION}|${MIDEA_AC_LAN_VERSION}"
 
 if [ -f "$MARKER" ] && [ "$(cat "$MARKER")" = "$EXPECTED" ]; then
   echo "All components at expected versions — nothing to do"
@@ -36,6 +37,23 @@ if [ ! -f "$HACS_MARKER" ] || [ "$(cat "$HACS_MARKER")" != "$HACS_VERSION" ]; th
   echo "HACS ${HACS_VERSION} installed"
 else
   echo "HACS ${HACS_VERSION} already installed"
+fi
+
+# ── midea_ac_lan integration (wuwentao fork) ─────────────────
+# The georgezhao2010 fork is unmaintained (last release Oct 2023) and crashes
+# at HA shutdown with "Event loop is closed", causing exit code 100 + restart
+# loop. wuwentao's fork is the actively maintained successor.
+MIDEA_MARKER=/config/custom_components/midea_ac_lan/.version
+if [ ! -f "$MIDEA_MARKER" ] || [ "$(cat "$MIDEA_MARKER")" != "$MIDEA_AC_LAN_VERSION" ]; then
+  echo "Installing midea_ac_lan ${MIDEA_AC_LAN_VERSION}..."
+  wget -qO /tmp/midea.zip "https://github.com/wuwentao/midea_ac_lan/releases/download/${MIDEA_AC_LAN_VERSION}/midea_ac_lan.zip"
+  rm -rf /config/custom_components/midea_ac_lan
+  mkdir -p /config/custom_components/midea_ac_lan
+  unzip -o /tmp/midea.zip -d /config/custom_components/midea_ac_lan
+  echo "$MIDEA_AC_LAN_VERSION" > "$MIDEA_MARKER"
+  echo "midea_ac_lan ${MIDEA_AC_LAN_VERSION} installed"
+else
+  echo "midea_ac_lan ${MIDEA_AC_LAN_VERSION} already installed"
 fi
 
 # ── Frontend cards ───────────────────────────────────────────
