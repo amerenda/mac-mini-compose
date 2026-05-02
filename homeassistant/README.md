@@ -90,31 +90,54 @@ Toggle `input_boolean.sl_enabled` (the "Smart Lighting" toggle on the dashboard)
 
 Both systems coexist — all v2 helpers use the `sl_` prefix and do not conflict with v1 helpers. You can switch back and forth at any time.
 
+### Runtime split (HA = config, Z2M = runtime)
+
+Smart Lighting is intentionally split:
+
+- **Home Assistant** stores scene values in helpers and pushes the full config to Z2M (retained on `zigbee2mqtt/sl/config`). It also fires a small `zigbee2mqtt/sl/snap` event after a per-room save. HA is **not** in the runtime path.
+- **`zigbee2mqtt/external_extensions/smart-lighting.js`** is the runtime: it stores all 4 window scenes on each Hue group, writes `hue_power_on_*` per bulb, runs window transitions, dispatches Hue dimmer button actions, and recalls scenes when HA edits one.
+
+#### Power-on flow
+
+| How you turn it on | Runtime owner | What happens |
+|--------------------|---------------|--------------|
+| Hue dimmer Button 1 | Z2M extension | `_handleSwitchAction` → `_roomOn` applies the **current window scene** with brightness/CT. HA not required. |
+| Wall switch / mains restored | Bulb firmware | Bulb starts at `hue_power_on_*`, which Z2M rewrites to the current window's brightness/CT on every window transition. HA not required. |
+| HA dashboard light card | HA → Zigbee | `light.turn_on` over Zigbee restores the bulb's last RAM state. **Will not** re-apply the window scene — by design, HA stays out of the critical path. Use the dimmer for proper power-on. |
+
+#### Scene edit flow (snap-on-edit)
+
+Saving a scene from the dashboard:
+
+1. HA writes `input_number.sl_<room>_<window>_brightness` / `_color_temp` helpers.
+2. HA calls `script.sl_push_config` → publishes the full config on `zigbee2mqtt/sl/config` (retained). Z2M re-stores all 4 scenes on every group and rewrites `hue_power_on_*` for the current window.
+3. HA publishes `zigbee2mqtt/sl/snap` `{room_key, window}`. If `window == currentWindow`, Z2M calls `_recallSceneIfOn(room)` for **only that room** (gated by the room's `auto_transition`). Edits for non-current windows take effect on the next window transition or off→on.
+
 ### Architecture
 
 ```
 homeassistant/configuration/
-├── automations/
-│   ├── sl_<room>.yaml              — State-change trigger (light on → apply scene)
-│   ├── sl_<room>_motion.yaml       — Motion trigger (disabled, no sensors yet)
-│   ├── sl_<room>_motion_off.yaml   — Motion auto-off timer (disabled)
-│   └── sl_window_transition.yaml   — Global: re-apply scenes at window boundaries
+├── automations/                    — Config-side automations only (no runtime)
 ├── scripts/
-│   ├── sl_room_on.yaml             — Core logic: determine window, check mode, apply scene
-│   └── sl_room_off.yaml            — Turn off room + clear override
+│   ├── sl_push_config.yaml         — Builds + publishes the full Z2M config
+│   ├── sl_scene_editor.yaml        — sl_save_current_as_scene + snap publish
+│   ├── sl_room_on.yaml             — Used by motion + dashboard helpers (legacy v2 callers)
+│   ├── sl_room_off.yaml            — Turn off room + clear HA override flag
+│   └── sl_apply_custom_scene_all_rooms.yaml — Whole-house custom scene apply
 ├── python_scripts/
-│   └── sl_custom_scenes_persist.py — GitOps: persistent “All Rooms” custom scene packs (`sl_custom_scenes.json` on the `ha-config` volume)
+│   └── sl_custom_scenes_persist.py — Persistent “All Rooms” custom scene packs
 ├── helpers/generated/
 │   ├── input_boolean/sl_*.yaml     — Toggles (motion, transition, override, UI)
 │   ├── input_datetime/sl_*.yaml    — Schedule times (weekday + weekend)
-│   ├── input_number/sl_*.yaml      — Motion timeout per room
-│   ├── input_select/sl_*.yaml      — House mode, room selector
-│   ├── input_text/sl_*.yaml        — Last window tracker
+│   ├── input_number/sl_*.yaml      — Scene brightness/CT, motion timeout
+│   ├── input_select/sl_*.yaml      — House mode, room selector, switch actions
+│   ├── input_text/sl_*.yaml        — Custom scene name, last window tracker
 │   └── timer/sl_*.yaml             — Motion auto-off timers
-├── packages/
-│   └── sl_smart_lighting.yaml      — Template sensor (current window)
 └── dashboards/
     └── smart_lighting.yaml         — Dashboard YAML
+
+zigbee2mqtt/external_extensions/
+└── smart-lighting.js               — Runtime: scenes, window transitions, dimmer dispatch, snap-on-edit
 ```
 
 ### Frontend Cards (installed by ha-init)

@@ -149,6 +149,19 @@ sl_save_current_as_scene:
                             data:
                               value: "{{ ct | int }}"
                 - service: script.sl_push_config
+                # Snap-on-edit: tell Z2M to recall this window per room if it's the current window.
+                - repeat:
+                    for_each:
+                      - living_room
+                      - bedroom
+                      - bathroom
+                      - kitchen
+                      - hallway
+                    sequence:
+                      - service: mqtt.publish
+                        data:
+                          topic: "zigbee2mqtt/sl/snap"
+                          payload: '{"room_key": "{{ repeat.item }}", "window": "{{ sl_window }}"}'
       default:
         - variables:
             source_light: "{{ source_light_map[sl_room] }}"
@@ -179,6 +192,15 @@ sl_save_current_as_scene:
               data:
                 value: "{{ ct | int }}"
         - service: script.sl_push_config
+        # Snap-on-edit: only meaningful for standard windows; Z2M ignores non-window slugs.
+        - if:
+            - condition: template
+              value_template: "{{ sl_window in ['morning', 'day', 'evening', 'night'] }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "zigbee2mqtt/sl/snap"
+                payload: '{"room_key": "{{ sl_room }}", "window": "{{ sl_window }}"}'
 
 sl_debug_save_read:
   alias: "SL: Debug — show what save would read"

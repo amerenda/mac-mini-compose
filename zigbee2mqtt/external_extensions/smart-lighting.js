@@ -6,6 +6,7 @@ const mqtt = require('mqtt');
 const CACHE_FILE = path.join(__dirname, 'sl-cache.json');
 const RUNTIME_FILE = path.join(__dirname, 'sl-runtime.json');
 const CONFIG_TOPIC = 'zigbee2mqtt/sl/config';
+const SNAP_TOPIC = 'zigbee2mqtt/sl/snap';
 const STATUS_TOPIC = 'zigbee2mqtt/sl/status';
 const BASE_TOPIC = 'zigbee2mqtt';
 
@@ -111,6 +112,11 @@ class SmartLighting {
         await this.z2mMqtt.subscribe(CONFIG_TOPIC);
         this.logger.info(`[SL] Subscribed to ${CONFIG_TOPIC}`);
 
+        // Snap-on-edit: HA fires this after a per-room save so we can recall when
+        // the saved window matches the current window.
+        await this.z2mMqtt.subscribe(SNAP_TOPIC);
+        this.logger.info(`[SL] Subscribed to ${SNAP_TOPIC}`);
+
         await this._refreshSwitchTopicSubscriptions();
 
         this.eventBus.onMQTTMessage(this, this._onMQTTMessage.bind(this));
@@ -188,6 +194,11 @@ class SmartLighting {
             return;
         }
 
+        if (data.topic === SNAP_TOPIC) {
+            this._handleSnap(data.message.toString());
+            return;
+        }
+
         const m = data.topic.match(/^zigbee2mqtt\/([^/]+)\/action$/);
         if (!m) return;
         const device = m[1];
@@ -195,6 +206,42 @@ class SmartLighting {
         if (!sw) return;
         const payload = data.message.toString().trim();
         this._handleSwitchAction(sw, payload);
+    }
+
+    _handleSnap(messageStr) {
+        let parsed;
+        try {
+            parsed = JSON.parse(messageStr);
+        } catch (e) {
+            this.logger.error(`[SL] snap parse: ${e.message}`);
+            return;
+        }
+        const roomKey = parsed && parsed.room_key;
+        const window = parsed && parsed.window;
+        if (!roomKey || !window) {
+            this.logger.warn(`[SL] snap missing room_key/window: ${messageStr}`);
+            return;
+        }
+        if (!WINDOWS.includes(window)) {
+            this.logger.info(`[SL] snap ignored: window=${window} not standard`);
+            return;
+        }
+        if (window !== this.currentWindow) {
+            this.logger.info(`[SL] snap ignored: window=${window} != currentWindow=${this.currentWindow}`);
+            return;
+        }
+        const displayName = ROOM_KEY_TO_GROUP[roomKey];
+        if (!displayName) {
+            this.logger.warn(`[SL] snap unknown room_key: ${roomKey}`);
+            return;
+        }
+        const roomConfig = this.config && this.config.rooms ? this.config.rooms[displayName] : null;
+        if (!roomConfig) {
+            this.logger.warn(`[SL] snap no roomConfig for ${displayName}`);
+            return;
+        }
+        this.logger.info(`[SL] snap edit-recall: ${displayName} (${window})`);
+        this._recallSceneIfOn(displayName, roomConfig, window);
     }
 
     async _refreshSwitchTopicSubscriptions() {
@@ -371,6 +418,13 @@ class SmartLighting {
         if (this.config.sl_enabled === false) {
             this.logger.info('[SL] room_on skipped (sl_enabled off)');
             return;
+        }
+        // Safety net: if HA (or anything else) turned the room fully OFF, an old
+        // manualOverride from a prior brightness step should not block this on.
+        if (this.runtime.manualOverride[roomKey] && !this._roomAnyOn(roomDisplayName)) {
+            this.logger.info(`[SL] clearing stale manualOverride for ${roomKey} (group is OFF)`);
+            this.runtime.manualOverride[roomKey] = false;
+            this._saveRuntime();
         }
         if (this.runtime.manualOverride[roomKey]) {
             this.logger.info(`[SL] room_on skipped (manual override) ${roomKey}`);
