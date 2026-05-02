@@ -73,13 +73,15 @@ sl_save_current_as_scene:
     - variables:
         room_in: "{{ room }}"
         window_in: "{{ window | default('', true) }}"
-        room: >-
+        # Use sl_room / sl_window — do not reuse field names room/window below; HA still binds
+        # those names to raw service data in nested templates.
+        sl_room: >-
           {% if room_in in ['all', 'living_room', 'bedroom', 'bathroom', 'kitchen', 'hallway'] %}
             {{ room_in }}
           {% else %}
             {{ states('input_select.sl_room_selector') | lower | replace(' ', '_') | replace('all_rooms', 'all') }}
           {% endif %}
-        window: >-
+        sl_window: >-
           {% set w = window_in | string | trim %}
           {% if '{{' in w or w == '' or w in ['unknown', 'unavailable', 'none'] %}
             {{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}
@@ -96,17 +98,17 @@ sl_save_current_as_scene:
         # Custom Scenes tab: "All Rooms" → dashboard passes room=all; write real per-room helpers
         - conditions:
             - condition: template
-              value_template: "{{ room == 'all' }}"
+              value_template: "{{ sl_room == 'all' }}"
           sequence:
             # Full per-room light snapshots (persists across HA restart in /config/sl_custom_scenes.json)
             - service: python_script.sl_custom_scenes_persist
               data:
                 action: save_all_rooms_pack
-                slug: "{{ window }}"
+                slug: "{{ sl_window }}"
             # Standard time windows: mirror first-light values into helpers + Z2M
             - if:
                 - condition: template
-                  value_template: "{{ window in ['morning', 'day', 'evening', 'night'] }}"
+                  value_template: "{{ sl_window in ['morning', 'day', 'evening', 'night'] }}"
               then:
                 - repeat:
                     for_each:
@@ -134,7 +136,7 @@ sl_save_current_as_scene:
                           has_ct: "{{ ct | int(0) > 0 }}"
                       - service: input_number.set_value
                         target:
-                          entity_id: "input_number.sl_{{ r }}_{{ window }}_brightness"
+                          entity_id: "input_number.sl_{{ r }}_{{ sl_window }}_brightness"
                         data:
                           value: "{{ bri }}"
                       - if:
@@ -143,13 +145,13 @@ sl_save_current_as_scene:
                         then:
                           - service: input_number.set_value
                             target:
-                              entity_id: "input_number.sl_{{ r }}_{{ window }}_color_temp"
+                              entity_id: "input_number.sl_{{ r }}_{{ sl_window }}_color_temp"
                             data:
                               value: "{{ ct | int }}"
                 - service: script.sl_push_config
       default:
         - variables:
-            source_light: "{{ source_light_map[room] }}"
+            source_light: "{{ source_light_map[sl_room] }}"
             bri: "{{ state_attr(source_light, 'brightness') | int(200) }}"
             ct_mireds: "{{ state_attr(source_light, 'color_temp') }}"
             ct_kelvin: "{{ state_attr(source_light, 'color_temp_kelvin') | int(0) }}"
@@ -164,7 +166,7 @@ sl_save_current_as_scene:
             has_ct: "{{ ct | int(0) > 0 }}"
         - service: input_number.set_value
           target:
-            entity_id: "input_number.sl_{{ room }}_{{ window }}_brightness"
+            entity_id: "input_number.sl_{{ sl_room }}_{{ sl_window }}_brightness"
           data:
             value: "{{ bri }}"
         - if:
@@ -173,7 +175,7 @@ sl_save_current_as_scene:
           then:
             - service: input_number.set_value
               target:
-                entity_id: "input_number.sl_{{ room }}_{{ window }}_color_temp"
+                entity_id: "input_number.sl_{{ sl_room }}_{{ sl_window }}_color_temp"
               data:
                 value: "{{ ct | int }}"
         - service: script.sl_push_config
