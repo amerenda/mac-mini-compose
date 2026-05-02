@@ -1268,6 +1268,25 @@ views:
           data:
             room: "{{ states('input_select.sl_room_selector') | lower | replace(' ', '_') | replace('all_rooms', 'all') }}"
             window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+      - type: conditional
+        conditions:
+          - entity: input_select.sl_room_selector
+            state: "All Rooms"
+        card:
+          type: vertical-stack
+          cards:
+            - type: markdown
+              content: >
+                **All Rooms:** Save creates five HA scenes `scene.slc_<room>_<name>` (one per room, all lights in that room).
+                **Apply** recalls all five. Scenes created this way last until HA restarts or a scene reload.
+            - type: button
+              name: Apply custom scene (all rooms)
+              icon: mdi:play-circle
+              tap_action:
+                action: call-service
+                service: script.sl_apply_custom_scene_all_rooms
+                data:
+                  window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
 
   # ════════════════════════════════════════════════════════════
   # Switch Config Tab

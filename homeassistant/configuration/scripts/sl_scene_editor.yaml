@@ -50,7 +50,11 @@ sl_preview_scene:
 
 sl_save_current_as_scene:
   alias: "SL: Save Current Light State as Scene"
-  description: "Reads current brightness/color_temp from a room's lights, saves to helpers, and pushes config to Z2M. Use room=all (from Custom Scenes \"All Rooms\") to save each room's reference light into sl_<room>_<scene>_ helpers."
+  description: >
+    Saves light state to helpers and Z2M where applicable. For Custom Scenes with room=all,
+    also creates one HA scene per room (scene.slc_<room>_<slug>) via scene.create so all
+    lights in that room are captured; use script.sl_apply_custom_scene_all_rooms to recall.
+    Dynamic scenes are cleared on full HA restart or scene reload.
   mode: single
   fields:
     room:
@@ -78,45 +82,79 @@ sl_save_current_as_scene:
             - condition: template
               value_template: "{{ room == 'all' }}"
           sequence:
-            - repeat:
-                for_each:
-                  - living_room
-                  - bedroom
-                  - bathroom
-                  - kitchen
-                  - hallway
-                sequence:
-                  - variables:
-                      r: "{{ repeat.item }}"
-                  - variables:
-                      source_light: "{{ source_light_map[r] }}"
-                      bri: "{{ state_attr(source_light, 'brightness') | int(200) }}"
-                      ct_mireds: "{{ state_attr(source_light, 'color_temp') }}"
-                      ct_kelvin: "{{ state_attr(source_light, 'color_temp_kelvin') | int(0) }}"
-                      ct: >-
-                        {% if ct_mireds not in ['unknown', 'unavailable', '', None] %}
-                          {{ ct_mireds | int }}
-                        {% elif ct_kelvin and ct_kelvin > 0 %}
-                          {{ (1000000 / ct_kelvin) | int }}
-                        {% else %}
-                          0
-                        {% endif %}
-                      has_ct: "{{ ct | int(0) > 0 }}"
-                  - service: input_number.set_value
-                    target:
-                      entity_id: "input_number.sl_{{ r }}_{{ window }}_brightness"
-                    data:
-                      value: "{{ bri }}"
-                  - if:
-                      - condition: template
-                        value_template: "{{ has_ct }}"
-                    then:
+            # Per-room HA scenes (full light list); entity_id scene.slc_<room>_<window>
+            - service: scene.create
+              data:
+                scene_id: "slc_living_room_{{ window }}"
+                snapshot_entities:
+                  - light.living_room_1
+            - service: scene.create
+              data:
+                scene_id: "slc_bedroom_{{ window }}"
+                snapshot_entities:
+                  - light.bedroom_1
+                  - light.bedroom_2
+                  - light.lamp_1
+            - service: scene.create
+              data:
+                scene_id: "slc_bathroom_{{ window }}"
+                snapshot_entities:
+                  - light.bathroom_1
+            - service: scene.create
+              data:
+                scene_id: "slc_kitchen_{{ window }}"
+                snapshot_entities:
+                  - light.kitchen_1
+                  - light.kitchen_2
+            - service: scene.create
+              data:
+                scene_id: "slc_hallway_{{ window }}"
+                snapshot_entities:
+                  - light.hallway_1
+            # Standard time windows: mirror first-light values into helpers + Z2M
+            - if:
+                - condition: template
+                  value_template: "{{ window in ['morning', 'day', 'evening', 'night'] }}"
+              then:
+                - repeat:
+                    for_each:
+                      - living_room
+                      - bedroom
+                      - bathroom
+                      - kitchen
+                      - hallway
+                    sequence:
+                      - variables:
+                          r: "{{ repeat.item }}"
+                      - variables:
+                          source_light: "{{ source_light_map[r] }}"
+                          bri: "{{ state_attr(source_light, 'brightness') | int(200) }}"
+                          ct_mireds: "{{ state_attr(source_light, 'color_temp') }}"
+                          ct_kelvin: "{{ state_attr(source_light, 'color_temp_kelvin') | int(0) }}"
+                          ct: >-
+                            {% if ct_mireds not in ['unknown', 'unavailable', '', None] %}
+                              {{ ct_mireds | int }}
+                            {% elif ct_kelvin and ct_kelvin > 0 %}
+                              {{ (1000000 / ct_kelvin) | int }}
+                            {% else %}
+                              0
+                            {% endif %}
+                          has_ct: "{{ ct | int(0) > 0 }}"
                       - service: input_number.set_value
                         target:
-                          entity_id: "input_number.sl_{{ r }}_{{ window }}_color_temp"
+                          entity_id: "input_number.sl_{{ r }}_{{ window }}_brightness"
                         data:
-                          value: "{{ ct | int }}"
-            - service: script.sl_push_config
+                          value: "{{ bri }}"
+                      - if:
+                          - condition: template
+                            value_template: "{{ has_ct }}"
+                        then:
+                          - service: input_number.set_value
+                            target:
+                              entity_id: "input_number.sl_{{ r }}_{{ window }}_color_temp"
+                            data:
+                              value: "{{ ct | int }}"
+                - service: script.sl_push_config
       default:
         - variables:
             source_light: "{{ source_light_map[room] }}"
