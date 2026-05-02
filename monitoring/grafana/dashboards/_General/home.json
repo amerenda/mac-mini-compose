@@ -692,7 +692,7 @@
     },
     {
       "type": "timeseries",
-      "title": "LLM \u2014 queue depth",
+      "title": "LLM \u2014 queue depth by runner",
       "datasource": {
         "type": "prometheus"
       },
@@ -703,6 +703,7 @@
         "y": 35
       },
       "id": 17,
+      "description": "Pool backlog (`llm_queue_depth`: queued + waiting_for_eviction) plus per-runner jobs in running or loading_model (`llm_runner_attached_jobs`).",
       "fieldConfig": {
         "defaults": {
           "unit": "short",
@@ -714,7 +715,7 @@
             "showPoints": "never",
             "spanNulls": true,
             "stacking": {
-              "mode": "normal",
+              "mode": "none",
               "group": "A"
             }
           }
@@ -738,8 +739,16 @@
             "type": "prometheus"
           },
           "expr": "llm_queue_depth or vector(0)",
-          "legendFormat": "depth",
+          "legendFormat": "queued (pool)",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus"
+          },
+          "expr": "llm_runner_attached_jobs{runner=~\"$runner\"}",
+          "legendFormat": "{{runner}} attached",
+          "refId": "B"
         }
       ]
     },
@@ -1877,5 +1886,5 @@
   "timezone": "",
   "title": "Home",
   "uid": "home",
-  "version": 2
+  "version": 3
 }

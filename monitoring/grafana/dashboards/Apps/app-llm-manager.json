@@ -314,7 +314,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Queue Depth Over Time",
+      "title": "Queue depth (pool + per-runner attached)",
       "id": 11,
       "datasource": {
         "type": "prometheus"
@@ -335,7 +335,7 @@
             "showPoints": "never",
             "spanNulls": true,
             "stacking": {
-              "mode": "normal"
+              "mode": "none"
             }
           }
         }
@@ -353,18 +353,23 @@
       "targets": [
         {
           "expr": "max(llm_queue_depth)",
-          "legendFormat": "queued",
+          "legendFormat": "queued (pool)",
           "refId": "A"
         },
         {
           "expr": "max(llm_queue_active_jobs)",
-          "legendFormat": "running",
+          "legendFormat": "running (total)",
           "refId": "B"
         },
         {
           "expr": "max(llm_queue_loading_jobs)",
-          "legendFormat": "loading model",
+          "legendFormat": "loading model (total)",
           "refId": "C"
+        },
+        {
+          "expr": "llm_runner_attached_jobs{runner=~\"$runner\"}",
+          "legendFormat": "{{runner}} attached (run+load)",
+          "refId": "D"
         }
       ]
     },
@@ -1214,5 +1219,5 @@
   "timezone": "browser",
   "title": "LLM Manager",
   "uid": "llm-manager",
-  "version": 4
+  "version": 5
 }

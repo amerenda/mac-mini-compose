@@ -74,7 +74,13 @@ mqtt:
     - name: "SL: Z2M Sync Status"
       unique_id: sl_z2m_sync_status
       state_topic: "zigbee2mqtt/sl/status"
-      value_template: "{{ value_json.status }}"
+      value_template: >-
+        {% set s = value_json.status | default('unknown') %}
+        {% if s is match('window_') %}
+          {{ s[7:] }}
+        {% else %}
+          {{ s }}
+        {% endif %}
       json_attributes_topic: "zigbee2mqtt/sl/status"
       json_attributes_template: "{{ value_json | tojson }}"
       icon: mdi:sync

@@ -1729,17 +1729,40 @@ views:
         show_header_toggle: false
         entities:
           - entity: sensor.sl_z2m_sync_status
-            name: Status
+            name: Sync status
       - type: markdown
         content: >
+          {% set st = states('sensor.sl_z2m_sync_status') %}
           {% set sync = state_attr('sensor.sl_z2m_sync_status', 'last_sync') %}
           {% set hash = state_attr('sensor.sl_z2m_sync_status', 'config_hash') %}
           {% set window = state_attr('sensor.sl_z2m_sync_status', 'current_window') %}
-          **Z2M Window:** {{ window | default('unknown') }}
+          {% set has_cfg = state_attr('sensor.sl_z2m_sync_status', 'has_config') %}
+          {% set mqtt_ts = state_attr('sensor.sl_z2m_sync_status', 'timestamp') %}
+          {% if st == 'synced' %}
+          **Event:** Full scene push finished (HA config applied to groups/bulbs).
+          {% elif st in ['morning', 'day', 'evening', 'night'] %}
+          **Event:** Time window changed ({{ st }}) → extension updated `hue_power_on_*` and recalled scenes on groups that were already on. This is normal; it is **not** a failed HA sync.
+          {% elif st == 'started' %}
+          **Event:** Smart Lighting extension started (may still be waiting for first config if no hash yet).
+          {% elif st == 'config_updated' %}
+          **Event:** New config received from HA (full push usually follows immediately; status often becomes `synced`).
+          {% else %}
+          **Event:** `{{ st }}`
+          {% endif %}
 
-          **Config Hash:** {{ hash | default('none') }}
+          **Z2M computed window:** {{ window | default('unknown') }}
 
-          **Last Sync:** {{ sync | default('never') }}
+          **HA has config cached in Z2M:** {{ has_cfg | default('unknown') }}
+
+          **Config hash:** {{ hash | default('none') }}
+
+          **Last full scene push** (HA → Z2M `scene_add` + power-on defaults): {{ sync | default('never') }}
+
+          **Last status MQTT message:** {{ mqtt_ts | default('unknown') }}
+
+          ---
+
+          *`last_sync` only updates when a **full** push runs (after `script.sl_push_config`, on config MQTT, or startup with cache). Window transitions set the entity **state** to the window name (`morning`, `day`, …) but do not refresh `last_sync`. Raw MQTT still uses the `window_` prefix in the `status` attribute. Use **Force Sync** to confirm end-to-end; you should see state `synced` and a new `last_sync` time.*
 
       - type: button
         name: Force Sync
