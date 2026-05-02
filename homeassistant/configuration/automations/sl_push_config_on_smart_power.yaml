@@ -1,0 +1,16 @@
+alias: "SL: Push Z2M config when Smart Wall Switch changes"
+id: sl_push_config_on_smart_power
+description: >
+  Z2M smart-lighting.js only sees smart_power_on via MQTT config. Without this,
+  toggling helpers in HA leaves stale behavior until manual Force Sync.
+mode: single
+trigger:
+  - platform: state
+    entity_id:
+      - input_boolean.sl_living_room_smart_power_on
+      - input_boolean.sl_bedroom_smart_power_on
+      - input_boolean.sl_bathroom_smart_power_on
+      - input_boolean.sl_kitchen_smart_power_on
+      - input_boolean.sl_hallway_smart_power_on
+action:
+  - service: script.sl_push_config
