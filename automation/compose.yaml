@@ -33,6 +33,7 @@ services:
       - ../homeassistant/configuration/automations:/config/automations:ro
       - ../homeassistant/configuration/blueprints/automation:/config/blueprints/automation/_defaults:ro
       - ../homeassistant/configuration/scripts:/config/scripts:ro
+      - ../homeassistant/configuration/python_scripts:/config/python_scripts:ro
       - ../homeassistant/configuration/helpers/generated/input_boolean:/config/helpers/input_boolean:ro
       - ../homeassistant/configuration/helpers/generated/input_datetime:/config/helpers/input_datetime:ro
       - ../homeassistant/configuration/helpers/generated/input_select:/config/helpers/input_select:ro

@@ -1,6 +1,6 @@
 # Home Assistant Configuration
 
-All Home Assistant configuration is managed via GitOps through the `mac-mini-compose` repo. Files in `homeassistant/configuration/` are bind-mounted read-only into the HA container. Changes go through git, not the HA UI.
+All Home Assistant configuration is managed via GitOps through the `mac-mini-compose` repo. Files in `homeassistant/configuration/` are bind-mounted read-only into the HA container (see `automation/compose.yaml`). That includes `python_scripts/` for Smart Lighting persistence — commit and deploy like any other config; no manual copy. Changes go through git, not the HA UI.
 
 ## Smart Lighting v2
 
@@ -102,6 +102,8 @@ homeassistant/configuration/
 ├── scripts/
 │   ├── sl_room_on.yaml             — Core logic: determine window, check mode, apply scene
 │   └── sl_room_off.yaml            — Turn off room + clear override
+├── python_scripts/
+│   └── sl_custom_scenes_persist.py — GitOps: persistent “All Rooms” custom scene packs (`sl_custom_scenes.json` on the `ha-config` volume)
 ├── helpers/generated/
 │   ├── input_boolean/sl_*.yaml     — Toggles (motion, transition, override, UI)
 │   ├── input_datetime/sl_*.yaml    — Schedule times (weekday + weekend)
