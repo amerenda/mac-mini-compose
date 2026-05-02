@@ -59,3 +59,9 @@ if echo "$CHANGED" | grep -q '^homeassistant/'; then
     echo "$(date): homeassistant config changed, restarting homeassistant" >> "$LOG"
     "$DOCKER" restart homeassistant 2>/dev/null || true
 fi
+
+# Z2M external extensions are bind-mounted; VirtFS can serve stale JS until restart.
+if echo "$CHANGED" | grep -q '^zigbee2mqtt/'; then
+    echo "$(date): zigbee2mqtt files changed, restarting zigbee2mqtt" >> "$LOG"
+    "$DOCKER" restart zigbee2mqtt 2>/dev/null || true
+fi

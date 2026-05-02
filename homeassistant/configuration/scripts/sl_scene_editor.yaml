@@ -76,8 +76,17 @@ sl_save_current_as_scene:
           hallway: "light.hallway_1"
         source_light: "{{ source_light_map[room] }}"
         bri: "{{ state_attr(source_light, 'brightness') | int(200) }}"
-        ct: "{{ state_attr(source_light, 'color_temp') }}"
-        has_ct: "{{ ct not in ['unknown', 'unavailable', '', None] }}"
+        ct_mireds: "{{ state_attr(source_light, 'color_temp') }}"
+        ct_kelvin: "{{ state_attr(source_light, 'color_temp_kelvin') | int(0) }}"
+        ct: >-
+          {% if ct_mireds not in ['unknown', 'unavailable', '', None] %}
+            {{ ct_mireds | int }}
+          {% elif ct_kelvin and ct_kelvin > 0 %}
+            {{ (1000000 / ct_kelvin) | int }}
+          {% else %}
+            0
+          {% endif %}
+        has_ct: "{{ ct | int(0) > 0 }}"
 
     # Always save brightness
     - service: input_number.set_value
@@ -86,7 +95,7 @@ sl_save_current_as_scene:
       data:
         value: "{{ bri }}"
 
-    # Save color_temp only for ambiance rooms (helper exists)
+    # Save color_temp (mireds) when the bulb reports mireds or Kelvin
     - if:
         - condition: template
           value_template: "{{ has_ct }}"

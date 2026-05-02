@@ -1,6 +1,6 @@
 sl_push_config:
   alias: "SL: Push Config to Z2M"
-  description: "Reads schedule + scene helpers, publishes to zigbee2mqtt/sl/config (retained)"
+  description: "Reads schedule + scene helpers + switch maps, publishes to zigbee2mqtt/sl/config (retained)"
   mode: single
   sequence:
     - variables:
@@ -53,9 +53,16 @@ sl_push_config:
           {% endmacro %}
           {% macro room_config(room_key, room_name, lights) %}
             {% set spo = false if is_guest else is_state('input_boolean.sl_' ~ room_key ~ '_smart_power_on', 'on') %}
+            {% set auto_t = is_state('input_boolean.sl_' ~ room_key ~ '_auto_transition', 'on') %}
+            {% set trans_min = states('input_number.sl_' ~ room_key ~ '_smooth_transition_duration') | float(10) %}
+            {% set trans_secs = (trans_min * 60) | int if is_state('input_boolean.sl_' ~ room_key ~ '_smooth_transition', 'on') else 0 %}
+            {% set motion_night = is_state('input_boolean.sl_' ~ room_key ~ '_motion_night', 'on') %}
             {
               "lights": {{ lights | tojson }},
               "smart_power_on": {{ spo | tojson }},
+              "auto_transition": {{ auto_t | tojson }},
+              "transition_secs": {{ trans_secs }},
+              "motion_night": {{ motion_night | tojson }},
               "scenes": {
                 "morning": {{ scene(room_key, 'morning') | from_json | tojson }},
                 "day": {{ scene(room_key, 'day') | from_json | tojson }},
@@ -71,7 +78,112 @@ sl_push_config:
             'Kitchen': room_config('kitchen', 'Kitchen', ['kitchen_1', 'kitchen_2']) | from_json,
             'Hallway': room_config('hallway', 'Hallway', ['hallway_1']) | from_json
           } %}
-          {{ {'profiles': profiles, 'day_assignments': day_assignments, 'house_mode': house_mode, 'rooms': rooms} | tojson }}
+          {% set switches = {
+            'living_room_s_1': {
+              'sid': 'living_room',
+              'room_group': 'Living Room',
+              'room_key': 'living_room',
+              'brightness_step_pct': states('input_number.sl_living_room_brightness_step') | float(20),
+              'min_brightness_pct': states('input_number.sl_living_room_min_brightness') | float(20),
+              'multi_room_groups': (['Living Room'] if is_state('input_boolean.sl_living_room_multi_living_room', 'on') else []) + (['Bedroom'] if is_state('input_boolean.sl_living_room_multi_bedroom', 'on') else []) + (['Bathroom'] if is_state('input_boolean.sl_living_room_multi_bathroom', 'on') else []) + (['Kitchen'] if is_state('input_boolean.sl_living_room_multi_kitchen', 'on') else []) + (['Hallway'] if is_state('input_boolean.sl_living_room_multi_hallway', 'on') else []),
+              'b1_short': states('input_select.sl_living_room_b1_short'),
+              'b1_long': states('input_select.sl_living_room_b1_long'),
+              'b2_short': states('input_select.sl_living_room_b2_short'),
+              'b2_long': states('input_select.sl_living_room_b2_long'),
+              'b3_short': states('input_select.sl_living_room_b3_short'),
+              'b3_long': states('input_select.sl_living_room_b3_long'),
+              'b4_short': states('input_select.sl_living_room_b4_short'),
+              'b4_long': states('input_select.sl_living_room_b4_long')
+            },
+            'bedroom_s_1': {
+              'sid': 'bedroom',
+              'room_group': 'Bedroom',
+              'room_key': 'bedroom',
+              'brightness_step_pct': states('input_number.sl_bedroom_brightness_step') | float(20),
+              'min_brightness_pct': states('input_number.sl_bedroom_min_brightness') | float(20),
+              'multi_room_groups': (['Living Room'] if is_state('input_boolean.sl_bedroom_multi_living_room', 'on') else []) + (['Bedroom'] if is_state('input_boolean.sl_bedroom_multi_bedroom', 'on') else []) + (['Bathroom'] if is_state('input_boolean.sl_bedroom_multi_bathroom', 'on') else []) + (['Kitchen'] if is_state('input_boolean.sl_bedroom_multi_kitchen', 'on') else []) + (['Hallway'] if is_state('input_boolean.sl_bedroom_multi_hallway', 'on') else []),
+              'b1_short': states('input_select.sl_bedroom_b1_short'),
+              'b1_long': states('input_select.sl_bedroom_b1_long'),
+              'b2_short': states('input_select.sl_bedroom_b2_short'),
+              'b2_long': states('input_select.sl_bedroom_b2_long'),
+              'b3_short': states('input_select.sl_bedroom_b3_short'),
+              'b3_long': states('input_select.sl_bedroom_b3_long'),
+              'b4_short': states('input_select.sl_bedroom_b4_short'),
+              'b4_long': states('input_select.sl_bedroom_b4_long')
+            },
+            'bathroom_s_1': {
+              'sid': 'bathroom',
+              'room_group': 'Bathroom',
+              'room_key': 'bathroom',
+              'brightness_step_pct': states('input_number.sl_bathroom_brightness_step') | float(20),
+              'min_brightness_pct': states('input_number.sl_bathroom_min_brightness') | float(20),
+              'multi_room_groups': (['Living Room'] if is_state('input_boolean.sl_bathroom_multi_living_room', 'on') else []) + (['Bedroom'] if is_state('input_boolean.sl_bathroom_multi_bedroom', 'on') else []) + (['Bathroom'] if is_state('input_boolean.sl_bathroom_multi_bathroom', 'on') else []) + (['Kitchen'] if is_state('input_boolean.sl_bathroom_multi_kitchen', 'on') else []) + (['Hallway'] if is_state('input_boolean.sl_bathroom_multi_hallway', 'on') else []),
+              'b1_short': states('input_select.sl_bathroom_b1_short'),
+              'b1_long': states('input_select.sl_bathroom_b1_long'),
+              'b2_short': states('input_select.sl_bathroom_b2_short'),
+              'b2_long': states('input_select.sl_bathroom_b2_long'),
+              'b3_short': states('input_select.sl_bathroom_b3_short'),
+              'b3_long': states('input_select.sl_bathroom_b3_long'),
+              'b4_short': states('input_select.sl_bathroom_b4_short'),
+              'b4_long': states('input_select.sl_bathroom_b4_long')
+            },
+            'kitchen_s_1': {
+              'sid': 'kitchen',
+              'room_group': 'Kitchen',
+              'room_key': 'kitchen',
+              'brightness_step_pct': states('input_number.sl_kitchen_brightness_step') | float(20),
+              'min_brightness_pct': states('input_number.sl_kitchen_min_brightness') | float(20),
+              'multi_room_groups': (['Living Room'] if is_state('input_boolean.sl_kitchen_multi_living_room', 'on') else []) + (['Bedroom'] if is_state('input_boolean.sl_kitchen_multi_bedroom', 'on') else []) + (['Bathroom'] if is_state('input_boolean.sl_kitchen_multi_bathroom', 'on') else []) + (['Kitchen'] if is_state('input_boolean.sl_kitchen_multi_kitchen', 'on') else []) + (['Hallway'] if is_state('input_boolean.sl_kitchen_multi_hallway', 'on') else []),
+              'b1_short': states('input_select.sl_kitchen_b1_short'),
+              'b1_long': states('input_select.sl_kitchen_b1_long'),
+              'b2_short': states('input_select.sl_kitchen_b2_short'),
+              'b2_long': states('input_select.sl_kitchen_b2_long'),
+              'b3_short': states('input_select.sl_kitchen_b3_short'),
+              'b3_long': states('input_select.sl_kitchen_b3_long'),
+              'b4_short': states('input_select.sl_kitchen_b4_short'),
+              'b4_long': states('input_select.sl_kitchen_b4_long')
+            },
+            'hallway_s_1': {
+              'sid': 'hallway',
+              'room_group': 'Hallway',
+              'room_key': 'hallway',
+              'brightness_step_pct': states('input_number.sl_hallway_brightness_step') | float(20),
+              'min_brightness_pct': states('input_number.sl_hallway_min_brightness') | float(20),
+              'multi_room_groups': (['Living Room'] if is_state('input_boolean.sl_hallway_multi_living_room', 'on') else []) + (['Bedroom'] if is_state('input_boolean.sl_hallway_multi_bedroom', 'on') else []) + (['Bathroom'] if is_state('input_boolean.sl_hallway_multi_bathroom', 'on') else []) + (['Kitchen'] if is_state('input_boolean.sl_hallway_multi_kitchen', 'on') else []) + (['Hallway'] if is_state('input_boolean.sl_hallway_multi_hallway', 'on') else []),
+              'b1_short': states('input_select.sl_hallway_b1_short'),
+              'b1_long': states('input_select.sl_hallway_b1_long'),
+              'b2_short': states('input_select.sl_hallway_b2_short'),
+              'b2_long': states('input_select.sl_hallway_b2_long'),
+              'b3_short': states('input_select.sl_hallway_b3_short'),
+              'b3_long': states('input_select.sl_hallway_b3_long'),
+              'b4_short': states('input_select.sl_hallway_b4_short'),
+              'b4_long': states('input_select.sl_hallway_b4_long')
+            },
+            'hallway_s_2': {
+              'sid': 'hallway_s2',
+              'room_group': 'Hallway',
+              'room_key': 'hallway',
+              'brightness_step_pct': states('input_number.sl_hallway_s2_brightness_step') | float(20),
+              'min_brightness_pct': states('input_number.sl_hallway_s2_min_brightness') | float(20),
+              'multi_room_groups': (['Living Room'] if is_state('input_boolean.sl_hallway_s2_multi_living_room', 'on') else []) + (['Bedroom'] if is_state('input_boolean.sl_hallway_s2_multi_bedroom', 'on') else []) + (['Bathroom'] if is_state('input_boolean.sl_hallway_s2_multi_bathroom', 'on') else []) + (['Kitchen'] if is_state('input_boolean.sl_hallway_s2_multi_kitchen', 'on') else []) + (['Hallway'] if is_state('input_boolean.sl_hallway_s2_multi_hallway', 'on') else []),
+              'b1_short': states('input_select.sl_hallway_s2_b1_short'),
+              'b1_long': states('input_select.sl_hallway_s2_b1_long'),
+              'b2_short': states('input_select.sl_hallway_s2_b2_short'),
+              'b2_long': states('input_select.sl_hallway_s2_b2_long'),
+              'b3_short': states('input_select.sl_hallway_s2_b3_short'),
+              'b3_long': states('input_select.sl_hallway_s2_b3_long'),
+              'b4_short': states('input_select.sl_hallway_s2_b4_short'),
+              'b4_long': states('input_select.sl_hallway_s2_b4_long')
+            }
+          } %}
+          {{ {
+            'profiles': profiles,
+            'day_assignments': day_assignments,
+            'house_mode': house_mode,
+            'sl_enabled': is_state('input_boolean.sl_enabled', 'on'),
+            'rooms': rooms,
+            'switches': switches
+          } | tojson }}
     - service: mqtt.publish
       data:
         topic: "zigbee2mqtt/sl/config"
