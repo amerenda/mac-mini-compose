@@ -58,5 +58,20 @@ if [[ -f llm/gitops.env ]]; then
   sed '/^[[:space:]]*#/d;/^[[:space:]]*$/d' llm/gitops.env >>llm/.env
 fi
 
+# Unified VRAM pool for Metal: psutil in the agent often sees only OrbStack's cgroup (~8Gi).
+# Library "fits" + scheduler need real host DRAM. setup-macmini writes .ansible-memory-bytes.
+# Skip if gitops.env already set AGENT_UNIFIED_VRAM_TOTAL_BYTES.
+if ! grep -q '^AGENT_UNIFIED_VRAM_TOTAL_BYTES=' llm/.env && [[ -f llm/.ansible-memory-bytes ]]; then
+  _mem="$(tr -d ' \t\r\n' <llm/.ansible-memory-bytes)"
+  if [[ -n "$_mem" && "$_mem" =~ ^[0-9]+$ && "$_mem" -gt 0 ]]; then
+    echo "AGENT_UNIFIED_VRAM_TOTAL_BYTES=${_mem}" >>llm/.env
+  fi
+fi
+# If still unset, use a 16 GiB floor so library "fits" is not stuck at the ~8Gi cgroup
+# (set exact bytes in gitops.env or run setup-macmini for .ansible-memory-bytes).
+if ! grep -q '^AGENT_UNIFIED_VRAM_TOTAL_BYTES=' llm/.env; then
+  echo "AGENT_UNIFIED_VRAM_TOTAL_BYTES=17179869184" >>llm/.env
+fi
+
 # GitOps: native Homebrew Ollama must bind 0.0.0.0 so containers reach host.docker.internal:11434.
 bash "$ROOT/scripts/configure-native-ollama-bind.sh"
