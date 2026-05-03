@@ -52,9 +52,10 @@ fi
   printf 'NATIVE_OLLAMA_RESTART_CMD=%q\n' "$RESTART_CMD"
 } >llm/.env
 
-# Optional: operator-created file (gitignored) with extra KEY=value lines, e.g. AGENT_ADDRESS=...
-if [[ -f llm/compose.local.env ]]; then
-  cat llm/compose.local.env >>llm/.env
+# GitOps overrides (committed in repo — change via PR, not on the host).
+# Later lines win if a key appears twice (e.g. AGENT_IMAGE_TAG overrides API resolution).
+if [[ -f llm/gitops.env ]]; then
+  sed '/^[[:space:]]*#/d;/^[[:space:]]*$/d' llm/gitops.env >>llm/.env
 fi
 
 # GitOps: native Homebrew Ollama must bind 0.0.0.0 so containers reach host.docker.internal:11434.

@@ -5,7 +5,6 @@ automation/.env
 monitoring/.env
 monitoring/ha-token
 runners/compose.env
-llm/compose.local.env
 llm/.env
 llm/ollama.env
 bind9/keys/key.conf
