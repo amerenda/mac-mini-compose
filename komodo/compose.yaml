@@ -12,7 +12,8 @@ services:
       POSTGRES_DB: postgres
 
   ferretdb:
-    image: ghcr.io/ferretdb/ferretdb:v2.7.0
+    # GHCR tags are 2.7.0 (no "v"); v2.7.0 returns manifest unknown.
+    image: ghcr.io/ferretdb/ferretdb:2.7.0
     labels:
       komodo.skip:
     restart: unless-stopped
