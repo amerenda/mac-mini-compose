@@ -738,7 +738,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "llm_queue_depth or vector(0)",
+          "expr": "max(llm_queue_depth) or vector(0)",
           "legendFormat": "queued (pool)",
           "refId": "A"
         },
@@ -746,7 +746,7 @@
           "datasource": {
             "type": "prometheus"
           },
-          "expr": "llm_runner_attached_jobs{runner=~\"$runner\"}",
+          "expr": "sum by (runner) (llm_runner_attached_jobs{runner=~\"$runner\"})",
           "legendFormat": "{{runner}} attached",
           "refId": "B"
         }
@@ -1886,5 +1886,5 @@
   "timezone": "",
   "title": "Home",
   "uid": "home",
-  "version": 3
+  "version": 4
 }
