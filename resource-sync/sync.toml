@@ -9,6 +9,6 @@ tags = ["mac-mini", "archlinux"]
 [resource_sync.config]
 webhook_enabled = true
 repo = "amerenda/komodo-dean-gitops"
-branch = "feat/komodo-repo-layout"
+branch = "main"
 resource_path = ["resource-sync/stacks.toml"]
 git_account = "amerenda"

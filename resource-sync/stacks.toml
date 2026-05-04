@@ -1,6 +1,5 @@
 # Komodo Resource Sync — Stack definitions
-# Synced when changes are pushed to the branch named in each `branch =` field
-# (use `main` after this layout is merged to default branch).
+# Synced when changes are pushed to the branch named in each `branch =` field.
 # Secrets are fetched from Bitwarden Secrets Manager at deploy time via pre_deploy.
 #
 # Secrets remain in the existing k3s BWS project. Per-host machine accounts
@@ -25,7 +24,7 @@ deploy = true
 [stack.config]
 server = "mac-mini-m4"
 repo = "amerenda/komodo-dean-gitops"
-branch = "feat/komodo-repo-layout"
+branch = "main"
 file_paths = ["mac-mini-m4/core/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
@@ -51,7 +50,7 @@ deploy = true
 [stack.config]
 server = "mac-mini-m4"
 repo = "amerenda/komodo-dean-gitops"
-branch = "feat/komodo-repo-layout"
+branch = "main"
 file_paths = ["mac-mini-m4/automation/compose.yaml"]
 git_account = "amerenda"
 ignore_services = ["hacs-init"]
@@ -66,7 +65,7 @@ deploy = true
 [stack.config]
 server = "mac-mini-m4"
 repo = "amerenda/komodo-dean-gitops"
-branch = "feat/komodo-repo-layout"
+branch = "main"
 file_paths = ["mac-mini-m4/monitoring/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
@@ -92,7 +91,7 @@ deploy = true
 [stack.config]
 server = "mac-mini-m4"
 repo = "amerenda/komodo-dean-gitops"
-branch = "feat/komodo-repo-layout"
+branch = "main"
 file_paths = ["mac-mini-m4/runners/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
@@ -118,7 +117,7 @@ deploy = true
 [stack.config]
 server = "mac-mini-m4"
 repo = "amerenda/komodo-dean-gitops"
-branch = "feat/komodo-repo-layout"
+branch = "main"
 file_paths = ["mac-mini-m4/llm/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
@@ -155,7 +154,7 @@ deploy = true
 [stack.config]
 server = "archlinux"
 repo = "amerenda/komodo-dean-gitops"
-branch = "feat/komodo-repo-layout"
+branch = "main"
 file_paths = ["archlinux/media-server/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]

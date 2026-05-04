@@ -161,10 +161,11 @@ and when it applies ResourceSync updates from git.
 3. Confirm stacks show the new `mac-mini-m4/...` and `archlinux/...` file paths
    and deploy cleanly on each Periphery.
 
-**After merging to `main`:** change every `branch = "feat/komodo-repo-layout"`
-back to `branch = "main"` in `resource-sync/sync.toml` and
-`resource-sync/stacks.toml`, push to `main`, sync again in Komodo, and set the
-ResourceSync **Branch** back to `main` in the UI if you overrode it.
+**Production:** `resource-sync/sync.toml` and every `[[stack]]` in
+`resource-sync/stacks.toml` use `branch = "main"`. After editing them, push to
+`main` and run **Sync** on the `komodo-dean-gitops` ResourceSync (or rely on the
+webhook). If you ever pointed the ResourceSync at a feature branch in the Komodo
+UI, set **Branch** back to `main` there too.
 
 ## One-time migration checklist
 
