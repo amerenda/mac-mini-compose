@@ -110,6 +110,13 @@ no GitHub repo/org secrets, no manually managed files. See
 [`mac-mini-m4/README.md`](mac-mini-m4/README.md#secrets) for the per-host flow
 and rotation steps.
 
+## GitOps Policy
+
+Operational rules for this repository live in
+[`GITOPS_POLICY.md`](GITOPS_POLICY.md). In short: BWS-only secrets, zero manual
+drift, and every fix must be codified in Ansible and/or repo config so a new
+host converges without one-off commands.
+
 ## Per-host docs
 
 - [mac-mini-m4/README.md](mac-mini-m4/README.md) — Mac Mini stacks (full operational guide)
