@@ -111,7 +111,7 @@ chmod +x /etc/komodo/runner-secrets/entrypoint-wrapper.sh
 # ── LLM: llm-manager agent (native Ollama on Mac Mini) ─────────────────────
 
 [[stack]]
-name = "llm"
+name = "llm-mac-mini-m4"
 description = "llm-manager agent — uses host Ollama (Metal); agent API :8090"
 tags = ["mac-mini"]
 deploy = true

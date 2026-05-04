@@ -45,7 +45,7 @@ Docker Compose stacks for the Mac Mini M4, managed via Komodo GitOps from the
 
 Runs **only** the agent container. **Ollama stays native on macOS** (Metal); the agent reaches it at `host.docker.internal:11434`. Compose sets **`RUNNER_HOSTNAME=mac-mini-m4`** (llm-manager runner name) and **`AGENT_UNIFIED_MEMORY_VRAM=true`** so the UI treats **VRAM and RAM as one pool** (container-visible unified memory; used = system RAM usage, same as llm-manager’s memory bar). The agent service uses **`pull_policy: always`**; **`pre-deploy`** pins **`AGENT_IMAGE_TAG`** from the backend target when possible. The **`llm/`** directory is bind-mounted so the agent can **self-update** (pin `.env`, pull, `compose up`). In llm-manager **Runners**, enable **auto update** for `mac-mini-m4` so a new global target triggers that path on the next heartbeat (~30s) without waiting for Komodo. Non-secret overrides for deploy (**`AGENT_ADDRESS`**, **`AGENT_IMAGE_TAG`**, etc.) go in committed **`llm/gitops.env`** (merged at deploy); change them with a PR, not on the host.
 
-**Ollama bind (GitOps):** commit **`OLLAMA_HOST`** (and other native tunables) in **`ollama/environment`**. Every **`llm`** stack deploy runs **`scripts/configure-native-ollama-bind.sh`**, which sources that file and writes **`OLLAMA_HOST`** into Homebrew’s **cellar** `homebrew.mxcl.ollama.plist` (not only `~/Library/LaunchAgents`, which `brew services restart` overwrites from the cellar). **Ollama tunables** (llm-manager Runners → *Ollama Tunables*): the agent writes **`llm/ollama.env`** and merges changed keys into the **mounted** LaunchAgents plist, then runs **`brew services restart ollama`** via OrbStack’s **`mac`** CLI (`NATIVE_OLLAMA_RESTART_CMD` in `llm/.env`, defaulting to `~/.orbstack/bin/mac` when present). Re-deploy **`llm`** after `brew upgrade ollama` if the formula resets the cellar plist. If **`OLLAMA_LAUNCH_AGENTS_DIR`** or **`NATIVE_OLLAMA_RESTART_CMD`** must differ from defaults, extend **`llm/pre-deploy.sh`** / **`llm/gitops.env`** via PR (or Ansible for host-level prerequisites), not one-off edits on the Mac Mini. **`BWS_LLM_AGENT_PSK_UUID`** in `llm/pre-deploy.sh` must point at the Bitwarden secret for `llm-manager-agent-psk` (same as k8s `agent-psk` ExternalSecret). **Backend on k3s:** OrbStack/Docker bridge often yields an unroutable agent address; set **`AGENT_ADDRESS=https://<Tailscale-or-LAN-IP>:8090`** (or DNS the cluster resolves) in **`llm/gitops.env`** so registration and TLS match the URL the backend uses. **Library “fits” on Metal:** the agent container often sees only ~8Gi cgroup RAM; **`pre-deploy`** adds **`AGENT_UNIFIED_VRAM_TOTAL_BYTES`** from **`llm/.ansible-memory-bytes`** (written by **`setup-macmini.yml`**) or a 16 GiB fallback — override in **`gitops.env`** if needed (`sysctl -n hw.memsize` on the Mac).
+**Ollama bind (GitOps):** commit **`OLLAMA_HOST`** (and other native tunables) in **`ollama/environment`**. Every **`llm-mac-mini-m4`** stack deploy runs **`scripts/configure-native-ollama-bind.sh`**, which sources that file and writes **`OLLAMA_HOST`** into Homebrew’s **cellar** `homebrew.mxcl.ollama.plist` (not only `~/Library/LaunchAgents`, which `brew services restart` overwrites from the cellar). **Ollama tunables** (llm-manager Runners → *Ollama Tunables*): the agent writes **`llm/ollama.env`** and merges changed keys into the **mounted** LaunchAgents plist, then runs **`brew services restart ollama`** via OrbStack’s **`mac`** CLI (`NATIVE_OLLAMA_RESTART_CMD` in `llm/.env`, defaulting to `~/.orbstack/bin/mac` when present). Re-deploy **`llm-mac-mini-m4`** after `brew upgrade ollama` if the formula resets the cellar plist. If **`OLLAMA_LAUNCH_AGENTS_DIR`** or **`NATIVE_OLLAMA_RESTART_CMD`** must differ from defaults, extend **`llm/pre-deploy.sh`** / **`llm/gitops.env`** via PR (or Ansible for host-level prerequisites), not one-off edits on the Mac Mini. **`BWS_LLM_AGENT_PSK_UUID`** in `llm/pre-deploy.sh` must point at the Bitwarden secret for `llm-manager-agent-psk` (same as k8s `agent-psk` ExternalSecret). **Backend on k3s:** OrbStack/Docker bridge often yields an unroutable agent address; set **`AGENT_ADDRESS=https://<Tailscale-or-LAN-IP>:8090`** (or DNS the cluster resolves) in **`llm/gitops.env`** so registration and TLS match the URL the backend uses. **Library “fits” on Metal:** the agent container often sees only ~8Gi cgroup RAM; **`pre-deploy`** adds **`AGENT_UNIFIED_VRAM_TOTAL_BYTES`** from **`llm/.ansible-memory-bytes`** (written by **`setup-macmini.yml`**) or a 16 GiB fallback — override in **`gitops.env`** if needed (`sysctl -n hw.memsize` on the Mac).
 
 ### Komodo stack (`komodo/compose.yaml`)
 
@@ -63,7 +63,7 @@ for pre_deploy secret injection.
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| Ollama | 11434 | LLM inference (native macOS, Metal GPU). **`ollama/environment`** in this repo sets **`OLLAMA_HOST=0.0.0.0:11434`** for the Homebrew service (applied on **`llm`** pre-deploy). **`127.0.0.1` only** can break agent reachability depending on Docker/OrbStack networking. |
+| Ollama | 11434 | LLM inference (native macOS, Metal GPU). **`ollama/environment`** in this repo sets **`OLLAMA_HOST=0.0.0.0:11434`** for the Homebrew service (applied on **`llm-mac-mini-m4`** / `llm/` pre-deploy). **`127.0.0.1` only** can break agent reachability depending on Docker/OrbStack networking. |
 | BlueBubbles | 1234 | iMessage proxy (native macOS app) |
 
 ## Setup
@@ -93,7 +93,7 @@ GitHub push → pubhooks.amer.dev (k3s Traefik proxy) → Komodo Core (Mac Mini:
                                                         ├─ /sync/.../sync    → ResourceSync executes
                                                         ├─ /stack/<id>/deploy → core/automation/monitoring (one webhook + stack id)
                                                         ├─ /stack/<id>/deploy → runners (different stack id)
-                                                        └─ /stack/<id>/deploy → llm (optional — separate stack id, see below)
+                                                        └─ /stack/<id>/deploy → llm-mac-mini-m4 (optional — separate stack id, see below)
 ```
 
 ### How it works
@@ -105,7 +105,7 @@ GitHub push → pubhooks.amer.dev (k3s Traefik proxy) → Komodo Core (Mac Mini:
 3. Each stack's `pre_deploy` script runs first, fetching secrets from BWS via `bws` CLI
 4. Komodo runs `docker compose up -d` with the updated compose files
 
-**Keeping `llm` isolated from other deploys:** Add the `llm` stack in `resource-sync/stacks.toml` (done in-repo), let ResourceSync pick it up, then in Komodo create a **dedicated GitHub webhook** whose path is `/listener/github/stack/<llm-stack-id>/deploy` — same HMAC secret as the others. Pushes only trigger the stacks whose webhooks you configure; the `llm` webhook does **not** deploy core, automation, monitoring, or runners. Conversely, existing deploy webhooks only touch their own stack ids, so they never pull up `llm` unless you merge those stacks in Komodo (this repo keeps them separate).
+**Keeping `llm-mac-mini-m4` isolated from other deploys:** The stack is defined in `resource-sync/stacks.toml`; let ResourceSync pick it up, then in Komodo create a **dedicated GitHub webhook** whose path is `/listener/github/stack/<llm-mac-mini-m4-stack-uuid>/deploy` — same HMAC secret as the others. Pushes only trigger the stacks whose webhooks you configure; the `llm-mac-mini-m4` webhook does **not** deploy core, automation, monitoring, or runners. Conversely, existing deploy webhooks only touch their own stack ids, so they never pull up `llm-mac-mini-m4` unless you merge those stacks in Komodo (this repo keeps them separate).
 
 ### Webhook configuration
 
@@ -118,7 +118,7 @@ IngressRoute that forwards `/listener/github/*` to the Mac Mini's Komodo Core).
 | ResourceSync | `606876027` | `.../sync/komodo-dean-gitops/sync` | Sync stack definitions from TOML (path updated after rename) |
 | Core/Automation/Monitoring deploy | `605400567` | `.../stack/69c4863a9781f84b58ffd7a6/deploy` | Deploy core, automation, and monitoring stacks |
 | Runners deploy | `606895878` | `.../stack/69c4863a9781f84b58ffd7a8/deploy` | Deploy runners stack |
-| LLM deploy | *(add after sync)* | `.../stack/<llm-stack-uuid>/deploy` | Deploy `mac-mini-m4/llm/` only — use the stack id from Komodo UI after ResourceSync imports `stacks.toml` |
+| LLM deploy | *(add after sync)* | `.../stack/<llm-mac-mini-m4-stack-uuid>/deploy` | Deploy `mac-mini-m4/llm/` only — use the stack id for **`llm-mac-mini-m4`** from Komodo UI after ResourceSync imports `stacks.toml` |
 | Media-server deploy (murderbot) | *(add after sync)* | `.../stack/<media-server-stack-uuid>/deploy` | Deploy `murderbot/media-server/` only — see top-level [README.md](../README.md) |
 
 All webhooks use the `komodo-dean-webhook-secret` from BWS as the HMAC secret.
@@ -144,7 +144,7 @@ webhook fails or is missed, the sync will still happen within 5 minutes.
 | `resource-sync/sync.toml` | Defines the ResourceSync resource itself (repo, branch, resource path) |
 | `resource-sync/stacks.toml` | Defines the managed stacks (core, automation, monitoring, runners) with pre_deploy scripts |
 
-Stack definitions: `resource-sync/stacks.toml` (core, automation, monitoring, runners, llm)
+Stack definitions: `resource-sync/stacks.toml` (core, automation, monitoring, runners, llm-mac-mini-m4)
 Sync definition: `resource-sync/sync.toml`
 
 ## Komodo Administration
