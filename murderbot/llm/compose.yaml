@@ -26,6 +26,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
+    # NVML (pynvml) inside the agent needs GPU devices; host Ollama still uses the GPU natively.
+    # Requires nvidia-container-toolkit. For AMD + ROCm, use agent-amd + /dev/dri + /dev/kfd.
+    gpus: all
 
 volumes:
   llm-agent-tls:

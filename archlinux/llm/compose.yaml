@@ -26,6 +26,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
+    # pynvml in the agent; requires nvidia-container-toolkit (AMD: agent-amd + dri/kfd).
+    gpus: all
 
 volumes:
   llm-agent-tls:
