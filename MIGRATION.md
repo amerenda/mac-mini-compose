@@ -89,11 +89,10 @@ Everything below is **operator action** — none of it is in code.
   ```
 - [ ] Confirm `https://10.100.20.25:8120` answers
   (`curl -k https://10.100.20.25:8120` from another host).
-- [ ] In Komodo UI > Variables, set `KOMODO_PERIPHERY_PASSKEY` to the same
-  value stored in `komodo-dean-passkey` (the `[[server]]` block in
-  `resource-sync/stacks.toml` references this variable). The next
-  ResourceSync will register the `archlinux` server resource and the
-  `media-server` stack.
+- [ ] ResourceSync: the `archlinux` `[[server]]` uses **`passkey = ""`** so Core
+  inherits the same `komodo-dean-passkey` as Mac Periphery (do not use
+  `[[KOMODO_PERIPHERY_PASSKEY]]` in TOML — Core may send the literal brackets).
+  After the next sync, confirm **Servers → archlinux** is healthy.
 - [ ] In Komodo UI > Servers > `archlinux`, confirm status is healthy
   before the first stack deploy.
 

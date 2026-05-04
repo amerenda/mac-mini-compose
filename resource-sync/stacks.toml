@@ -139,8 +139,11 @@ tags = ["archlinux"]
 [server.config]
 address = "https://10.100.20.25:8120"
 enabled = true
-# Komodo variable resolved from a Komodo Variable, populated from BWS in the UI.
-passkey = "[[KOMODO_PERIPHERY_PASSKEY]]"
+# Intentionally empty: Core uses its global passkey (KOMODO_PASSKEY_FILE →
+# komodo-dean-passkey on the Mac Mini), which must match PERIPHERY_PASSKEYS on
+# Arch. Do NOT use [[KOMODO_PERIPHERY_PASSKEY]] here — Core can persist the
+# placeholder literally and you get "Invalid passkey" even when the Variable is correct.
+passkey = ""
 
 # ── Media server: Jellyfin + servarr + nginx/certbot + DO dyndns ──────────
 
