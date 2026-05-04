@@ -1,5 +1,10 @@
 # llm-manager agent on Mac Mini — pairs with native Ollama (Metal, host :11434).
 # Docker only runs the agent; OLLAMA_CONTAINER is unset so the agent skips compose-Ollama checks.
+#
+# Top-level name fixes the Docker Compose project name (`docker compose ls`); matches
+# Komodo stack id llm-mac-mini-m4. Without it, the project defaults to the checkout dir name.
+name: llm-mac-mini-m4
+
 services:
   llm-agent:
     image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
