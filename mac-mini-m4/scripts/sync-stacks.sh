@@ -107,18 +107,20 @@ if [ -d "$STACK_SERVICES/.git" ]; then
     fi
 fi
 
-if echo "$CHANGED" | grep -q '^monitoring/'; then
+# Paths are repo-root-relative (e.g. mac-mini-m4/homeassistant/...) after the
+# komodo-dean-gitops layout move; older ^homeassistant/ patterns never matched.
+if echo "$CHANGED" | grep -qE '^mac-mini-m4/monitoring/'; then
     echo "$(date): monitoring stack files changed, restarting grafana (and prometheus)" >> "$LOG"
     "$DOCKER" restart grafana 2>/dev/null || true
     "$DOCKER" restart prometheus 2>/dev/null || true
 fi
 
-if echo "$CHANGED" | grep -q '^homeassistant/'; then
+if echo "$CHANGED" | grep -qE '^mac-mini-m4/homeassistant/'; then
     echo "$(date): homeassistant config changed, restarting homeassistant" >> "$LOG"
     "$DOCKER" restart homeassistant 2>/dev/null || true
 fi
 
-if echo "$CHANGED" | grep -q '^zigbee2mqtt/'; then
+if echo "$CHANGED" | grep -qE '^mac-mini-m4/zigbee2mqtt/'; then
     echo "$(date): zigbee2mqtt files changed, restarting zigbee2mqtt" >> "$LOG"
     "$DOCKER" restart zigbee2mqtt 2>/dev/null || true
 fi

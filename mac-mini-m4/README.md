@@ -304,17 +304,18 @@ OrbStack's VirtFS does not reliably propagate new directory entries created by
 `git pull` inside containers to the host (and vice versa). This can cause
 Komodo Periphery's git operations to fail silently. The same limitation applies
 to **new files under existing folders** and **edits to existing files**: bind
-mounts (for example Grafana dashboard JSON under `monitoring/grafana/`) can
+mounts (for example Grafana dashboard JSON under `mac-mini-m4/monitoring/grafana/`) can
 stay stale until the **Grafana** container is restarted, so the UI may not show
 new or updated dashboards even after Komodo deploys and you `docker compose
 restart` other services.
 
 **Workaround:** A LaunchAgent (`com.local.komodo-stack-sync.plist`) runs
-`scripts/sync-stacks.sh` every 60 seconds on the host. It does `git fetch &&
+`mac-mini-m4/scripts/sync-stacks.sh` every 60 seconds on the host. It does `git fetch &&
 reset --hard` on the Komodo checkout (`/etc/komodo/stacks/services`), restarts
 Periphery when the **directory tree** changes, and restarts **Grafana and
-Prometheus** when any path under `monitoring/` changed so dashboard and scrape
-config updates always take effect.
+Prometheus** when any path under `mac-mini-m4/monitoring/` changed so dashboard and scrape
+config updates always take effect. **Home Assistant** and **Zigbee2MQTT** use the
+same `mac-mini-m4/…` prefix for `homeassistant/` and `zigbee2mqtt/` file changes.
 
 ### Komodo ResourceSync webhook does not auto-execute
 
@@ -325,19 +326,18 @@ Stack deploy webhooks work correctly. ResourceSync falls back to 5-minute pollin
 
 ### Grafana dashboards missing or never updating
 
-Komodo `pre_deploy` now writes `MONITORING_DIR=<repo>/monitoring` into
-`monitoring/.env` so Grafana and Prometheus always bind-mount the **checked-out
+Komodo `pre_deploy` writes `MONITORING_DIR=<repo>/mac-mini-m4/monitoring` into
+`mac-mini-m4/monitoring/.env` so Grafana and Prometheus always bind-mount the **checked-out
 tree**, not an ambiguous relative path. If dashboards still never change after
 `docker compose restart`:
 
-1. On the Mac Mini, confirm the files exist:
-   `ls "$MONITORING_DIR/grafana/dashboards/Apps/app-mycroft.json"` (or
-   `grep Mycroft monitoring/grafana/dashboards/_General/home.json` from repo
-   root).
-2. Recreate Grafana so bind mounts and provisioning reload cleanly:
-   `docker compose -f monitoring/compose.yaml up -d --force-recreate grafana`
+1. On the Mac Mini, from the GitOps repo root, confirm the files exist:
+   `ls mac-mini-m4/monitoring/grafana/dashboards/Apps/app-mycroft.json` (or
+   `grep Mycroft mac-mini-m4/monitoring/grafana/dashboards/_General/home.json`).
+2. Recreate Grafana so bind mounts and provisioning reload cleanly (run from repo root):
+   `docker compose -f mac-mini-m4/monitoring/compose.yaml up -d --force-recreate grafana`
 3. Last resort (drops Grafana UI state, not Prometheus data):  
-   `docker compose -f monitoring/compose.yaml stop grafana && docker volume rm monitoring_grafana-data && docker compose -f monitoring/compose.yaml up -d grafana`
+   `docker compose -f mac-mini-m4/monitoring/compose.yaml stop grafana && docker volume rm monitoring_grafana-data && docker compose -f mac-mini-m4/monitoring/compose.yaml up -d grafana`
 
 ## Health Check
 
