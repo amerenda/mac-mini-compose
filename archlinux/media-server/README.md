@@ -22,9 +22,9 @@ repo. Deploys via Komodo Periphery on the archlinux host.
 | `certbot` | 80 | built (`./certbot`) | Let's Encrypt standalone, 12 h renewal loop |
 | `dns` | — | built (`./dns`) | Updates DigitalOcean A record `media.amer.dev` to current external IP every 30 min |
 
-`*arr` apps and Jellyfin use host bind mounts under `/opt/media` and
-`/mnt/storage` owned `1000:1000`; linuxserver images run as `PUID=1000
-PGID=1000`.
+`*arr` apps and Jellyfin use host bind mounts under `/mnt/storage/media/config`
+(config) and `/mnt/storage` (libraries) owned `1000:1000`; linuxserver images
+run as `PUID=1000 PGID=1000`.
 
 ## Volumes
 
@@ -32,7 +32,7 @@ All bind-mount roots are pre-created by
 [`setup-archlinux-komodo.yml`](https://github.com/amerenda/ansible-playbooks/blob/main/playbooks/infrastructure/setup-archlinux-komodo.yml)
 with owner `1000:1000`:
 
-- `/opt/media/<service>/config` — small per-app config volumes
+- `/mnt/storage/media/config/<service>/config` — small per-app config volumes
 - `/mnt/storage/{movies,tv,books,downloads/{complete,incomplete},cache/transcode}` — large library volumes (assumes `/mnt/storage` is mounted out of band)
 
 ## Deployment

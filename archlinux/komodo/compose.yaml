@@ -25,5 +25,5 @@ services:
       # BWS access token (mode 0600 on host) — read by pre_deploy via /run/secrets/.
       - /etc/komodo/.bws-secret:/run/secrets/bws-access-token:ro
       # Media-server bind-mount roots so Periphery can pre-create stack folders.
-      - /opt/media:/opt/media
+      - /mnt/storage/media/config:/mnt/storage/media/config
       - /mnt/storage:/mnt/storage

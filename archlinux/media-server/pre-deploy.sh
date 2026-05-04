@@ -18,16 +18,17 @@ if [[ -z "$DO_API_TOKEN" || "$DO_API_TOKEN" == "null" ]]; then
 fi
 
 umask 077
+CONFIG_ROOT=/mnt/storage/media/config
 {
-  echo "CONFIG_BASE=/opt/media"
-  echo "PROFILARR_CONFIG=/opt/media/profilarr/config"
-  echo "RADARR_CONFIG=/opt/media/radarr/config"
-  echo "BAZARR_CONFIG=/opt/media/bazarr/config"
-  echo "SONARR_CONFIG=/opt/media/sonarr/config"
-  echo "SONARR_SCRIPTS=/opt/media/sonarr/scripts"
-  echo "PROWLARR_CONFIG=/opt/media/prowlarr/config"
-  echo "SABNZBD_CONFIG=/opt/media/sabnzbd/config"
-  echo "JELLYFIN_CONFIG=/opt/media/jellyfin/config"
+  echo "CONFIG_BASE=${CONFIG_ROOT}"
+  echo "PROFILARR_CONFIG=${CONFIG_ROOT}/profilarr/config"
+  echo "RADARR_CONFIG=${CONFIG_ROOT}/radarr/config"
+  echo "BAZARR_CONFIG=${CONFIG_ROOT}/bazarr/config"
+  echo "SONARR_CONFIG=${CONFIG_ROOT}/sonarr/config"
+  echo "SONARR_SCRIPTS=${CONFIG_ROOT}/sonarr/scripts"
+  echo "PROWLARR_CONFIG=${CONFIG_ROOT}/prowlarr/config"
+  echo "SABNZBD_CONFIG=${CONFIG_ROOT}/sabnzbd/config"
+  echo "JELLYFIN_CONFIG=${CONFIG_ROOT}/jellyfin/config"
   echo "DATA_BASE=/mnt/storage"
   echo "MOVIES_FOLDER=/mnt/storage/movies"
   echo "TV_FOLDER=/mnt/storage/tv"
