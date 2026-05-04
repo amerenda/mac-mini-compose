@@ -13,13 +13,13 @@ mac-mini-m4/llm/ollama.env
 mac-mini-m4/bind9/keys/key.conf
 mac-mini-m4/komodo/secrets/
 
-# archlinux stack secrets (written by pre_deploy)
-archlinux/media-server/.env
-archlinux/media-server/vpn-user.txt
-archlinux/media-server/vpn-password.txt
+# murderbot stack secrets (written by pre_deploy)
+murderbot/media-server/.env
+murderbot/media-server/vpn-user.txt
+murderbot/media-server/vpn-password.txt
 
-# archlinux Periphery (deployed by Ansible) — passkey rendered from compose.env.example
-archlinux/komodo/compose.env
+# murderbot Periphery (deployed by Ansible) — passkey rendered from compose.env.example
+murderbot/komodo/compose.env
 
 # Docker volumes (local data)
 data/

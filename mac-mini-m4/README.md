@@ -119,7 +119,7 @@ IngressRoute that forwards `/listener/github/*` to the Mac Mini's Komodo Core).
 | Core/Automation/Monitoring deploy | `605400567` | `.../stack/69c4863a9781f84b58ffd7a6/deploy` | Deploy core, automation, and monitoring stacks |
 | Runners deploy | `606895878` | `.../stack/69c4863a9781f84b58ffd7a8/deploy` | Deploy runners stack |
 | LLM deploy | *(add after sync)* | `.../stack/<llm-stack-uuid>/deploy` | Deploy `mac-mini-m4/llm/` only — use the stack id from Komodo UI after ResourceSync imports `stacks.toml` |
-| Media-server deploy (archlinux) | *(add after sync)* | `.../stack/<media-server-stack-uuid>/deploy` | Deploy `archlinux/media-server/` only — see top-level [README.md](../README.md) |
+| Media-server deploy (murderbot) | *(add after sync)* | `.../stack/<media-server-stack-uuid>/deploy` | Deploy `murderbot/media-server/` only — see top-level [README.md](../README.md) |
 
 All webhooks use the `komodo-dean-webhook-secret` from BWS as the HMAC secret.
 

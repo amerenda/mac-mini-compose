@@ -56,7 +56,7 @@ fetch_secret() {
     local val
     val=$("$BWS_BIN" secret get "$id" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
     # Strip leading/trailing whitespace so Komodo/mac Periphery matches
-    # archlinux Periphery (ansible render uses the same rule).
+    # murderbot Periphery (ansible render uses the same rule).
     val=$(printf '%s' "$val" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     if [[ -n "$val" ]] && [[ "$val" != "null" ]]; then
         printf '%s' "$val" > "$dest"

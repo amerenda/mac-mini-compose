@@ -1,5 +1,10 @@
 # Migration: mac-mini-compose → komodo-dean-gitops
 
+**Update:** the `archlinux/` directory in this repo was **renamed to `murderbot/`**
+(Debian host `10.100.20.19`). ResourceSync and Ansible use `murderbot/` paths;
+`setup-debian-komodo.yml` replaces Periphery bootstrap for that host. Historical
+checklist items below may still say `archlinux/` — treat them as `murderbot/`.
+
 One-time operator checklist. Delete this file once everything is green.
 
 The repo / file changes are already in place across two repos:

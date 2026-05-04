@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Renders archlinux/media-server/.env from BWS for Komodo deploy.
+# Renders murderbot/media-server/.env from BWS for Komodo deploy.
 # Invoked by Komodo Periphery from the gitops repo root, so all paths below
 # are relative to that root.
 set -euo pipefail
@@ -9,7 +9,7 @@ set -euo pipefail
 # Bitwarden Secrets Manager — secret key `do-dns-api-key` (DigitalOcean API token for dyndns).
 BWS_DO_API_TOKEN_UUID="d043a77f-ca1e-4ac6-8cfa-b38200f7b6c9"
 
-ENV=archlinux/media-server/.env
+ENV=murderbot/media-server/.env
 
 DO_API_TOKEN=$(bws secret get "$BWS_DO_API_TOKEN_UUID" --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
 if [[ -z "$DO_API_TOKEN" || "$DO_API_TOKEN" == "null" ]]; then
@@ -44,8 +44,8 @@ CONFIG_ROOT=/mnt/storage/media/config
 
 # Sanity check: assert media-server compose file is at the expected path so
 # Komodo's `docker compose up` doesn't silently use the wrong cwd.
-test -f archlinux/media-server/compose.yaml \
-  && test -d archlinux/media-server/dns \
-  && test -d archlinux/media-server/nginx \
-  && test -d archlinux/media-server/certbot \
+test -f murderbot/media-server/compose.yaml \
+  && test -d murderbot/media-server/dns \
+  && test -d murderbot/media-server/nginx \
+  && test -d murderbot/media-server/certbot \
   || { echo "media-server pre-deploy: layout check failed in $(pwd)" >&2; exit 1; }

@@ -1,11 +1,11 @@
-# archlinux/media-server
+# murderbot/media-server
 
 Komodo-managed Docker Compose stack: Jellyfin, the *arr ecosystem (radarr,
 sonarr, bazarr, prowlarr, profilarr), sabnzbd, plus a small
 nginx/certbot reverse proxy and a DigitalOcean dyndns updater.
 
 Replaces the standalone [`amerenda/media-server`](https://github.com/amerenda/media-server)
-repo. Deploys via Komodo Periphery on the archlinux host.
+repo. Deploys via Komodo Periphery on the **murderbot** host.
 
 ## Services
 
@@ -29,7 +29,7 @@ run as `PUID=1000 PGID=1000`.
 ## Volumes
 
 All bind-mount roots are pre-created by
-[`setup-archlinux-komodo.yml`](https://github.com/amerenda/ansible-playbooks/blob/main/playbooks/infrastructure/setup-archlinux-komodo.yml)
+[`setup-debian-komodo.yml`](https://github.com/amerenda/ansible-playbooks/blob/main/playbooks/infrastructure/setup-debian-komodo.yml)
 with owner `1000:1000`:
 
 - `/mnt/storage/media/config/<service>/config` — small per-app config volumes
@@ -38,9 +38,11 @@ with owner `1000:1000`:
 ## Deployment
 
 Stack registered in [`../../resource-sync/stacks.toml`](../../resource-sync/stacks.toml)
-as `media-server` on the `archlinux` server. Komodo runs `pre-deploy.sh`
+as `media-server` on the `murderbot` server. Komodo runs `pre-deploy.sh`
 (reads BWS for `DO_API_TOKEN` and writes `.env`), then `docker compose up -d
---build` from this directory.
+--build` from this directory. The Compose **project name** is `media-server`
+(top-level `name` in [`compose.yaml`](compose.yaml)); on the host, `docker compose ls`
+should list that project when the stack is running.
 
 ```bash
 # Manual local deploy from this directory (debugging only):
@@ -62,7 +64,7 @@ before populating `media-server-do-api-token` in BWS, and replace
 ## Initial setup checklist
 
 1. Bootstrap the host: run
-   `playbooks/infrastructure/setup-archlinux-komodo.yml` from
+   `playbooks/infrastructure/setup-debian-komodo.yml` from
    [ansible-playbooks](https://github.com/amerenda/ansible-playbooks) (this
    installs Docker, Periphery, bws CLI, and pre-creates volume dirs).
 2. Confirm `/mnt/storage` is a real mountpoint (the playbook only warns).
@@ -82,10 +84,10 @@ before populating `media-server-do-api-token` in BWS, and replace
 
 - **Port 80 must be free at renewal time.** Certbot uses standalone HTTP-01,
   which means the certbot container binds 80 every 12 h. If anything else on
-  archlinux listens on 80, renewals will quietly fail.
+  murderbot listens on 80, renewals will quietly fail.
 - **`/mnt/storage` mount.** The Ansible playbook does not format or fstab
   the disk; do that out of band (parted / mkfs.ext4 / fstab / `systemctl
   daemon-reload && mount -a`).
-- **HW transcode.** Jellyfin mounts `/dev/dri:/dev/dri`. If the archlinux
+- **HW transcode.** Jellyfin mounts `/dev/dri:/dev/dri`. If the murderbot
   host has no GPU exposed (or no Intel/AMD VAAPI driver), drop the `devices`
   block from `compose.yaml` or transcoding will fail.

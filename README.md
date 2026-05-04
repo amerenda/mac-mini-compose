@@ -29,7 +29,7 @@ komodo-dean-gitops/
 │   ├── scripts/               Boot, secret injection, sync, backup
 │   └── README.md              Full Mac Mini docs
 │
-└── archlinux/                 Stacks deployed to the Arch Linux Periphery
+└── murderbot/                 Stacks deployed to the murderbot (Debian) Periphery
     ├── README.md              Host overview + Periphery setup
     └── media-server/          Jellyfin + servarr + nginx/certbot + DO dyndns
 ```
@@ -46,7 +46,7 @@ pubhooks.amer.dev  (k3s Traefik proxy → Komodo Core)
 Komodo Core  (mac-mini-m4 :9120)
    │
    ├──► Periphery on mac-mini-m4   ──► mac-mini-m4/{core,automation,monitoring,runners,llm}
-   └──► Periphery on archlinux     ──► archlinux/{media-server, …}
+   └──► Periphery on murderbot     ──► murderbot/{media-server, …}
 ```
 
 Secrets flow:
@@ -66,20 +66,20 @@ docker compose up -d
 | Host | Role | OS | IP | Komodo |
 |------|------|----|----|--------|
 | `mac-mini-m4` | Core home services + Komodo Core | macOS (OrbStack) | 10.100.20.18 | Core + Periphery |
-| `archlinux` | Media + GPU | Arch Linux | 10.100.20.25 | Periphery only |
+| `murderbot` | Media + GPU | Debian | 10.100.20.19 | Periphery only |
 
 Each host's bootstrap (Docker, Periphery, BWS access token, host directories)
 is handled by [`amerenda/ansible-playbooks`](https://github.com/amerenda/ansible-playbooks):
 
 - Mac Mini: `playbooks/infrastructure/setup-macmini.yml`
-- Arch Linux: `playbooks/infrastructure/setup-archlinux-komodo.yml`
+- murderbot (Debian): `playbooks/infrastructure/setup-debian-komodo.yml`
 
 ## Adding a new stack
 
 1. Create `<host>/<stack>/compose.yaml` with the service definitions.
 2. If secrets are required, add a `<host>/<stack>/pre-deploy.sh` that pulls
    from BWS and writes a `.env` next to the compose (mirror the patterns under
-   [`mac-mini-m4/core/`](mac-mini-m4/core/) or [`archlinux/media-server/`](archlinux/media-server/)).
+   [`mac-mini-m4/core/`](mac-mini-m4/core/) or [`murderbot/media-server/`](murderbot/media-server/)).
 3. Add a `[[stack]]` block to [`resource-sync/stacks.toml`](resource-sync/stacks.toml)
    with `server`, `repo`, `file_paths`, `branch`, and `pre_deploy.command`.
 4. Push your branch (or `main` after merge). The ResourceSync webhook (or poll)
@@ -105,7 +105,7 @@ and rotation steps.
 ## Per-host docs
 
 - [mac-mini-m4/README.md](mac-mini-m4/README.md) — Mac Mini stacks (full operational guide)
-- [archlinux/README.md](archlinux/README.md) — Arch Linux Periphery setup (added with media-server)
+- [murderbot/README.md](murderbot/README.md) — murderbot Periphery setup (Debian)
 
 ## Git: remote URL, typo trap, and safe updates
 
@@ -158,7 +158,7 @@ and when it applies ResourceSync updates from git.
    `komodo-dean-gitops` sync resource and set **Branch** to
    `feat/komodo-repo-layout`, then save and run **Sync** (or wait for the
    webhook after your next push to that branch).
-3. Confirm stacks show the new `mac-mini-m4/...` and `archlinux/...` file paths
+3. Confirm stacks show the new `mac-mini-m4/...` and `murderbot/...` file paths
    and deploy cleanly on each Periphery.
 
 **Production:** `resource-sync/sync.toml` and every `[[stack]]` in

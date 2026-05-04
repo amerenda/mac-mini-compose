@@ -1,9 +1,9 @@
 name: media-server
 
-# Komodo-managed stack on the archlinux Periphery host. Secrets and host-path
-# overrides come from .env, which Komodo's pre_deploy renders from Bitwarden.
+# Komodo-managed stack on the murderbot (Debian) Periphery host. Secrets and
+# host-path overrides come from .env, which Komodo's pre_deploy renders from Bitwarden.
 # Config bind-mount root (/mnt/storage/media/config) and library root
-# (/mnt/storage) are pre-created with owner 1000:1000 by setup-archlinux-komodo.yml.
+# (/mnt/storage) are pre-created with owner 1000:1000 by setup-debian-komodo.yml.
 
 x-dns: &dns-servers
   - 1.1.1.1

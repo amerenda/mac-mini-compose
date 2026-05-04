@@ -3,7 +3,7 @@
 # Secrets are fetched from Bitwarden Secrets Manager at deploy time via pre_deploy.
 #
 # Secrets remain in the existing k3s BWS project. Per-host machine accounts
-# (mac-mini, archlinux) have read access to that project. Secrets are fetched
+# (mac-mini, murderbot) have read access to that project. Secrets are fetched
 # by UUID.
 #
 # NOTE: Komodo joins multi-line pre_deploy commands with ' && ' so bash
@@ -12,7 +12,7 @@
 #
 # Layout:
 #   mac-mini-m4/   stacks deployed to the Mac Mini M4 Periphery
-#   archlinux/     stacks deployed to the Arch Linux Periphery (added in a later PR)
+#   murderbot/     stacks deployed to the murderbot (Debian) Periphery host
 
 # ── Core: DNS, Postgres, MongoDB, Backups ──────────────────────────────────
 
@@ -126,22 +126,31 @@ export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
 bash mac-mini-m4/llm/pre-deploy.sh
 """
 
-# ── archlinux Periphery server ─────────────────────────────────────────────
+# ── murderbot Periphery server (Debian) ───────────────────────────────────
 # Periphery is bootstrapped on the host by Ansible
-# (playbooks/infrastructure/setup-archlinux-komodo.yml in ansible-playbooks).
-# This [[server]] block is what makes Komodo Core dial out to it.
+# (playbooks/infrastructure/setup-debian-komodo.yml in ansible-playbooks).
 
 [[server]]
-name = "archlinux"
-description = "Arch Linux home server (10.100.20.25) — media-server stack"
-tags = ["archlinux"]
+name = "murderbot"
+description = "Debian home server (10.100.20.19) — media-server stack"
+tags = ["murderbot"]
 [server.config]
-address = "https://10.100.20.25:8120"
+address = "https://10.100.20.19:8120"
 enabled = true
 # Intentionally empty: Core uses its global passkey (KOMODO_PASSKEY_FILE →
 # komodo-dean-passkey on the Mac Mini), which must match PERIPHERY_PASSKEYS on
-# Arch. Do NOT use [[KOMODO_PERIPHERY_PASSKEY]] here — Core can persist the
+# the Periphery host. Do NOT use [[KOMODO_PERIPHERY_PASSKEY]] here — Core can persist the
 # placeholder literally and you get "Invalid passkey" even when the Variable is correct.
+passkey = ""
+
+# Retired: media-server moved to murderbot. Disable so Komodo drops the old server.
+[[server]]
+name = "archlinux"
+description = "Retired — was Arch Linux Periphery at 10.100.20.25"
+tags = ["archlinux"]
+[server.config]
+address = "https://10.100.20.25:8120"
+enabled = false
 passkey = ""
 
 # ── Media server: Jellyfin + servarr + nginx/certbot + DO dyndns ──────────
@@ -149,16 +158,16 @@ passkey = ""
 [[stack]]
 name = "media-server"
 description = "Jellyfin, radarr/sonarr/bazarr/prowlarr/profilarr, sabnzbd, nginx/certbot, DO dyndns"
-tags = ["archlinux", "media"]
+tags = ["murderbot", "media"]
 deploy = true
 [stack.config]
-server = "archlinux"
+server = "murderbot"
 repo = "amerenda/komodo-dean-gitops"
 branch = "main"
-file_paths = ["archlinux/media-server/compose.yaml"]
+file_paths = ["murderbot/media-server/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-bash archlinux/media-server/pre-deploy.sh
+bash murderbot/media-server/pre-deploy.sh
 """

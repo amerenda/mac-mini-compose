@@ -4,8 +4,8 @@
 
 [[resource_sync]]
 name = "komodo-dean-gitops"
-description = "GitOps sync for komodo-dean-gitops stacks (mac-mini-m4 + archlinux)"
-tags = ["mac-mini", "archlinux"]
+description = "GitOps sync for komodo-dean-gitops stacks (mac-mini-m4 + murderbot)"
+tags = ["mac-mini", "murderbot"]
 [resource_sync.config]
 webhook_enabled = true
 repo = "amerenda/komodo-dean-gitops"
