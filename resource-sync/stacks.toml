@@ -192,12 +192,13 @@ enabled = true
 passkey = ""
 
 # ── Media server: Jellyfin + servarr + nginx/certbot + DO dyndns ──────────
+# Paused: no Komodo deploys until storage is ready (drive move). Set deploy = true to resume.
 
 [[stack]]
 name = "media-server"
 description = "Jellyfin, radarr/sonarr/bazarr/prowlarr/profilarr, sabnzbd, nginx/certbot, DO dyndns"
 tags = ["murderbot", "media"]
-deploy = true
+deploy = false
 [stack.config]
 server = "murderbot"
 repo = "amerenda/komodo-dean-gitops"
