@@ -1,6 +1,7 @@
 #!/bin/bash
 # inject-secrets.sh — Fetch all secrets from BWS and write them to disk.
-# Runs at boot (via LaunchDaemon) and can be re-run manually at any time.
+# Runs at boot (LaunchDaemon) and is kicked again by sync-stacks.sh after the
+# host komodo-dean-gitops repo fast-forwards (GitOps; see NOPASSWD in setup-macmini).
 # BWS is the single source of truth for all secrets.
 
 set -euo pipefail

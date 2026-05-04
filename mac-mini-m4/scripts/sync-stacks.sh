@@ -1,25 +1,65 @@
 #!/bin/bash
-# Keeps Komodo's stack checkouts fresh from the Mac Mini host.
-# Works around OrbStack VirtFS not propagating new files/dirs to containers.
+# Keeps GitOps checkouts fresh on the Mac Mini host (no manual git pull / inject).
+#
+# 1) Komodo stack clones under /etc/komodo/stacks/* (OrbStack VirtFS workaround).
+# 2) The host working copy KOMODO_HOST_REPO (default ~/komodo-dean-gitops): fast-
+#    forward to match origin. After any FF update, re-runs inject-secrets via
+#    `sudo launchctl kickstart` so new inject-secrets.sh + BWS values apply
+#    without SSH. Requires NOPASSWD for that launchctl line (see setup-macmini).
+#
 # Runs via LaunchAgent every 60 seconds.
 set -euo pipefail
 
-# Both are clones of komodo-dean-gitops; Docker bind mounts use .../automation/...
-# on this host, while Komodo may update .../services/... — sync both or HA stays stale.
+# Host repo (launchd plists and inject-secrets.sh live here)
+HOST_REPO="${KOMODO_HOST_REPO:-$HOME/komodo-dean-gitops}"
+# Komodo Periphery stack checkouts (same remote as HOST_REPO, usually main)
 STACK_SERVICES="/etc/komodo/stacks/services"
 STACK_AUTOMATION="/etc/komodo/stacks/automation"
 DOCKER="$HOME/.orbstack/bin/docker"
 LOG="/tmp/komodo-stack-sync.log"
-
-[ -d "$STACK_SERVICES/.git" ] || [ -d "$STACK_AUTOMATION/.git" ] || exit 0
 
 # Rotate log if over 100KB
 [ -f "$LOG" ] && [ "$(stat -f%z "$LOG" 2>/dev/null || echo 0)" -gt 102400 ] && : > "$LOG"
 
 CHANGED=""
 DIRS_BEFORE=""
-DIRS_AFTER=""
 SYNCED=false
+
+sync_host_gitops() {
+    [ -d "${HOST_REPO}/.git" ] || return 0
+    cd "$HOST_REPO" || return 0
+
+    git fetch --quiet origin 2>/dev/null || return 0
+
+    local local_h remote_ref
+    local_h=$(git rev-parse HEAD)
+    if git rev-parse @{u} >/dev/null 2>&1; then
+        remote_ref=$(git rev-parse @{u})
+    else
+        git rev-parse origin/main >/dev/null 2>&1 || return 0
+        remote_ref=$(git rev-parse origin/main)
+    fi
+
+    [ "$local_h" = "$remote_ref" ] && return 0
+
+    if ! git merge-base --is-ancestor HEAD "$remote_ref" 2>/dev/null; then
+        echo "$(date): host repo not fast-forwardable to ${remote_ref}, skipping (fix branch or merge)" >> "$LOG"
+        return 0
+    fi
+
+    local c
+    c=$(git diff --name-only "$local_h" "$remote_ref" 2>/dev/null || true)
+    git reset --hard "$remote_ref" --quiet
+    echo "$(date): synced host repo ${HOST_REPO} ${local_h} -> ${remote_ref}" >> "$LOG"
+    CHANGED="${CHANGED}"$'\n'"$c"
+    SYNCED=true
+
+    if sudo -n /bin/launchctl kickstart -k system/com.local.inject-secrets >>"$LOG" 2>&1; then
+        echo "$(date): kicked inject-secrets after host gitops sync" >> "$LOG"
+    else
+        echo "$(date): WARN: sudo launchctl kickstart inject-secrets failed (install NOPASSWD via setup-macmini, or run inject-secrets once)" >> "$LOG"
+    fi
+}
 
 sync_one() {
     local dir="$1"
@@ -40,14 +80,19 @@ sync_one() {
     SYNCED=true
 }
 
-# Directory hash only for services (periphery cache); same as before
-if [ -d "$STACK_SERVICES/.git" ]; then
-    cd "$STACK_SERVICES"
-    DIRS_BEFORE=$(find . -type d | sort | /sbin/md5 -q)
-fi
+sync_host_gitops
 
-sync_one "$STACK_SERVICES"
-sync_one "$STACK_AUTOMATION"
+if [ -d "$STACK_SERVICES/.git" ] || [ -d "$STACK_AUTOMATION/.git" ]; then
+    if [ -d "$STACK_SERVICES/.git" ]; then
+        cd "$STACK_SERVICES"
+        DIRS_BEFORE=$(find . -type d | sort | /sbin/md5 -q)
+    else
+        DIRS_BEFORE=""
+    fi
+
+    sync_one "$STACK_SERVICES"
+    sync_one "$STACK_AUTOMATION"
+fi
 
 if [ "$SYNCED" != true ]; then
     exit 0
