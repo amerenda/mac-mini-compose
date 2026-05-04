@@ -1,5 +1,8 @@
 # llm-manager stack on Mac Mini — agent + compose-managed Ollama.
 # Top-level name fixes the Docker Compose project name; matches Komodo stack id.
+#
+# Mount the full host Ollama data dir to /root/.ollama (not .../models → /root/.ollama).
+# See archlinux/llm/compose.yaml for rationale.
 name: llm-mac-mini-m4
 
 services:
@@ -15,7 +18,7 @@ services:
     environment:
       OLLAMA_HOST: 0.0.0.0:11434
     volumes:
-      - ${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}:/root/.ollama
+      - ${OLLAMA_DATA_HOST_PATH:-/Users/alex/.ollama}:/root/.ollama
     # No `gpus` — Docker on macOS does not expose Metal to Linux containers.
 
   llm-agent:

@@ -1,4 +1,10 @@
 # llm-manager stack on archlinux — agent + compose-managed Ollama.
+#
+# Ollama expects the *entire* data dir at /root/.ollama (models live in
+# /root/.ollama/models/...). Mounting only the host's models folder to
+# /root/.ollama breaks that layout and the daemon won't see pulls.
+# pre-deploy sets OLLAMA_DATA_HOST_PATH (default ~/.ollama) and
+# OLLAMA_MODELS_HOST_PATH=$OLLAMA_DATA_HOST_PATH/models for the agent RO mount.
 name: llm-archlinux
 
 services:
@@ -14,7 +20,7 @@ services:
     environment:
       OLLAMA_HOST: 0.0.0.0:11434
     volumes:
-      - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/root/.ollama
+      - ${OLLAMA_DATA_HOST_PATH:-/home/alex/.ollama}:/root/.ollama
     # NVIDIA path for archlinux host; switch to ollama/ollama:*-rocm if needed.
     gpus: all
 
