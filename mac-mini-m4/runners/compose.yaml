@@ -6,7 +6,7 @@ x-runner-common: &runner-common
   command: ["./bin/Runner.Listener", "run", "--startuptype", "service"]
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
-    - /etc/komodo/runner-secrets:/run/secrets:ro
+    - /Users/alex/komodo/runner-secrets:/run/secrets:ro
   labels:
     komodo.skip:
 

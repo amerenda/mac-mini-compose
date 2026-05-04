@@ -53,7 +53,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /proc:/proc
-      - /etc/komodo:/etc/komodo
+      - /Users/alex/komodo:/Users/alex/komodo
       - /Users/alex/.bws-secret:/run/secrets/bws-access-token:ro
 
 volumes:

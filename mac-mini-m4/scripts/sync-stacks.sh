@@ -1,7 +1,7 @@
 #!/bin/bash
 # Keeps GitOps checkouts fresh on the Mac Mini host (no manual git pull / inject).
 #
-# 1) Komodo stack clones under /etc/komodo/stacks/* (OrbStack VirtFS workaround).
+# 1) Komodo stack clones under ~/komodo/stacks/* (PERIPHERY_ROOT_DIRECTORY).
 # 2) The host working copy KOMODO_HOST_REPO (default ~/komodo-dean-gitops): fast-
 #    forward to match origin. After any FF update, re-runs inject-secrets via
 #    `sudo launchctl kickstart` so new inject-secrets.sh + BWS values apply
@@ -13,8 +13,9 @@ set -euo pipefail
 # Host repo (launchd plists and inject-secrets.sh live here)
 HOST_REPO="${KOMODO_HOST_REPO:-$HOME/komodo-dean-gitops}"
 # Komodo Periphery stack checkouts (same remote as HOST_REPO, usually main)
-STACK_SERVICES="/etc/komodo/stacks/services"
-STACK_AUTOMATION="/etc/komodo/stacks/automation"
+KOMODO_PERIPHERY_ROOT="${KOMODO_PERIPHERY_ROOT:-$HOME/komodo}"
+STACK_SERVICES="$KOMODO_PERIPHERY_ROOT/stacks/services"
+STACK_AUTOMATION="$KOMODO_PERIPHERY_ROOT/stacks/automation"
 DOCKER="$HOME/.orbstack/bin/docker"
 LOG="/tmp/komodo-stack-sync.log"
 

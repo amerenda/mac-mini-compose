@@ -7,6 +7,9 @@
 set -euo pipefail
 
 COMPOSE_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# Must match PERIPHERY_ROOT_DIRECTORY in komodo/compose.env (OrbStack: not /etc/komodo).
+KOMODO_PERIPHERY_ROOT="/Users/alex/komodo"
+RUNNER_SECRETS_DIR="${KOMODO_PERIPHERY_ROOT}/runner-secrets"
 BWS_TOKEN_FILE="/Users/alex/.bws-secret"
 BWS_BIN="/usr/local/bin/bws"
 BWS_VERSION="2.0.0"
@@ -67,19 +70,20 @@ fetch_secret() {
     fi
 }
 
-# ── Runner secrets → /etc/komodo/runner-secrets/ ────────────────────────────
+# ── Runner secrets → ${RUNNER_SECRETS_DIR} ───────────────────────────────────
 
 log "Injecting runner secrets..."
-mkdir -p /etc/komodo/runner-secrets
-chmod 0700 /etc/komodo/runner-secrets
+mkdir -p "$RUNNER_SECRETS_DIR"
+chmod 0700 "$RUNNER_SECRETS_DIR"
 
-fetch_secret "2c57558f-d185-4410-ad9d-b385015c9302" /etc/komodo/runner-secrets/github-app-arc-id
-fetch_secret "0015f9ab-dd5e-4649-a262-b385015ceac1" /etc/komodo/runner-secrets/github-app-arc-private-key
-fetch_secret "c5ad7fae-2f58-4a8b-9651-b413001cad7f" /etc/komodo/runner-secrets/docker-hub-k3s-runner-api-key
-fetch_secret "42ea6b6b-3b1e-43d9-8743-b41301665cc9" /etc/komodo/runner-secrets/github-pat-k3s-dean-gitops
+fetch_secret "2c57558f-d185-4410-ad9d-b385015c9302" "$RUNNER_SECRETS_DIR/github-app-arc-id"
+fetch_secret "0015f9ab-dd5e-4649-a262-b385015ceac1" "$RUNNER_SECRETS_DIR/github-app-arc-private-key"
+fetch_secret "c5ad7fae-2f58-4a8b-9651-b413001cad7f" "$RUNNER_SECRETS_DIR/docker-hub-k3s-runner-api-key"
+fetch_secret "42ea6b6b-3b1e-43d9-8743-b41301665cc9" "$RUNNER_SECRETS_DIR/github-pat-k3s-dean-gitops"
 
-cp "$COMPOSE_DIR/runners/entrypoint-wrapper.sh" /etc/komodo/runner-secrets/entrypoint-wrapper.sh
-chmod +x /etc/komodo/runner-secrets/entrypoint-wrapper.sh
+cp "$COMPOSE_DIR/runners/entrypoint-wrapper.sh" "$RUNNER_SECRETS_DIR/entrypoint-wrapper.sh"
+chmod +x "$RUNNER_SECRETS_DIR/entrypoint-wrapper.sh"
+chown -R "$OWNER" "$RUNNER_SECRETS_DIR" 2>/dev/null || true
 
 # ── Runner compose.env (non-secret config) ──────────────────────────────────
 
@@ -168,7 +172,7 @@ fi
 
 log "Updating Komodo git provider PAT..."
 ADMIN_PASS=$(cat "$COMPOSE_DIR/komodo/secrets/komodo-dean-admin-password" 2>/dev/null)
-GITOPS_PAT=$(cat /etc/komodo/runner-secrets/github-pat-k3s-dean-gitops 2>/dev/null)
+GITOPS_PAT=$(cat "$RUNNER_SECRETS_DIR/github-pat-k3s-dean-gitops" 2>/dev/null)
 
 if [[ -n "$ADMIN_PASS" ]] && [[ -n "$GITOPS_PAT" ]]; then
     # Wait for Komodo to be reachable (may not be up yet at boot)

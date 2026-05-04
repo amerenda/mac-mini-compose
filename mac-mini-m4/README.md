@@ -204,7 +204,7 @@ All three paths write to the same locations. The script is idempotent.
 | Path | Contents | Used by |
 |------|----------|---------|
 | `/Users/alex/.bws-secret` | BWS access token (bootstrapped by Ansible) | inject-secrets.sh, Komodo periphery |
-| `/etc/komodo/runner-secrets/` | GitHub App keys, DockerHub token, GitOps PAT | Runner containers (mounted as `/run/secrets`) |
+| `~/komodo/runner-secrets/` | GitHub App keys, DockerHub token, GitOps PAT | Runner containers (mounted as `/run/secrets`) |
 | `komodo/secrets/` | DB password, passkey, JWT secret, webhook secret, admin password | Komodo Core (via `_FILE` pattern) |
 | `komodo/compose.env` | Injected DB password, admin password, passkey | Komodo Compose (plaintext, required by Postgres/FerretDB) |
 | `.env` | Service passwords (Pihole, Postgres, MongoDB, backups) | Services Compose |
@@ -311,7 +311,7 @@ restart` other services.
 
 **Workaround:** A LaunchAgent (`com.local.komodo-stack-sync.plist`) runs
 `mac-mini-m4/scripts/sync-stacks.sh` every 60 seconds on the host. It does `git fetch &&
-reset --hard` on the Komodo checkout (`/etc/komodo/stacks/services`), restarts
+reset --hard` on the Komodo checkout (`~/komodo/stacks/...`), restarts
 Periphery when the **directory tree** changes, and restarts **Grafana and
 Prometheus** when any path under `mac-mini-m4/monitoring/` changed so dashboard and scrape
 config updates always take effect. **Home Assistant** and **Zigbee2MQTT** use the
