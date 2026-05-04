@@ -1,13 +1,19 @@
 # Komodo Resource Sync — Stack definitions
-# Synced automatically when changes are pushed to main.
+# Synced when changes are pushed to the branch named in each `branch =` field
+# (use `main` after this layout is merged to default branch).
 # Secrets are fetched from Bitwarden Secrets Manager at deploy time via pre_deploy.
 #
-# Secrets remain in the existing k3s BWS project. A mac-mini machine account
-# has read access to that project. Secrets are fetched by UUID.
+# Secrets remain in the existing k3s BWS project. Per-host machine accounts
+# (mac-mini, archlinux) have read access to that project. Secrets are fetched
+# by UUID.
 #
 # NOTE: Komodo joins multi-line pre_deploy commands with ' && ' so bash
 # function definitions and if/then/else blocks cannot be used directly.
 # Use simple sequential commands or call an external script instead.
+#
+# Layout:
+#   mac-mini-m4/   stacks deployed to the Mac Mini M4 Periphery
+#   archlinux/     stacks deployed to the Arch Linux Periphery (added in a later PR)
 
 # ── Core: DNS, Postgres, MongoDB, Backups ──────────────────────────────────
 
@@ -18,21 +24,21 @@ tags = ["mac-mini"]
 deploy = true
 [stack.config]
 server = "mac-mini-m4"
-repo = "amerenda/mac-mini-compose"
-branch = "main"
-file_paths = ["core/compose.yaml"]
+repo = "amerenda/komodo-dean-gitops"
+branch = "feat/komodo-repo-layout"
+file_paths = ["mac-mini-m4/core/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-printf 'TECHNITIUM_ADMIN_PASSWORD=%s\n' "$(bws secret get ae363b89-3fd6-43e3-9a83-b42100e7aed3 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > core/.env
-printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
-printf 'MINI_POSTGRES_TODO_PASSWORD=%s\n' "$(bws secret get 081051dc-3adb-4499-ad0f-b421014a114f --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
-printf 'AGENT_KB_PASSWORD=%s\n' "$(bws secret get 549c2404-4417-48bd-9fa1-b41c00e6365c --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
-printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
-printf 'BACKUP_ACCESS_KEY=%s\n' "$(bws secret get af4a292f-1f9f-45b1-9c56-b37300df69dc --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
-printf 'BACKUP_SECRET_KEY=%s\n' "$(bws secret get d2d87681-b2e3-4a3e-b821-b37300df7ce5 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
-printf 'BACKUP_ENDPOINT=%s\n' "$(bws secret get 2c95ebd0-9330-455b-abbd-b37300e580b0 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> core/.env
+printf 'TECHNITIUM_ADMIN_PASSWORD=%s\n' "$(bws secret get ae363b89-3fd6-43e3-9a83-b42100e7aed3 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > mac-mini-m4/core/.env
+printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/core/.env
+printf 'MINI_POSTGRES_TODO_PASSWORD=%s\n' "$(bws secret get 081051dc-3adb-4499-ad0f-b421014a114f --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/core/.env
+printf 'AGENT_KB_PASSWORD=%s\n' "$(bws secret get 549c2404-4417-48bd-9fa1-b41c00e6365c --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/core/.env
+printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/core/.env
+printf 'BACKUP_ACCESS_KEY=%s\n' "$(bws secret get af4a292f-1f9f-45b1-9c56-b37300df69dc --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/core/.env
+printf 'BACKUP_SECRET_KEY=%s\n' "$(bws secret get d2d87681-b2e3-4a3e-b821-b37300df7ce5 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/core/.env
+printf 'BACKUP_ENDPOINT=%s\n' "$(bws secret get 2c95ebd0-9330-455b-abbd-b37300e580b0 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/core/.env
 """
 
 # ── Automation: Home Assistant, Voice Pipeline, Zigbee, MQTT ───────────────
@@ -44,9 +50,9 @@ tags = ["mac-mini"]
 deploy = true
 [stack.config]
 server = "mac-mini-m4"
-repo = "amerenda/mac-mini-compose"
-branch = "main"
-file_paths = ["automation/compose.yaml"]
+repo = "amerenda/komodo-dean-gitops"
+branch = "feat/komodo-repo-layout"
+file_paths = ["mac-mini-m4/automation/compose.yaml"]
 git_account = "amerenda"
 ignore_services = ["hacs-init"]
 
@@ -59,21 +65,21 @@ tags = ["mac-mini"]
 deploy = true
 [stack.config]
 server = "mac-mini-m4"
-repo = "amerenda/mac-mini-compose"
-branch = "main"
-file_paths = ["monitoring/compose.yaml"]
+repo = "amerenda/komodo-dean-gitops"
+branch = "feat/komodo-repo-layout"
+file_paths = ["mac-mini-m4/monitoring/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > monitoring/.env
-printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
-printf 'TECHNITIUM_API_TOKEN=%s\n' "$(bws secret get 4645ac46-3955-4e6e-8558-b434015613a7 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
-printf 'GRAFANA_ADMIN_USER=admin\n' >> monitoring/.env
-printf 'GRAFANA_ADMIN_PASSWORD=%s\n' "$(bws secret get 9a2f2c00-0cc9-4aac-91da-b43d00f980d1 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> monitoring/.env
-test -f monitoring/compose.yaml && test -d monitoring/grafana/dashboards || exit 1
-printf 'MONITORING_DIR=%s/monitoring\n' "$(pwd)" >> monitoring/.env
-bws secret get c7ccdb87-b04e-428e-bbcf-b4340156edf6 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > monitoring/ha-token
+printf 'MINI_POSTGRES_PASSWORD=%s\n' "$(bws secret get a280e465-8813-4b48-9972-b4210149cb60 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" > mac-mini-m4/monitoring/.env
+printf 'MONGO_PASSWORD=%s\n' "$(bws secret get d0213758-1881-4d35-8fd2-b39d015cb7b9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/monitoring/.env
+printf 'TECHNITIUM_API_TOKEN=%s\n' "$(bws secret get 4645ac46-3955-4e6e-8558-b434015613a7 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/monitoring/.env
+printf 'GRAFANA_ADMIN_USER=admin\n' >> mac-mini-m4/monitoring/.env
+printf 'GRAFANA_ADMIN_PASSWORD=%s\n' "$(bws secret get 9a2f2c00-0cc9-4aac-91da-b43d00f980d1 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)" >> mac-mini-m4/monitoring/.env
+test -f mac-mini-m4/monitoring/compose.yaml && test -d mac-mini-m4/monitoring/grafana/dashboards || exit 1
+printf 'MONITORING_DIR=%s/mac-mini-m4/monitoring\n' "$(pwd)" >> mac-mini-m4/monitoring/.env
+bws secret get c7ccdb87-b04e-428e-bbcf-b4340156edf6 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > mac-mini-m4/monitoring/ha-token
 """
 
 # ── Runners: GitHub Actions self-hosted runners ───────────────────────────
@@ -85,20 +91,20 @@ tags = ["mac-mini"]
 deploy = true
 [stack.config]
 server = "mac-mini-m4"
-repo = "amerenda/mac-mini-compose"
-branch = "main"
-file_paths = ["runners/compose.yaml"]
+repo = "amerenda/komodo-dean-gitops"
+branch = "feat/komodo-repo-layout"
+file_paths = ["mac-mini-m4/runners/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-printf 'DOCKERHUB_USERNAME=amerenda\nRUNNER_SCOPE=repo\nRUNNER_WORKDIR=/_work\nRANDOM_RUNNER_SUFFIX=false\n' > runners/compose.env
+printf 'DOCKERHUB_USERNAME=amerenda\nRUNNER_SCOPE=repo\nRUNNER_WORKDIR=/_work\nRANDOM_RUNNER_SUFFIX=false\n' > mac-mini-m4/runners/compose.env
 mkdir -p /etc/komodo/runner-secrets
 bws secret get 2c57558f-d185-4410-ad9d-b385015c9302 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > /etc/komodo/runner-secrets/github-app-arc-id
 bws secret get 0015f9ab-dd5e-4649-a262-b385015ceac1 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > /etc/komodo/runner-secrets/github-app-arc-private-key
 bws secret get c5ad7fae-2f58-4a8b-9651-b413001cad7f --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > /etc/komodo/runner-secrets/docker-hub-k3s-runner-api-key
 bws secret get 42ea6b6b-3b1e-43d9-8743-b41301665cc9 --access-token "$BWS_ACCESS_TOKEN" | jq -r .value > /etc/komodo/runner-secrets/github-pat-k3s-dean-gitops
-cp runners/entrypoint-wrapper.sh /etc/komodo/runner-secrets/entrypoint-wrapper.sh
+cp mac-mini-m4/runners/entrypoint-wrapper.sh /etc/komodo/runner-secrets/entrypoint-wrapper.sh
 chmod +x /etc/komodo/runner-secrets/entrypoint-wrapper.sh
 """
 
@@ -111,12 +117,46 @@ tags = ["mac-mini"]
 deploy = true
 [stack.config]
 server = "mac-mini-m4"
-repo = "amerenda/mac-mini-compose"
-branch = "main"
-file_paths = ["llm/compose.yaml"]
+repo = "amerenda/komodo-dean-gitops"
+branch = "feat/komodo-repo-layout"
+file_paths = ["mac-mini-m4/llm/compose.yaml"]
 git_account = "amerenda"
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-bash llm/pre-deploy.sh
+bash mac-mini-m4/llm/pre-deploy.sh
+"""
+
+# ── archlinux Periphery server ─────────────────────────────────────────────
+# Periphery is bootstrapped on the host by Ansible
+# (playbooks/infrastructure/setup-archlinux-komodo.yml in ansible-playbooks).
+# This [[server]] block is what makes Komodo Core dial out to it.
+
+[[server]]
+name = "archlinux"
+description = "Arch Linux home server (10.100.20.25) — media-server stack"
+tags = ["archlinux"]
+[server.config]
+address = "https://10.100.20.25:8120"
+enabled = true
+# Komodo variable resolved from a Komodo Variable, populated from BWS in the UI.
+passkey = "[[KOMODO_PERIPHERY_PASSKEY]]"
+
+# ── Media server: Jellyfin + servarr + nginx/certbot + DO dyndns ──────────
+
+[[stack]]
+name = "media-server"
+description = "Jellyfin, radarr/sonarr/bazarr/prowlarr/whisparr/profilarr, sabnzbd, nginx/certbot, DO dyndns"
+tags = ["archlinux", "media"]
+deploy = true
+[stack.config]
+server = "archlinux"
+repo = "amerenda/komodo-dean-gitops"
+branch = "feat/komodo-repo-layout"
+file_paths = ["archlinux/media-server/compose.yaml"]
+git_account = "amerenda"
+[stack.config.pre_deploy]
+command = """
+export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
+bash archlinux/media-server/pre-deploy.sh
 """

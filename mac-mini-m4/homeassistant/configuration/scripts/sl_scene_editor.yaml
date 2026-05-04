@@ -1,0 +1,361 @@
+sl_preview_scene:
+  alias: "SL: Preview Scene (apply stored values to lights)"
+  description: "Turns on a room's lights at the currently stored scene values so you can see them. Does NOT change any stored values."
+  mode: single
+  fields:
+    room:
+      description: "Room key (living_room, bedroom, bathroom, kitchen, hallway)"
+      required: true
+      selector:
+        select:
+          options: [living_room, bedroom, bathroom, kitchen, hallway]
+    window:
+      description: "Time window (morning, day, evening, night)"
+      required: true
+      selector:
+        select:
+          options: [morning, day, evening, night]
+  sequence:
+    - variables:
+        light_map:
+          living_room: ["light.living_room_1"]
+          bedroom: ["light.bedroom_1", "light.bedroom_2", "light.lamp_1"]
+          bathroom: ["light.bathroom_1"]
+          kitchen: ["light.kitchen_1", "light.kitchen_2"]
+          hallway: ["light.hallway_1"]
+        lights: "{{ light_map[room] }}"
+        bri: "{{ states('input_number.sl_' ~ room ~ '_' ~ window ~ '_brightness') | int(200) }}"
+        ct_state: "{{ states('input_number.sl_' ~ room ~ '_' ~ window ~ '_color_temp') }}"
+        has_ct: "{{ ct_state not in ['unknown', 'unavailable', ''] }}"
+        ct: "{{ ct_state | int(0) }}"
+    - repeat:
+        for_each: "{{ lights }}"
+        sequence:
+          - if:
+              - condition: template
+                value_template: "{{ has_ct }}"
+            then:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ repeat.item }}"
+                data:
+                  brightness: "{{ bri }}"
+                  color_temp_kelvin: "{{ (1000000 / ct) | int }}"
+            else:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ repeat.item }}"
+                data:
+                  brightness: "{{ bri }}"
+
+sl_save_current_as_scene:
+  alias: "SL: Save Current Light State as Scene"
+  description: >
+    Saves light state to helpers and Z2M where applicable. For Custom Scenes with room=all,
+    also writes a persistent pack to /config/sl_custom_scenes.json (all lights per room) via
+    python_script.sl_custom_scenes_persist; use script.sl_apply_custom_scene_all_rooms to recall.
+  mode: single
+  fields:
+    room:
+      description: "Room key, or all for whole-house custom scene (per-room helpers)"
+      required: true
+      selector:
+        select:
+          options: [all, living_room, bedroom, bathroom, kitchen, hallway]
+    window:
+      description: "Time window (morning, day, evening, night) or custom scene name slug"
+      required: true
+      selector:
+        text:
+  sequence:
+    # Some Lovelace cards pass service data as literal "{{ ... }}" without evaluating it.
+    # Fall back to dashboard helpers so room=all and custom slugs work.
+    - variables:
+        room_in: "{{ room }}"
+        window_in: "{{ window | default('', true) }}"
+        # Use sl_room / sl_window — do not reuse field names room/window below; HA still binds
+        # those names to raw service data in nested templates.
+        sl_room: >-
+          {% if room_in in ['all', 'living_room', 'bedroom', 'bathroom', 'kitchen', 'hallway'] %}
+            {{ room_in }}
+          {% else %}
+            {{ states('input_select.sl_room_selector') | lower | replace(' ', '_') | replace('all_rooms', 'all') }}
+          {% endif %}
+        sl_window: >-
+          {% set w = window_in | string | trim %}
+          {% if '{{' in w or w == '' or w in ['unknown', 'unavailable', 'none'] %}
+            {{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}
+          {% else %}
+            {{ w | lower | replace(' ', '_') }}
+          {% endif %}
+        source_light_map:
+          living_room: "light.living_room_1"
+          bedroom: "light.bedroom_1"
+          bathroom: "light.bathroom_1"
+          kitchen: "light.kitchen_1"
+          hallway: "light.hallway_1"
+    - choose:
+        # Custom Scenes tab: "All Rooms" → dashboard passes room=all; write real per-room helpers
+        - conditions:
+            - condition: template
+              value_template: "{{ sl_room == 'all' }}"
+          sequence:
+            # Full per-room light snapshots (persists across HA restart in /config/sl_custom_scenes.json)
+            - service: python_script.sl_custom_scenes_persist
+              data:
+                action: save_all_rooms_pack
+                slug: "{{ sl_window }}"
+            # Standard time windows: mirror first-light values into helpers + Z2M
+            - if:
+                - condition: template
+                  value_template: "{{ sl_window in ['morning', 'day', 'evening', 'night'] }}"
+              then:
+                - repeat:
+                    for_each:
+                      - living_room
+                      - bedroom
+                      - bathroom
+                      - kitchen
+                      - hallway
+                    sequence:
+                      - variables:
+                          r: "{{ repeat.item }}"
+                      - variables:
+                          source_light: "{{ source_light_map[r] }}"
+                          bri: "{{ state_attr(source_light, 'brightness') | int(200) }}"
+                          mode: "{{ state_attr(source_light, 'color_mode') }}"
+                          ct_mireds: "{{ state_attr(source_light, 'color_temp') }}"
+                          ct_kelvin: "{{ state_attr(source_light, 'color_temp_kelvin') | int(0) }}"
+                          ct: >-
+                            {% if ct_mireds not in ['unknown', 'unavailable', '', None] %}
+                              {{ ct_mireds | int }}
+                            {% elif ct_kelvin and ct_kelvin > 0 %}
+                              {{ (1000000 / ct_kelvin) | int }}
+                            {% else %}
+                              0
+                            {% endif %}
+                          xy: "{{ state_attr(source_light, 'xy_color') }}"
+                          xy_x: >-
+                            {% if xy is iterable and xy is not string and xy | length == 2 %}
+                              {{ xy[0] | float(0) }}
+                            {% else %}
+                              0
+                            {% endif %}
+                          xy_y: >-
+                            {% if xy is iterable and xy is not string and xy | length == 2 %}
+                              {{ xy[1] | float(0) }}
+                            {% else %}
+                              0
+                            {% endif %}
+                          use_xy: "{{ mode != 'color_temp' and xy_x | float(0) > 0 and xy_y | float(0) > 0 }}"
+                          has_ct: "{{ not use_xy and ct | int(0) > 0 }}"
+                      - service: input_number.set_value
+                        target:
+                          entity_id: "input_number.sl_{{ r }}_{{ sl_window }}_brightness"
+                        data:
+                          value: "{{ bri }}"
+                      - if:
+                          - condition: template
+                            value_template: "{{ use_xy }}"
+                        then:
+                          # Save xy. Macro in sl_push_config prefers xy when both > 0,
+                          # so we don't need to clobber the existing _color_temp helper.
+                          - service: input_number.set_value
+                            target:
+                              entity_id: "input_number.sl_{{ r }}_{{ sl_window }}_color_x"
+                            data:
+                              value: "{{ xy_x | float(0) }}"
+                          - service: input_number.set_value
+                            target:
+                              entity_id: "input_number.sl_{{ r }}_{{ sl_window }}_color_y"
+                            data:
+                              value: "{{ xy_y | float(0) }}"
+                      - if:
+                          - condition: template
+                            value_template: "{{ has_ct }}"
+                        then:
+                          - service: input_number.set_value
+                            target:
+                              entity_id: "input_number.sl_{{ r }}_{{ sl_window }}_color_temp"
+                            data:
+                              value: "{{ ct | int }}"
+                          # Zero xy so it doesn't outrank ct in sl_push_config (helper min is 0,
+                          # missing helper for kitchen/hallway is fine — input_number.set_value
+                          # logs a warning and proceeds for the rest).
+                          - service: input_number.set_value
+                            target:
+                              entity_id: "input_number.sl_{{ r }}_{{ sl_window }}_color_x"
+                            data:
+                              value: 0
+                            continue_on_error: true
+                          - service: input_number.set_value
+                            target:
+                              entity_id: "input_number.sl_{{ r }}_{{ sl_window }}_color_y"
+                            data:
+                              value: 0
+                            continue_on_error: true
+                - service: script.sl_push_config
+                # Snap-on-edit: tell Z2M to recall this window per room if it's the current window.
+                - repeat:
+                    for_each:
+                      - living_room
+                      - bedroom
+                      - bathroom
+                      - kitchen
+                      - hallway
+                    sequence:
+                      - service: mqtt.publish
+                        data:
+                          topic: "zigbee2mqtt/sl/snap"
+                          payload: '{"room_key": "{{ repeat.item }}", "window": "{{ sl_window }}"}'
+      default:
+        - variables:
+            source_light: "{{ source_light_map[sl_room] }}"
+            bri: "{{ state_attr(source_light, 'brightness') | int(200) }}"
+            mode: "{{ state_attr(source_light, 'color_mode') }}"
+            ct_mireds: "{{ state_attr(source_light, 'color_temp') }}"
+            ct_kelvin: "{{ state_attr(source_light, 'color_temp_kelvin') | int(0) }}"
+            ct: >-
+              {% if ct_mireds not in ['unknown', 'unavailable', '', None] %}
+                {{ ct_mireds | int }}
+              {% elif ct_kelvin and ct_kelvin > 0 %}
+                {{ (1000000 / ct_kelvin) | int }}
+              {% else %}
+                0
+              {% endif %}
+            xy: "{{ state_attr(source_light, 'xy_color') }}"
+            xy_x: >-
+              {% if xy is iterable and xy is not string and xy | length == 2 %}
+                {{ xy[0] | float(0) }}
+              {% else %}
+                0
+              {% endif %}
+            xy_y: >-
+              {% if xy is iterable and xy is not string and xy | length == 2 %}
+                {{ xy[1] | float(0) }}
+              {% else %}
+                0
+              {% endif %}
+            use_xy: "{{ mode != 'color_temp' and xy_x | float(0) > 0 and xy_y | float(0) > 0 }}"
+            has_ct: "{{ not use_xy and ct | int(0) > 0 }}"
+        - service: input_number.set_value
+          target:
+            entity_id: "input_number.sl_{{ sl_room }}_{{ sl_window }}_brightness"
+          data:
+            value: "{{ bri }}"
+        - if:
+            - condition: template
+              value_template: "{{ use_xy }}"
+          then:
+            - service: input_number.set_value
+              target:
+                entity_id: "input_number.sl_{{ sl_room }}_{{ sl_window }}_color_x"
+              data:
+                value: "{{ xy_x | float(0) }}"
+            - service: input_number.set_value
+              target:
+                entity_id: "input_number.sl_{{ sl_room }}_{{ sl_window }}_color_y"
+              data:
+                value: "{{ xy_y | float(0) }}"
+        - if:
+            - condition: template
+              value_template: "{{ has_ct }}"
+          then:
+            - service: input_number.set_value
+              target:
+                entity_id: "input_number.sl_{{ sl_room }}_{{ sl_window }}_color_temp"
+              data:
+                value: "{{ ct | int }}"
+            - service: input_number.set_value
+              target:
+                entity_id: "input_number.sl_{{ sl_room }}_{{ sl_window }}_color_x"
+              data:
+                value: 0
+              continue_on_error: true
+            - service: input_number.set_value
+              target:
+                entity_id: "input_number.sl_{{ sl_room }}_{{ sl_window }}_color_y"
+              data:
+                value: 0
+              continue_on_error: true
+        - service: script.sl_push_config
+        # Snap-on-edit: only meaningful for standard windows; Z2M ignores non-window slugs.
+        - if:
+            - condition: template
+              value_template: "{{ sl_window in ['morning', 'day', 'evening', 'night'] }}"
+          then:
+            - service: mqtt.publish
+              data:
+                topic: "zigbee2mqtt/sl/snap"
+                payload: '{"room_key": "{{ sl_room }}", "window": "{{ sl_window }}"}'
+
+sl_debug_save_read:
+  alias: "SL: Debug — show what save would read"
+  description: "Logs current attrs of every light in a room (or all rooms) plus the stored helper values, so we can see exactly what sl_save_current_as_scene would read. Output goes to HA log under logger 'sl.debug' (level WARNING)."
+  mode: single
+  fields:
+    room:
+      description: "Room key (or 'all')"
+      required: true
+      selector:
+        select:
+          options: [all, living_room, bedroom, bathroom, kitchen, hallway]
+  sequence:
+    - variables:
+        light_map:
+          living_room: ["light.living_room_1"]
+          bedroom: ["light.bedroom_1", "light.bedroom_2", "light.lamp_1"]
+          bathroom: ["light.bathroom_1"]
+          kitchen: ["light.kitchen_1", "light.kitchen_2"]
+          hallway: ["light.hallway_1"]
+        rooms: "{{ ['living_room','bedroom','bathroom','kitchen','hallway'] if room == 'all' else [room] }}"
+    - service: system_log.write
+      data:
+        level: warning
+        logger: sl.debug
+        message: "=== sl_debug_save_read start (rooms={{ rooms | join(',') }}) current_window={{ states('sensor.sl_current_window') }} house_mode={{ states('input_select.sl_house_mode') }} ==="
+    - repeat:
+        for_each: "{{ rooms }}"
+        sequence:
+          - variables:
+              r: "{{ repeat.item }}"
+              lights: "{{ light_map[r] }}"
+              source_light: "{{ lights[0] }}"
+          - service: system_log.write
+            data:
+              level: warning
+              logger: sl.debug
+              message: >-
+                room={{ r }}
+                source_light_for_save={{ source_light }}
+                helpers
+                morning(b={{ states('input_number.sl_' ~ r ~ '_morning_brightness') }},ct={{ states('input_number.sl_' ~ r ~ '_morning_color_temp') }})
+                day(b={{ states('input_number.sl_' ~ r ~ '_day_brightness') }},ct={{ states('input_number.sl_' ~ r ~ '_day_color_temp') }})
+                evening(b={{ states('input_number.sl_' ~ r ~ '_evening_brightness') }},ct={{ states('input_number.sl_' ~ r ~ '_evening_color_temp') }})
+                night(b={{ states('input_number.sl_' ~ r ~ '_night_brightness') }},ct={{ states('input_number.sl_' ~ r ~ '_night_color_temp') }})
+          - repeat:
+              for_each: "{{ lights }}"
+              sequence:
+                - variables:
+                    l: "{{ repeat.item }}"
+                - service: system_log.write
+                  data:
+                    level: warning
+                    logger: sl.debug
+                    message: >-
+                      light={{ l }}
+                      state={{ states(l) }}
+                      brightness={{ state_attr(l,'brightness') }}
+                      color_temp_mireds={{ state_attr(l,'color_temp') }}
+                      color_temp_kelvin={{ state_attr(l,'color_temp_kelvin') }}
+                      color_mode={{ state_attr(l,'color_mode') }}
+                      supported_color_modes={{ state_attr(l,'supported_color_modes') }}
+                      min_ct_k={{ state_attr(l,'min_color_temp_kelvin') }}
+                      max_ct_k={{ state_attr(l,'max_color_temp_kelvin') }}
+                      hs={{ state_attr(l,'hs_color') }}
+                      xy={{ state_attr(l,'xy_color') }}
+    - service: system_log.write
+      data:
+        level: warning
+        logger: sl.debug
+        message: "=== sl_debug_save_read end ==="
