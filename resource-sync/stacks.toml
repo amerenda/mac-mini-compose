@@ -197,22 +197,7 @@ address = "https://10.100.20.25:8120"
 enabled = true
 passkey = ""
 
-# ── Media server: Jellyfin + servarr + nginx/certbot + DO dyndns ──────────
-# Paused: no Komodo deploys until storage is ready (drive move). Set deploy = true to resume.
-
-[[stack]]
-name = "media-server"
-description = "Jellyfin, radarr/sonarr/bazarr/prowlarr/profilarr, sabnzbd, nginx/certbot, DO dyndns"
-tags = ["murderbot", "media"]
-deploy = false
-[stack.config]
-server = "murderbot"
-repo = "amerenda/komodo-dean-gitops"
-branch = "main"
-file_paths = ["murderbot/media-server/compose.yaml"]
-git_account = "amerenda"
-[stack.config.pre_deploy]
-command = """
-export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-bash murderbot/media-server/pre-deploy.sh
-"""
+# media-server stack: REMOVED from sync so Komodo cannot redeploy it (deploy=false
+# still allowed manual/webhook/queued deploys to stale server bindings). Restore from
+# resource-sync/parked/media-server.stack.toml after murderbot storage is ready,
+# then RunSync. Manually delete orphaned "media-server" in Komodo UI once if it lingers.
