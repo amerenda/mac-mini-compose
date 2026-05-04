@@ -1,0 +1,200 @@
+name: media-server
+
+# Komodo-managed stack on the archlinux Periphery host. Secrets and host-path
+# overrides come from .env, which Komodo's pre_deploy renders from Bitwarden.
+# All bind-mount roots (/opt/media, /mnt/storage) are pre-created with owner
+# 1000:1000 by setup-archlinux-komodo.yml.
+
+x-dns: &dns-servers
+  - 1.1.1.1
+  - 8.8.8.8
+
+services:
+  whisparr:
+    container_name: whisparr
+    image: ghcr.io/hotio/whisparr:v3
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ${WHISPARR_CONFIG}:/config
+      - ${WHISPARR_FOLDER}:/porn
+      - ${USENET_DOWNLOADS}:/downloads
+    ports:
+      - 6969:6969
+    networks:
+      servarr:
+    dns: *dns-servers
+    restart: unless-stopped
+
+  profilarr:
+    container_name: profilarr
+    image: santiagosayshey/profilarr:latest
+    ports:
+      - 6868:6868
+    volumes:
+      - ${PROFILARR_CONFIG}:/config
+    environment:
+      - TZ=America/New_York
+    networks:
+      servarr:
+    dns: *dns-servers
+    restart: unless-stopped
+
+  prowlarr:
+    container_name: prowlarr
+    image: linuxserver/prowlarr:latest
+    networks:
+      servarr:
+    dns: *dns-servers
+    ports:
+      - 9696:9696
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ${PROWLARR_CONFIG}:/config
+    restart: unless-stopped
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    networks:
+      servarr:
+    dns: *dns-servers
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    ports:
+      - 8080:8080
+    volumes:
+      - ${SABNZBD_CONFIG}:/config
+      - ${USENET_DOWNLOADS}:/downloads
+      - ${USENET_DOWNLOADS_INCOMPLETE}:/incomplete-downloads
+    restart: unless-stopped
+
+  radarr:
+    container_name: radarr
+    image: lscr.io/linuxserver/radarr:latest
+    networks:
+      servarr:
+    dns: *dns-servers
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    ports:
+      - 7878:7878
+    volumes:
+      - ${RADARR_CONFIG}:/config
+      - ${MOVIES_FOLDER}:/movies
+      - ${USENET_DOWNLOADS}:/downloads
+    restart: unless-stopped
+
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    networks:
+      servarr:
+    dns: *dns-servers
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ${SONARR_CONFIG}:/config
+      - ${TV_FOLDER}:/tv
+      - ${USENET_DOWNLOADS}:/downloads
+      - ${SONARR_SCRIPTS}:/scripts
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  bazarr:
+    container_name: bazarr
+    image: linuxserver/bazarr:latest
+    networks:
+      servarr:
+    dns: *dns-servers
+    ports:
+      - 6767:6767
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - ${BAZARR_CONFIG}:/config
+      - ${TV_FOLDER}:/tv
+      - ${MOVIES_FOLDER}:/movies
+    restart: unless-stopped
+
+  jellyfin:
+    image: linuxserver/jellyfin:10.11.4
+    container_name: jellyfin
+    networks:
+      servarr:
+    dns: *dns-servers
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - JELLYFIN_PublishedServerUrl=$JELLYFIN_URL
+    volumes:
+      - ${JELLYFIN_CONFIG}:/config
+      - ${MOVIES_FOLDER}:/movies
+      - ${TV_FOLDER}:/tv
+      - ${TRANSCODE_FOLDER}:/transcode
+    ports:
+      - 8096:8096
+      - 7359:7359/udp
+      - 8920:8920
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+
+  dns:
+    build:
+      context: ./dns/
+      dockerfile: Dockerfile
+    container_name: dns
+    env_file: .env
+    networks:
+      servarr:
+    dns: *dns-servers
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    volumes:
+      - ${CERT_FOLDER}:/etc/letsencrypt
+      - ${NGINX_FOLDER}:/etc/nginx/conf.d/
+    ports:
+      - 443:443
+    networks:
+      servarr:
+    dns: *dns-servers
+    restart: unless-stopped
+
+  certbot:
+    build:
+      context: ./certbot
+      dockerfile: Dockerfile
+    container_name: certbot
+    env_file: .env
+    ports:
+      - 80:80
+    volumes:
+      - ${CERT_FOLDER}:/etc/letsencrypt
+    networks:
+      servarr:
+    dns: *dns-servers
+    restart: "no"
+
+networks:
+  servarr:
+    driver: bridge

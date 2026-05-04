@@ -1,15 +1,25 @@
 # Secrets — never commit
 .env
-core/.env
-automation/.env
-monitoring/.env
-monitoring/ha-token
-runners/compose.env
-llm/.env
-llm/.ansible-memory-bytes
-llm/ollama.env
-bind9/keys/key.conf
-komodo/secrets/
+
+# mac-mini-m4 stack secrets (written by pre_deploy)
+mac-mini-m4/core/.env
+mac-mini-m4/automation/.env
+mac-mini-m4/monitoring/.env
+mac-mini-m4/monitoring/ha-token
+mac-mini-m4/runners/compose.env
+mac-mini-m4/llm/.env
+mac-mini-m4/llm/.ansible-memory-bytes
+mac-mini-m4/llm/ollama.env
+mac-mini-m4/bind9/keys/key.conf
+mac-mini-m4/komodo/secrets/
+
+# archlinux stack secrets (written by pre_deploy)
+archlinux/media-server/.env
+archlinux/media-server/vpn-user.txt
+archlinux/media-server/vpn-password.txt
+
+# archlinux Periphery (deployed by Ansible) — passkey rendered from compose.env.example
+archlinux/komodo/compose.env
 
 # Docker volumes (local data)
 data/
