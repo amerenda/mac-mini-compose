@@ -4,6 +4,21 @@
 # are relative to that root.
 set -euo pipefail
 
+# Stale Komodo stack → server bindings may still target archlinux after the
+# murderbot migration. Refuse pre-deploy on the known archlinux LAN IP
+# (ansible inventory). Unset or override to allow: MEDIA_SERVER_BLOCK_LAN_IPS=""
+MEDIA_SERVER_BLOCK_LAN_IPS="${MEDIA_SERVER_BLOCK_LAN_IPS:-10.100.20.25}"
+if [[ -n "$MEDIA_SERVER_BLOCK_LAN_IPS" ]]; then
+  _ips=" $(hostname -I 2>/dev/null || echo) "
+  for _bad in $MEDIA_SERVER_BLOCK_LAN_IPS; do
+    [[ -z "$_bad" ]] && continue
+    if [[ "$_ips" == *" ${_bad} "* ]]; then
+      echo "media-server pre-deploy: blocked on LAN IP ${_bad} (archlinux). In Komodo, set this stack's server to murderbot only; stacks.toml has deploy=false until storage is ready." >&2
+      exit 1
+    fi
+  done
+fi
+
 : "${BWS_ACCESS_TOKEN:?BWS_ACCESS_TOKEN required (cat /run/secrets/bws-access-token)}"
 
 # Bitwarden Secrets Manager — secret key `do-dns-api-key` (DigitalOcean API token for dyndns).
