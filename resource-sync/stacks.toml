@@ -3,7 +3,7 @@
 # Secrets are fetched from Bitwarden Secrets Manager at deploy time via pre_deploy.
 #
 # Secrets remain in the existing k3s BWS project. Per-host machine accounts
-# (mac-mini, murderbot) have read access to that project. Secrets are fetched
+# (mac-mini, murderbot, archlinux) have read access to that project. Secrets are fetched
 # by UUID.
 #
 # NOTE: Komodo joins multi-line pre_deploy commands with ' && ' so bash
@@ -13,6 +13,7 @@
 # Layout:
 #   mac-mini-m4/   stacks deployed to the Mac Mini M4 Periphery
 #   murderbot/     stacks deployed to the murderbot (Debian) Periphery host
+#   archlinux/     stacks deployed to the Arch Linux Periphery host
 
 # ── Core: DNS, Postgres, MongoDB, Backups ──────────────────────────────────
 
@@ -126,6 +127,44 @@ export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
 bash mac-mini-m4/llm/pre-deploy.sh
 """
 
+# ── LLM: llm-manager agents on Linux hosts (native Ollama) ────────────────
+# Same agent image and wiring as mac-mini-m4/llm; systemd bind + restart instead
+# of Homebrew. Install native Ollama on each host; pre-deploy opens 0.0.0.0:11434.
+
+[[stack]]
+name = "llm-murderbot"
+description = "llm-manager agent — native Ollama on murderbot; agent API :8090"
+tags = ["murderbot", "llm"]
+deploy = true
+[stack.config]
+server = "murderbot"
+repo = "amerenda/komodo-dean-gitops"
+branch = "main"
+file_paths = ["murderbot/llm/compose.yaml"]
+git_account = "amerenda"
+[stack.config.pre_deploy]
+command = """
+export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
+bash murderbot/llm/pre-deploy.sh
+"""
+
+[[stack]]
+name = "llm-archlinux"
+description = "llm-manager agent — native Ollama on archlinux; agent API :8090"
+tags = ["archlinux", "llm"]
+deploy = true
+[stack.config]
+server = "archlinux"
+repo = "amerenda/komodo-dean-gitops"
+branch = "main"
+file_paths = ["archlinux/llm/compose.yaml"]
+git_account = "amerenda"
+[stack.config.pre_deploy]
+command = """
+export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
+bash archlinux/llm/pre-deploy.sh
+"""
+
 # ── murderbot Periphery server (Debian) ───────────────────────────────────
 # Periphery is bootstrapped on the host by Ansible
 # (playbooks/infrastructure/setup-debian-komodo.yml in ansible-playbooks).
@@ -143,14 +182,13 @@ enabled = true
 # placeholder literally and you get "Invalid passkey" even when the Variable is correct.
 passkey = ""
 
-# Retired: media-server moved to murderbot. Disable so Komodo drops the old server.
 [[server]]
 name = "archlinux"
-description = "Retired — was Arch Linux Periphery at 10.100.20.25"
+description = "Arch Linux Periphery (10.100.20.25) — llm and other stacks"
 tags = ["archlinux"]
 [server.config]
 address = "https://10.100.20.25:8120"
-enabled = false
+enabled = true
 passkey = ""
 
 # ── Media server: Jellyfin + servarr + nginx/certbot + DO dyndns ──────────

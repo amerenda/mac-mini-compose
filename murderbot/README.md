@@ -8,6 +8,7 @@ Periphery on `:8120`.
 
 | Stack | Path | Purpose |
 |-------|------|---------|
+| `llm-murderbot` | [`llm/`](llm/) | llm-manager agent + native Ollama on the host (same pattern as `mac-mini-m4/llm`) |
 | `media-server` | [`media-server/`](media-server/) | Jellyfin + servarr (radarr/sonarr/bazarr/prowlarr/profilarr) + sabnzbd + nginx/certbot + DigitalOcean dyndns |
 
 ## Periphery (self-managed)
@@ -58,6 +59,8 @@ and ResourceSync runs.
   to be free at renewal time.
 - LAN reachability from the Mac Mini to `10.100.20.19:8120` for
   Komodo Core → Periphery traffic.
+- For [`llm/`](llm/): [native Ollama](https://ollama.com) on the host (`ollama.service`)
+  and port `8090` free for the agent container.
 
 ## Secrets
 

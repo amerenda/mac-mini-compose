@@ -1,0 +1,31 @@
+# llm-manager agent on archlinux — pairs with native Ollama on the host (:11434).
+# Same pattern as mac-mini-m4/llm: Docker runs only the agent; OLLAMA_CONTAINER is
+# unset so the agent talks to host Ollama via host.docker.internal.
+services:
+  llm-agent:
+    image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
+    pull_policy: always
+    container_name: llm-agent
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    environment:
+      RUNNER_HOSTNAME: archlinux
+      OLLAMA_URL: http://host.docker.internal:11434
+      OLLAMA_CONTAINER: ""
+      COMPOSE_PROFILE: ""
+      COMPOSE_DIR: ${HOST_LLM_COMPOSE_DIR}
+      COMPOSE_DIR_LOCAL: /host/llm-compose
+      MODEL_STORAGE_PATH: /host-ollama-models
+    volumes:
+      - llm-agent-tls:/data/tls
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
+      - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
+
+volumes:
+  llm-agent-tls:

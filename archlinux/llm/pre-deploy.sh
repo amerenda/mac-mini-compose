@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Writes archlinux/llm/.env for Komodo deploy (Compose loads it for interpolation + container env).
+# Run from repo root: bash archlinux/llm/pre-deploy.sh
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+NATIVE_OLLAMA_RESTART_CMD="${NATIVE_OLLAMA_RESTART_CMD:-systemctl restart ollama}"
+
+BWS_LLM_AGENT_PSK_UUID="cdaa7917-3eba-44b5-a9ea-b41300f1dab5"
+
+OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-${HOME}/.ollama/models}"
+
+export BWS_ACCESS_TOKEN="${BWS_ACCESS_TOKEN:-$(cat /run/secrets/bws-access-token)}"
+
+skip_native_ollama_bind=""
+if [[ -f llm/gitops.env ]] && grep -v '^[[:space:]]*#' llm/gitops.env | grep -qE '^KOMODO_SKIP_NATIVE_OLLAMA_BIND=(1|true|yes)$'; then
+  skip_native_ollama_bind=1
+fi
+
+PSK="$(bws secret get "$BWS_LLM_AGENT_PSK_UUID" --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)"
+
+BACKEND_PUBLIC="${BACKEND_PUBLIC:-https://llm-manager-backend.amer.dev}"
+BACKEND_PUBLIC="${BACKEND_PUBLIC%/}"
+AGENT_IMAGE_TAG_RESOLVED="${AGENT_IMAGE_TAG:-}"
+if [[ -z "$AGENT_IMAGE_TAG_RESOLVED" ]] && command -v curl >/dev/null && command -v jq >/dev/null; then
+  AGENT_IMAGE_TAG_RESOLVED="$(curl -sfL "$BACKEND_PUBLIC/api/runners/target-version" | jq -r '.target_version // empty' | tr -d ' \t\r\n' || true)"
+fi
+if [[ -z "$AGENT_IMAGE_TAG_RESOLVED" ]]; then
+  AGENT_IMAGE_TAG_RESOLVED="latest"
+fi
+
+{
+  echo "LLM_MANAGER_AGENT_PSK=${PSK}"
+  echo "BACKEND_URL=https://llm-manager-backend.amer.dev"
+  echo "OLLAMA_URL=http://host.docker.internal:11434"
+  echo "AGENT_IMAGE_TAG=${AGENT_IMAGE_TAG_RESOLVED}"
+  echo "OLLAMA_MODELS_HOST_PATH=${OLLAMA_MODELS_HOST_PATH}"
+  echo "HOST_LLM_COMPOSE_DIR=${ROOT}/llm"
+  printf 'NATIVE_OLLAMA_RESTART_CMD=%q\n' "$NATIVE_OLLAMA_RESTART_CMD"
+} >llm/.env
+
+if [[ -f llm/gitops.env ]]; then
+  sed '/^[[:space:]]*#/d;/^[[:space:]]*$/d;/^KOMODO_SKIP_NATIVE_OLLAMA_BIND=/d' llm/gitops.env >>llm/.env
+fi
+
+if [[ -z "$skip_native_ollama_bind" ]]; then
+  bash "$ROOT/scripts/configure-native-ollama-bind.sh"
+else
+  echo "pre-deploy: skipping native Ollama bind (KOMODO_SKIP_NATIVE_OLLAMA_BIND)" >&2
+fi

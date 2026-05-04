@@ -29,9 +29,14 @@ komodo-dean-gitops/
 │   ├── scripts/               Boot, secret injection, sync, backup
 │   └── README.md              Full Mac Mini docs
 │
-└── murderbot/                 Stacks deployed to the murderbot (Debian) Periphery
-    ├── README.md              Host overview + Periphery setup
-    └── media-server/          Jellyfin + servarr + nginx/certbot + DO dyndns
+├── murderbot/                 Stacks deployed to the murderbot (Debian) Periphery
+│   ├── README.md              Host overview + Periphery setup
+│   ├── llm/                   llm-manager agent (native Ollama)
+│   └── media-server/          Jellyfin + servarr + nginx/certbot + DO dyndns
+│
+└── archlinux/                 Stacks deployed to the Arch Linux Periphery
+    ├── README.md              Host overview
+    └── llm/                   llm-manager agent (native Ollama)
 ```
 
 ## Architecture
@@ -46,7 +51,8 @@ pubhooks.amer.dev  (k3s Traefik proxy → Komodo Core)
 Komodo Core  (mac-mini-m4 :9120)
    │
    ├──► Periphery on mac-mini-m4   ──► mac-mini-m4/{core,automation,monitoring,runners,llm}
-   └──► Periphery on murderbot     ──► murderbot/{media-server, …}
+   ├──► Periphery on murderbot     ──► murderbot/{llm, media-server, …}
+   └──► Periphery on archlinux     ──► archlinux/{llm, …}
 ```
 
 Secrets flow:
@@ -67,12 +73,14 @@ docker compose up -d
 |------|------|----|----|--------|
 | `mac-mini-m4` | Core home services + Komodo Core | macOS (OrbStack) | 10.100.20.18 | Core + Periphery |
 | `murderbot` | Media + GPU | Debian | 10.100.20.19 | Periphery only |
+| `archlinux` | Workstation / GPU | Arch Linux | 10.100.20.25 | Periphery only |
 
 Each host's bootstrap (Docker, Periphery, BWS access token, host directories)
 is handled by [`amerenda/ansible-playbooks`](https://github.com/amerenda/ansible-playbooks):
 
 - Mac Mini: `playbooks/infrastructure/setup-macmini.yml`
 - murderbot (Debian): `playbooks/infrastructure/setup-debian-komodo.yml`
+- archlinux: `playbooks/infrastructure/setup-archlinux-komodo.yml`
 
 ## Adding a new stack
 
