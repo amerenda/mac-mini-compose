@@ -14,11 +14,6 @@ OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-${HOME}/.ollama/models}"
 
 export BWS_ACCESS_TOKEN="${BWS_ACCESS_TOKEN:-$(cat /run/secrets/bws-access-token)}"
 
-skip_native_ollama_bind=""
-if [[ -f llm/gitops.env ]] && grep -v '^[[:space:]]*#' llm/gitops.env | grep -qE '^KOMODO_SKIP_NATIVE_OLLAMA_BIND=(1|true|yes)$'; then
-  skip_native_ollama_bind=1
-fi
-
 PSK="$(bws secret get "$BWS_LLM_AGENT_PSK_UUID" --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)"
 
 BACKEND_PUBLIC="${BACKEND_PUBLIC:-https://llm-manager-backend.amer.dev}"
@@ -34,8 +29,10 @@ fi
 {
   echo "LLM_MANAGER_AGENT_PSK=${PSK}"
   echo "BACKEND_URL=https://llm-manager-backend.amer.dev"
-  echo "OLLAMA_URL=http://host.docker.internal:11434"
+  echo "OLLAMA_URL=http://ollama:11434"
+  echo "OLLAMA_CONTAINER=ollama"
   echo "AGENT_IMAGE_TAG=${AGENT_IMAGE_TAG_RESOLVED}"
+  echo "OLLAMA_IMAGE_TAG=${OLLAMA_IMAGE_TAG:-0.21.0}"
   echo "OLLAMA_MODELS_HOST_PATH=${OLLAMA_MODELS_HOST_PATH}"
   echo "HOST_LLM_COMPOSE_DIR=${ROOT}/llm"
   printf 'NATIVE_OLLAMA_RESTART_CMD=%q\n' "$NATIVE_OLLAMA_RESTART_CMD"
@@ -45,8 +42,6 @@ if [[ -f llm/gitops.env ]]; then
   sed '/^[[:space:]]*#/d;/^[[:space:]]*$/d;/^KOMODO_SKIP_NATIVE_OLLAMA_BIND=/d' llm/gitops.env >>llm/.env
 fi
 
-if [[ -z "$skip_native_ollama_bind" ]]; then
-  bash "$ROOT/scripts/configure-native-ollama-bind.sh"
-else
-  echo "pre-deploy: skipping native Ollama bind (KOMODO_SKIP_NATIVE_OLLAMA_BIND)" >&2
+if [[ ! -f llm/ollama.env ]]; then
+  cp llm/ollama.env.example llm/ollama.env
 fi
