@@ -1,14 +1,25 @@
-# llm-manager agent on Mac Mini — pairs with native Ollama (Metal, host :11434).
-# Docker only runs the agent; OLLAMA_CONTAINER is unset so the agent skips compose-Ollama checks.
-#
-# Top-level name fixes the Docker Compose project name (`docker compose ls`); matches
-# Komodo stack id llm-mac-mini-m4. Without it, the project defaults to the checkout dir name.
+# llm-manager stack on Mac Mini — agent + compose-managed Ollama.
+# Top-level name fixes the Docker Compose project name; matches Komodo stack id.
 name: llm-mac-mini-m4
 
 services:
+  ollama:
+    image: ollama/ollama:${OLLAMA_IMAGE_TAG:-0.21.0}
+    pull_policy: always
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    env_file:
+      - ollama.env
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    volumes:
+      - ${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}:/root/.ollama
+    # No `gpus` — Docker on macOS does not expose Metal to Linux containers.
+
   llm-agent:
     image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
-    # Align with registry on each deploy so AGENT_VERSION matches CI global target.
     pull_policy: always
     container_name: llm-agent
     restart: unless-stopped
@@ -19,27 +30,21 @@ services:
     env_file:
       - .env
     environment:
-      # Stable name in llm-manager (default Docker hostname is the container id).
       RUNNER_HOSTNAME: mac-mini-m4
-      # Metal / unified memory: report pool size from container RAM + Ollama loaded weights.
       AGENT_UNIFIED_MEMORY_VRAM: "true"
-      OLLAMA_URL: http://host.docker.internal:11434
-      OLLAMA_CONTAINER: ""
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_CONTAINER: ollama
       COMPOSE_PROFILE: ""
-      # Host filesystem path (same value as left side of bind below) for docker:cli self-update
       COMPOSE_DIR: ${HOST_LLM_COMPOSE_DIR}
-      # Writable mount of llm/ so the agent can pin AGENT_IMAGE_TAG in llm/.env
       COMPOSE_DIR_LOCAL: /host/llm-compose
       MODEL_STORAGE_PATH: /host-ollama-models
-      # Native Homebrew Ollama: merge tunables into plist + brew services restart
-      OLLAMA_BREW_SERVICE_PLIST: /host/ollama-launchagents/homebrew.mxcl.ollama.plist
-      # NATIVE_OLLAMA_RESTART_CMD is set in llm/.env by pre-deploy (full path to OrbStack `mac` when available)
+    depends_on:
+      - ollama
     volumes:
       - llm-agent-tls:/data/tls
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
-      - ${OLLAMA_LAUNCH_AGENTS_DIR}:/host/ollama-launchagents:rw
 
 volumes:
   llm-agent-tls:

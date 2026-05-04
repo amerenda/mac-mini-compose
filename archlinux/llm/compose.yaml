@@ -1,4 +1,6 @@
 # llm-manager stack on archlinux — agent + compose-managed Ollama.
+name: llm-archlinux
+
 services:
   ollama:
     image: ollama/ollama:${OLLAMA_IMAGE_TAG:-0.21.0}

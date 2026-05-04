@@ -1,7 +1,22 @@
-# llm-manager agent on murderbot — pairs with native Ollama on the host (:11434).
-# Same pattern as mac-mini-m4/llm: Docker runs only the agent; OLLAMA_CONTAINER is
-# unset so the agent talks to host Ollama via host.docker.internal.
+# llm-manager stack on murderbot — agent + compose-managed Ollama.
+name: llm-murderbot
+
 services:
+  ollama:
+    image: ollama/ollama:${OLLAMA_IMAGE_TAG:-0.21.0}
+    pull_policy: always
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    env_file:
+      - ollama.env
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    volumes:
+      - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/root/.ollama
+    gpus: all
+
   llm-agent:
     image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
     pull_policy: always
@@ -15,19 +30,19 @@ services:
       - .env
     environment:
       RUNNER_HOSTNAME: murderbot
-      OLLAMA_URL: http://host.docker.internal:11434
-      OLLAMA_CONTAINER: ""
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_CONTAINER: ollama
       COMPOSE_PROFILE: ""
       COMPOSE_DIR: ${HOST_LLM_COMPOSE_DIR}
       COMPOSE_DIR_LOCAL: /host/llm-compose
       MODEL_STORAGE_PATH: /host-ollama-models
+    depends_on:
+      - ollama
     volumes:
       - llm-agent-tls:/data/tls
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
-    # NVML (pynvml) inside the agent needs GPU devices; host Ollama still uses the GPU natively.
-    # Requires nvidia-container-toolkit. For AMD + ROCm, use agent-amd + /dev/dri + /dev/kfd.
     gpus: all
 
 volumes:

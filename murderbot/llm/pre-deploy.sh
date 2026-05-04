@@ -6,8 +6,6 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-NATIVE_OLLAMA_RESTART_CMD="${NATIVE_OLLAMA_RESTART_CMD:-systemctl restart ollama}"
-
 BWS_LLM_AGENT_PSK_UUID="cdaa7917-3eba-44b5-a9ea-b41300f1dab5"
 
 OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-${HOME}/.ollama/models}"
@@ -29,15 +27,18 @@ fi
 {
   echo "LLM_MANAGER_AGENT_PSK=${PSK}"
   echo "BACKEND_URL=https://llm-manager-backend.amer.dev"
-  echo "OLLAMA_URL=http://host.docker.internal:11434"
+  echo "OLLAMA_URL=http://ollama:11434"
+  echo "OLLAMA_CONTAINER=ollama"
   echo "AGENT_IMAGE_TAG=${AGENT_IMAGE_TAG_RESOLVED}"
+  echo "OLLAMA_IMAGE_TAG=${OLLAMA_IMAGE_TAG:-0.21.0}"
   echo "OLLAMA_MODELS_HOST_PATH=${OLLAMA_MODELS_HOST_PATH}"
   echo "HOST_LLM_COMPOSE_DIR=${ROOT}/llm"
-  printf 'NATIVE_OLLAMA_RESTART_CMD=%q\n' "$NATIVE_OLLAMA_RESTART_CMD"
 } >llm/.env
 
 if [[ -f llm/gitops.env ]]; then
   sed '/^[[:space:]]*#/d;/^[[:space:]]*$/d' llm/gitops.env >>llm/.env
 fi
 
-bash "$ROOT/scripts/configure-native-ollama-bind.sh"
+if [[ ! -f llm/ollama.env ]]; then
+  cp llm/ollama.env.example llm/ollama.env
+fi

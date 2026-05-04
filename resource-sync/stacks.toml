@@ -112,11 +112,11 @@ cp mac-mini-m4/runners/entrypoint-wrapper.sh /Users/alex/komodo/runner-secrets/e
 chmod +x /Users/alex/komodo/runner-secrets/entrypoint-wrapper.sh
 """
 
-# ── LLM: llm-manager agent (native Ollama on Mac Mini) ─────────────────────
+# ── LLM: llm-manager agent + compose Ollama (Mac Mini) ─────────────────────
 
 [[stack]]
 name = "llm-mac-mini-m4"
-description = "llm-manager agent — uses host Ollama (Metal); agent API :8090"
+description = "llm-manager agent + Ollama in compose; agent API :8090"
 tags = ["mac-mini"]
 deploy = true
 [stack.config]
@@ -133,13 +133,11 @@ export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
 bash mac-mini-m4/llm/pre-deploy.sh
 """
 
-# ── LLM: llm-manager agents on Linux hosts (native Ollama) ────────────────
-# Same agent image and wiring as mac-mini-m4/llm; systemd bind + restart instead
-# of Homebrew. Install native Ollama on each host; pre-deploy opens 0.0.0.0:11434.
+# ── LLM: llm-manager agent + compose Ollama (Linux hosts) ─────────────────
 
 [[stack]]
 name = "llm-murderbot"
-description = "llm-manager agent — native Ollama on murderbot; agent API :8090"
+description = "llm-manager agent + Ollama in compose; agent API :8090"
 tags = ["murderbot", "llm"]
 deploy = true
 [stack.config]
@@ -148,6 +146,7 @@ repo = "amerenda/komodo-dean-gitops"
 branch = "main"
 file_paths = ["murderbot/llm/compose.yaml"]
 git_account = "amerenda"
+project_name = "llm-murderbot"
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
@@ -156,7 +155,7 @@ bash murderbot/llm/pre-deploy.sh
 
 [[stack]]
 name = "llm-archlinux"
-description = "llm-manager agent — native Ollama on archlinux; agent API :8090"
+description = "llm-manager agent + Ollama in compose; agent API :8090"
 tags = ["archlinux", "llm"]
 deploy = true
 [stack.config]
@@ -165,6 +164,7 @@ repo = "amerenda/komodo-dean-gitops"
 branch = "main"
 file_paths = ["archlinux/llm/compose.yaml"]
 git_account = "amerenda"
+project_name = "llm-archlinux"
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
