@@ -6,19 +6,10 @@ set -euo pipefail
 
 : "${BWS_ACCESS_TOKEN:?BWS_ACCESS_TOKEN required (cat /run/secrets/bws-access-token)}"
 
-# Bitwarden Secrets Manager UUIDs.
-# Rotate the leaked DigitalOcean token first, store the new value as
-# `media-server-do-api-token` in BWS, then paste the UUID below.
-BWS_DO_API_TOKEN_UUID="REPLACE_WITH_NEW_BWS_UUID"
+# Bitwarden Secrets Manager — secret key `do-dns-api-key` (DigitalOcean API token for dyndns).
+BWS_DO_API_TOKEN_UUID="d043a77f-ca1e-4ac6-8cfa-b38200f7b6c9"
 
 ENV=archlinux/media-server/.env
-
-if [[ "$BWS_DO_API_TOKEN_UUID" == "REPLACE_WITH_NEW_BWS_UUID" ]]; then
-  echo "media-server pre-deploy: BWS_DO_API_TOKEN_UUID is not set." >&2
-  echo "  Rotate the DO token, store it in Bitwarden Secrets Manager," >&2
-  echo "  and update BWS_DO_API_TOKEN_UUID in archlinux/media-server/pre-deploy.sh." >&2
-  exit 1
-fi
 
 DO_API_TOKEN=$(bws secret get "$BWS_DO_API_TOKEN_UUID" --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
 if [[ -z "$DO_API_TOKEN" || "$DO_API_TOKEN" == "null" ]]; then
