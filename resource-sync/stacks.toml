@@ -149,7 +149,7 @@ passkey = ""
 
 [[stack]]
 name = "media-server"
-description = "Jellyfin, radarr/sonarr/bazarr/prowlarr/whisparr/profilarr, sabnzbd, nginx/certbot, DO dyndns"
+description = "Jellyfin, radarr/sonarr/bazarr/prowlarr/profilarr, sabnzbd, nginx/certbot, DO dyndns"
 tags = ["archlinux", "media"]
 deploy = true
 [stack.config]

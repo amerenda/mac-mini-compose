@@ -1,7 +1,7 @@
 # archlinux/media-server
 
 Komodo-managed Docker Compose stack: Jellyfin, the *arr ecosystem (radarr,
-sonarr, bazarr, prowlarr, whisparr, profilarr), sabnzbd, plus a small
+sonarr, bazarr, prowlarr, profilarr), sabnzbd, plus a small
 nginx/certbot reverse proxy and a DigitalOcean dyndns updater.
 
 Replaces the standalone [`amerenda/media-server`](https://github.com/amerenda/media-server)
@@ -16,16 +16,15 @@ repo. Deploys via Komodo Periphery on the archlinux host.
 | `sonarr` | 8989 | `linuxserver/sonarr` | TV |
 | `bazarr` | 6767 | `linuxserver/bazarr` | Subtitles |
 | `prowlarr` | 9696 | `linuxserver/prowlarr` | Indexer manager |
-| `whisparr` | 6969 | `ghcr.io/hotio/whisparr:v3` | Adult media |
 | `profilarr` | 6868 | `santiagosayshey/profilarr` | Custom format profiles |
 | `sabnzbd` | 8080 | `lscr.io/linuxserver/sabnzbd` | Usenet downloader |
 | `nginx` | 443 | built (`./nginx`) | TLS termination for `media.amer.dev` |
 | `certbot` | 80 | built (`./certbot`) | Let's Encrypt standalone, 12 h renewal loop |
 | `dns` | — | built (`./dns`) | Updates DigitalOcean A record `media.amer.dev` to current external IP every 30 min |
 
-`whisparr` and `bazarr` deliberately bind `${WHISPARR_FOLDER}` /
-`${BAZARR_CONFIG}` to host paths owned `1000:1000`; the linuxserver / hotio
-images run as `PUID=1000 PGID=1000`.
+`*arr` apps and Jellyfin use host bind mounts under `/opt/media` and
+`/mnt/storage` owned `1000:1000`; linuxserver images run as `PUID=1000
+PGID=1000`.
 
 ## Volumes
 

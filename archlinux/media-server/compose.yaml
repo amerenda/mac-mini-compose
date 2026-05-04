@@ -10,24 +10,6 @@ x-dns: &dns-servers
   - 8.8.8.8
 
 services:
-  whisparr:
-    container_name: whisparr
-    image: ghcr.io/hotio/whisparr:v3
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=America/New_York
-    volumes:
-      - ${WHISPARR_CONFIG}:/config
-      - ${WHISPARR_FOLDER}:/porn
-      - ${USENET_DOWNLOADS}:/downloads
-    ports:
-      - 6969:6969
-    networks:
-      servarr:
-    dns: *dns-servers
-    restart: unless-stopped
-
   profilarr:
     container_name: profilarr
     image: santiagosayshey/profilarr:latest

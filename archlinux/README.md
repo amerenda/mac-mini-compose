@@ -8,7 +8,7 @@ Periphery on `:8120`.
 
 | Stack | Path | Purpose |
 |-------|------|---------|
-| `media-server` | [`media-server/`](media-server/) | Jellyfin + servarr (radarr/sonarr/bazarr/prowlarr/whisparr/profilarr) + sabnzbd + nginx/certbot + DigitalOcean dyndns |
+| `media-server` | [`media-server/`](media-server/) | Jellyfin + servarr (radarr/sonarr/bazarr/prowlarr/profilarr) + sabnzbd + nginx/certbot + DigitalOcean dyndns |
 
 ## Periphery (self-managed)
 
@@ -38,7 +38,7 @@ The playbook:
 4. Renders `archlinux/komodo/compose.env` from `compose.env.example`,
    injecting `PERIPHERY_PASSKEYS` from BWS (`komodo-dean-passkey`).
 5. `docker compose --env-file compose.env up -d --build` for Periphery.
-6. Pre-creates `/opt/media/{profilarr,whisparr,radarr,bazarr,sonarr/{config,scripts},prowlarr,sabnzbd,jellyfin}/config`
+6. Pre-creates `/opt/media/{profilarr,radarr,bazarr,sonarr/{config,scripts},prowlarr,sabnzbd,jellyfin}/config`
    and `/mnt/storage/{movies,tv,books,downloads/{complete,incomplete},cache/transcode}`,
    all owned `1000:1000` so the linuxserver.io / hotio containers can write.
 

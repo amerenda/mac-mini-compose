@@ -21,7 +21,6 @@ umask 077
 {
   echo "CONFIG_BASE=/opt/media"
   echo "PROFILARR_CONFIG=/opt/media/profilarr/config"
-  echo "WHISPARR_CONFIG=/opt/media/whisparr/config"
   echo "RADARR_CONFIG=/opt/media/radarr/config"
   echo "BAZARR_CONFIG=/opt/media/bazarr/config"
   echo "SONARR_CONFIG=/opt/media/sonarr/config"
@@ -33,7 +32,6 @@ umask 077
   echo "MOVIES_FOLDER=/mnt/storage/movies"
   echo "TV_FOLDER=/mnt/storage/tv"
   echo "BOOKS_FOLDER=/mnt/storage/books"
-  echo "WHISPARR_FOLDER=/mnt/storage/misc/porn"
   echo "USENET_DOWNLOADS=/mnt/storage/downloads/complete"
   echo "USENET_DOWNLOADS_INCOMPLETE=/mnt/storage/downloads/incomplete"
   echo "TRANSCODE_FOLDER=/mnt/storage/cache/transcode"
