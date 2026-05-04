@@ -121,6 +121,8 @@ repo = "amerenda/komodo-dean-gitops"
 branch = "main"
 file_paths = ["mac-mini-m4/llm/compose.yaml"]
 git_account = "amerenda"
+# Komodo passes this as docker compose -p … (overrides checkout dir name "llm").
+project_name = "llm-mac-mini-m4"
 [stack.config.pre_deploy]
 command = """
 export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
