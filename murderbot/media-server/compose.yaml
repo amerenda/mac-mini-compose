@@ -1,7 +1,7 @@
 name: media-server
 
-# Komodo-managed stack on the murderbot (Debian) Periphery host. Secrets and
-# host-path overrides come from .env, which Komodo's pre_deploy renders from Bitwarden.
+# Komodo-managed stack on the murderbot (Debian) Periphery host.
+# This stack now relies on k3s Traefik + cert-manager ingress for HTTPS/public routing.
 # Config bind-mount root (/mnt/storage/media/config) and library root
 # (/mnt/storage) are pre-created with owner 1000:1000 by setup-debian-komodo.yml.
 
@@ -136,46 +136,6 @@ services:
     devices:
       - /dev/dri:/dev/dri
     restart: unless-stopped
-
-  dns:
-    build:
-      context: ./dns/
-      dockerfile: Dockerfile
-    container_name: dns
-    env_file: .env
-    networks:
-      servarr:
-    dns: *dns-servers
-
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    container_name: nginx
-    volumes:
-      - ${CERT_FOLDER}:/etc/letsencrypt
-      - ${NGINX_FOLDER}:/etc/nginx/conf.d/
-    ports:
-      - 443:443
-    networks:
-      servarr:
-    dns: *dns-servers
-    restart: unless-stopped
-
-  certbot:
-    build:
-      context: ./certbot
-      dockerfile: Dockerfile
-    container_name: certbot
-    env_file: .env
-    ports:
-      - 80:80
-    volumes:
-      - ${CERT_FOLDER}:/etc/letsencrypt
-    networks:
-      servarr:
-    dns: *dns-servers
-    restart: "no"
 
 networks:
   servarr:

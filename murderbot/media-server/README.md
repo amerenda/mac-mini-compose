@@ -1,8 +1,11 @@
 # murderbot/media-server
 
 Komodo-managed Docker Compose stack: Jellyfin, the *arr ecosystem (radarr,
-sonarr, bazarr, prowlarr, profilarr), sabnzbd, plus a small
-nginx/certbot reverse proxy and a DigitalOcean dyndns updater.
+sonarr, bazarr, prowlarr, profilarr), and sabnzbd.
+
+TLS/ingress is handled by k3s Traefik + cert-manager (see
+`k3s-dean-gitops/infra/ingresses/jellyfin-ingress-amer-dev.yaml`), so this
+stack no longer runs local nginx/certbot/dns sidecars.
 
 Replaces the standalone [`amerenda/media-server`](https://github.com/amerenda/media-server)
 repo. Deploys via Komodo Periphery on the **murderbot** host.
@@ -18,9 +21,6 @@ repo. Deploys via Komodo Periphery on the **murderbot** host.
 | `prowlarr` | 9696 | `linuxserver/prowlarr` | Indexer manager |
 | `profilarr` | 6868 | `santiagosayshey/profilarr` | Custom format profiles |
 | `sabnzbd` | 8080 | `lscr.io/linuxserver/sabnzbd` | Usenet downloader |
-| `nginx` | 443 | built (`./nginx`) | TLS termination for `media.amer.dev` |
-| `certbot` | 80 | built (`./certbot`) | Let's Encrypt standalone, 12 h renewal loop |
-| `dns` | — | built (`./dns`) | Updates DigitalOcean A record `media.amer.dev` to current external IP every 30 min |
 
 `*arr` apps and Jellyfin use host bind mounts under `/mnt/storage/media/config`
 (config) and `/mnt/storage` (libraries) owned `1000:1000`; linuxserver images
@@ -39,7 +39,7 @@ with owner `1000:1000`:
 
 Stack registered in [`../../resource-sync/stacks.toml`](../../resource-sync/stacks.toml)
 as `media-server` on the `murderbot` server. Komodo runs `pre-deploy.sh`
-(reads BWS for `DO_API_TOKEN` and writes `.env`), then `docker compose up -d
+(writes `.env`), then `docker compose up -d
 --build` from this directory. The Compose **project name** is `media-server`
 (top-level `name` in [`compose.yaml`](compose.yaml)); on the host, `docker compose ls`
 should list that project when the stack is running.
@@ -53,13 +53,7 @@ docker compose --env-file .env up -d --build
 
 | Secret | Source | Used by |
 |--------|--------|---------|
-| `DO_API_TOKEN` | BWS (`media-server-do-api-token`) | `dns` service (`./dns/main.py`) |
 | BWS access token | `/etc/komodo/.bws-secret` (root, mode 0600) | Periphery container at deploy time |
-
-**Rotation note:** the legacy `amerenda/media-server` repo's `.env` contains
-a leaked DigitalOcean API token. Rotate it in the DigitalOcean console
-before populating `media-server-do-api-token` in BWS, and replace
-`BWS_DO_API_TOKEN_UUID` in [`pre-deploy.sh`](pre-deploy.sh) with the new UUID.
 
 ## Initial setup checklist
 
@@ -68,10 +62,9 @@ before populating `media-server-do-api-token` in BWS, and replace
    [ansible-playbooks](https://github.com/amerenda/ansible-playbooks) (this
    installs Docker, Periphery, bws CLI, and pre-creates volume dirs).
 2. Confirm `/mnt/storage` is a real mountpoint (the playbook only warns).
-3. Point `media.amer.dev` at the host's external IP at the registrar/DO so
-   certbot's first run can solve the HTTP-01 challenge on port 80.
-4. Open ports 80/443 (and 8096/8920/7359 if you want direct Jellyfin) on the
-   home router.
+3. Ensure k3s Traefik ingress and certificate are configured (see ingress
+   manifest noted at the top).
+4. Open only the host ports you actually use directly (for example 8096/8920/7359).
 5. Push to `amerenda/komodo-dean-gitops` `main` (this folder + the new
    `[[stack]]` block in `resource-sync/stacks.toml`). The next ResourceSync
    creates the stack in Komodo; click *Deploy* (or wait for the deploy
@@ -82,9 +75,6 @@ before populating `media-server-do-api-token` in BWS, and replace
 
 ## Known prerequisites / gotchas
 
-- **Port 80 must be free at renewal time.** Certbot uses standalone HTTP-01,
-  which means the certbot container binds 80 every 12 h. If anything else on
-  murderbot listens on 80, renewals will quietly fail.
 - **`/mnt/storage` mount.** The Ansible playbook does not format or fstab
   the disk; do that out of band (parted / mkfs.ext4 / fstab / `systemctl
   daemon-reload && mount -a`).

@@ -13,7 +13,7 @@ if [[ -n "$MEDIA_SERVER_BLOCK_LAN_IPS" ]]; then
   for _bad in $MEDIA_SERVER_BLOCK_LAN_IPS; do
     [[ -z "$_bad" ]] && continue
     if [[ "$_ips" == *" ${_bad} "* ]]; then
-      echo "media-server pre-deploy: blocked on LAN IP ${_bad} (archlinux). In Komodo, set this stack's server to murderbot only; stacks.toml has deploy=false until storage is ready." >&2
+      echo "media-server pre-deploy: blocked on LAN IP ${_bad} (archlinux). In Komodo, set this stack's server to murderbot only." >&2
       exit 1
     fi
   done
@@ -21,16 +21,7 @@ fi
 
 : "${BWS_ACCESS_TOKEN:?BWS_ACCESS_TOKEN required (cat /run/secrets/bws-access-token)}"
 
-# Bitwarden Secrets Manager — secret key `do-dns-api-key` (DigitalOcean API token for dyndns).
-BWS_DO_API_TOKEN_UUID="d043a77f-ca1e-4ac6-8cfa-b38200f7b6c9"
-
 ENV=murderbot/media-server/.env
-
-DO_API_TOKEN=$(bws secret get "$BWS_DO_API_TOKEN_UUID" --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)
-if [[ -z "$DO_API_TOKEN" || "$DO_API_TOKEN" == "null" ]]; then
-  echo "media-server pre-deploy: failed to fetch DO_API_TOKEN from BWS" >&2
-  exit 1
-fi
 
 umask 077
 CONFIG_ROOT=/mnt/storage/media/config
@@ -51,16 +42,11 @@ CONFIG_ROOT=/mnt/storage/media/config
   echo "USENET_DOWNLOADS=/mnt/storage/downloads/complete"
   echo "USENET_DOWNLOADS_INCOMPLETE=/mnt/storage/downloads/incomplete"
   echo "TRANSCODE_FOLDER=/mnt/storage/cache/transcode"
-  echo "CERT_FOLDER=/etc/letsencrypt/"
-  echo "NGINX_FOLDER=./nginx/config"
   echo "JELLYFIN_URL=media.amer.dev"
-  echo "DO_API_TOKEN=${DO_API_TOKEN}"
 } > "$ENV"
 
 # Sanity check: assert media-server compose file is at the expected path so
 # Komodo's `docker compose up` doesn't silently use the wrong cwd.
 test -f murderbot/media-server/compose.yaml \
-  && test -d murderbot/media-server/dns \
-  && test -d murderbot/media-server/nginx \
-  && test -d murderbot/media-server/certbot \
+  && test -d murderbot/media-server/scripts \
   || { echo "media-server pre-deploy: layout check failed in $(pwd)" >&2; exit 1; }
