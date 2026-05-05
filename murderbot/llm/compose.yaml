@@ -1,6 +1,7 @@
 # llm-manager stack on murderbot — agent + compose-managed Ollama.
 #
-# Full host ~/.ollama → /root/.ollama (models under .../models/). See archlinux stack comment.
+# Ollama data (keys, config) → /root/.ollama; models stored separately at OLLAMA_MODELS_HOST_PATH
+# (defaults to /mnt/storage/models) and mapped to /mnt/models inside the container via OLLAMA_MODELS.
 name: llm-murderbot
 
 services:
@@ -15,8 +16,10 @@ services:
       - ollama.env
     environment:
       OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_MODELS: /mnt/models
     volumes:
       - ${OLLAMA_DATA_HOST_PATH:-/home/alex/.ollama}:/root/.ollama
+      - ${OLLAMA_MODELS_HOST_PATH:-/mnt/storage/models}:/mnt/models
     gpus: all
 
   llm-agent:
