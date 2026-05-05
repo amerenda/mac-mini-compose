@@ -21,6 +21,12 @@ fi
 
 : "${BWS_ACCESS_TOKEN:?BWS_ACCESS_TOKEN required (cat /run/secrets/bws-access-token)}"
 
+# Remove orphaned containers from pre-k3s-ingress era (nginx/certbot/dns no
+# longer in compose; k3s Traefik + cert-manager handle TLS termination).
+for _c in nginx certbot dns; do
+  docker rm -f "$_c" 2>/dev/null || true
+done
+
 ENV=murderbot/media-server/.env
 
 umask 077

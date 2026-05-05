@@ -201,7 +201,7 @@ passkey = ""
 
 [[stack]]
 name = "media-server"
-description = "Jellyfin, radarr/sonarr/bazarr/prowlarr/profilarr, sabnzbd, nginx/certbot, DO dyndns"
+description = "Jellyfin, radarr/sonarr/bazarr/prowlarr/profilarr, sabnzbd; TLS via k3s Traefik"
 tags = ["murderbot", "media"]
 deploy = true
 [stack.config]
