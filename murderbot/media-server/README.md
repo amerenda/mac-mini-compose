@@ -20,7 +20,7 @@ repo. Deploys via Komodo Periphery on the **murderbot** host.
 | `bazarr` | 6767 | `linuxserver/bazarr` | Subtitles |
 | `prowlarr` | 9696 | `linuxserver/prowlarr` | Indexer manager |
 | `profilarr` | 6868 | `santiagosayshey/profilarr` | Custom format profiles |
-| `sabnzbd` | 8080 | `lscr.io/linuxserver/sabnzbd` | Usenet downloader |
+| `sabnzbd` | 8081 (host) -> 8080 (container) | `lscr.io/linuxserver/sabnzbd` | Usenet downloader |
 
 `*arr` apps and Jellyfin use host bind mounts under `/mnt/storage/media/config`
 (config) and `/mnt/storage` (libraries) owned `1000:1000`; linuxserver images
