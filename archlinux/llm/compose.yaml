@@ -13,6 +13,11 @@ services:
     pull_policy: always
     container_name: ollama
     restart: unless-stopped
+    # Docker sometimes creates 127.0.0.11 with no upstream forwarders (especially
+    # right after boot) — agent/Ollama then cannot resolve BACKEND_URL / pulls.
+    dns:
+      - ${DOCKER_DNS_1:-1.1.1.1}
+      - ${DOCKER_DNS_2:-8.8.8.8}
     ports:
       - "11434:11434"
     env_file:
@@ -37,6 +42,9 @@ services:
     pull_policy: always
     container_name: llm-agent
     restart: unless-stopped
+    dns:
+      - ${DOCKER_DNS_1:-1.1.1.1}
+      - ${DOCKER_DNS_2:-8.8.8.8}
     ports:
       - "8090:8090"
     extra_hosts:
