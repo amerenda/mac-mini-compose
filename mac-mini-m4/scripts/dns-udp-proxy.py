@@ -11,9 +11,11 @@ Why a userspace proxy:
   from plain sockets get routed through the Tailscale tunnel instead of
   en0. IP_BOUND_IF pins sockets to en0 so all sends go via the LAN.
 
-UDP from clients is forwarded to Technitium (OrbStack VM) using DNS over TCP.
-UDP datagrams to the VM:5354 are intermittently dropped; TCP to the same
-port is reliable in practice.
+Client DNS is forwarded to Technitium on the VM using plain UDP on port 5354.
+DNS-over-TCP from macOS to 192.168.139.2:5354 is reset on this OrbStack/bridge
+path even though TCP works inside the VM; UDP from the Mac to the VM is the
+working transport. Bind backend sockets to the bridge source IP and pin to en0
+so replies do not flap via Tailscale.
 
 Runs as root via LaunchDaemon at boot.
 """
@@ -152,7 +154,20 @@ def _strip_ecs_from_response(data: bytes) -> bytes:
     return data
 
 
-# ── DNS-over-TCP to Technitium ────────────────────────────────────────────────
+# ── Backend (Technitium on OrbStack VM) ─────────────────────────────────────
+
+def _query_backend_udp(query: bytes, backend_src: str) -> bytes:
+    """Plain DNS UDP to Technitium (host network in the Linux VM)."""
+    be = en0_bound_socket(socket.SOCK_DGRAM)
+    be.settimeout(TIMEOUT)
+    try:
+        be.bind((backend_src, 0))
+        be.sendto(query, (BACKEND_IP, BACKEND_PORT))
+        resp, _ = be.recvfrom(65535)
+        return resp
+    finally:
+        be.close()
+
 
 def recv_dns_tcp(s: socket.socket) -> bytes:
     """Read a DNS-over-TCP message (2-byte length prefix + payload)."""
@@ -169,19 +184,6 @@ def recv_dns_tcp(s: socket.socket) -> bytes:
     return data
 
 
-def _query_backend_tcp(query: bytes, backend_src: str) -> bytes:
-    """DNS-over-TCP to Technitium (length-prefixed wire format)."""
-    be = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    be.settimeout(TIMEOUT)
-    be.bind((backend_src, 0))
-    be.connect((BACKEND_IP, BACKEND_PORT))
-    try:
-        be.sendall(struct.pack("!H", len(query)) + query)
-        return recv_dns_tcp(be)
-    finally:
-        be.close()
-
-
 # ── UDP (client) ──────────────────────────────────────────────────────────────
 
 def handle_udp(
@@ -192,9 +194,9 @@ def handle_udp(
 ) -> None:
     try:
         tagged = _add_ecs_to_query(data, client_addr[0])
-        resp = _query_backend_tcp(tagged, backend_src)
+        resp = _query_backend_udp(tagged, backend_src)
         if not resp:
-            raise RuntimeError("empty DNS response from backend TCP")
+            raise RuntimeError("empty DNS response from backend UDP")
         listen_sock.sendto(resp, client_addr)
         _bump("udp_ok")
     except Exception as e:
@@ -230,7 +232,8 @@ def handle_tcp(conn: socket.socket, client_addr: tuple, backend_src: str) -> Non
         query = recv_dns_tcp(conn)
         if not query:
             return
-        resp = _query_backend_tcp(query, backend_src)
+        # TCP clients → backend via UDP (mac→VM TCP :5354 is not viable here).
+        resp = _query_backend_udp(query, backend_src)
         if resp:
             conn.sendall(struct.pack("!H", len(resp)) + resp)
         _bump("tcp_ok")
