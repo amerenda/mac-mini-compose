@@ -168,6 +168,63 @@ else
     ERRORS=$((ERRORS + 1))
 fi
 
+# ── monitoring/.env + ha-token (UUIDs must match resource-sync/stacks.toml) ─
+
+log "Injecting mac-mini-m4/monitoring/.env..."
+MON_DIR="$COMPOSE_DIR/monitoring"
+MON_ENV="$MON_DIR/.env"
+mkdir -p "$MON_DIR"
+
+MON_PG=$("$BWS_BIN" secret get "a280e465-8813-4b48-9972-b4210149cb60" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+MON_PG=$(printf '%s' "$MON_PG" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+MON_MONGO=$("$BWS_BIN" secret get "d0213758-1881-4d35-8fd2-b39d015cb7b9" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+MON_MONGO=$(printf '%s' "$MON_MONGO" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+MON_TECH=$("$BWS_BIN" secret get "4645ac46-3955-4e6e-8558-b434015613a7" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+MON_TECH=$(printf '%s' "$MON_TECH" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+MON_GRAF=$("$BWS_BIN" secret get "9a2f2c00-0cc9-4aac-91da-b43d00f980d1" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+MON_GRAF=$(printf '%s' "$MON_GRAF" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+
+{
+    if [[ -n "$MON_PG" ]] && [[ "$MON_PG" != "null" ]]; then
+        printf 'MINI_POSTGRES_PASSWORD=%s\n' "$MON_PG"
+    else
+        log "WARN: failed to fetch MINI_POSTGRES_PASSWORD for monitoring/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$MON_MONGO" ]] && [[ "$MON_MONGO" != "null" ]]; then
+        printf 'MONGO_PASSWORD=%s\n' "$MON_MONGO"
+    else
+        log "WARN: failed to fetch MONGO_PASSWORD for monitoring/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$MON_TECH" ]] && [[ "$MON_TECH" != "null" ]]; then
+        printf 'TECHNITIUM_API_TOKEN=%s\n' "$MON_TECH"
+    else
+        log "WARN: failed to fetch TECHNITIUM_API_TOKEN for monitoring/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    printf 'GRAFANA_ADMIN_USER=admin\n'
+    if [[ -n "$MON_GRAF" ]] && [[ "$MON_GRAF" != "null" ]]; then
+        printf 'GRAFANA_ADMIN_PASSWORD=%s\n' "$MON_GRAF"
+    else
+        log "WARN: failed to fetch GRAFANA_ADMIN_PASSWORD for monitoring/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    printf 'MONITORING_DIR=%s\n' "$MON_DIR"
+} > "$MON_ENV"
+chown "$OWNER" "$MON_ENV" 2>/dev/null || true
+
+HA_TOK=$("$BWS_BIN" secret get "c7ccdb87-b04e-428e-bbcf-b4340156edf6" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+HA_TOK=$(printf '%s' "$HA_TOK" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+if [[ -n "$HA_TOK" ]] && [[ "$HA_TOK" != "null" ]]; then
+    printf '%s' "$HA_TOK" > "$MON_DIR/ha-token"
+    chmod 0600 "$MON_DIR/ha-token"
+    chown "$OWNER" "$MON_DIR/ha-token" 2>/dev/null || true
+else
+    log "WARN: failed to fetch monitoring/ha-token (Home Assistant Prometheus token)"
+    ERRORS=$((ERRORS + 1))
+fi
+
 # ── Update Komodo git provider PAT ──────────────────────────────────────────
 
 log "Updating Komodo git provider PAT..."
