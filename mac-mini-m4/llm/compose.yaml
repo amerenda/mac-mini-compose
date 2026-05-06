@@ -48,6 +48,8 @@ services:
     volumes:
       - llm-agent-tls:/data/tls
       - /var/run/docker.sock:/var/run/docker.sock
+      # Agent disk stats use /hostfs + OLLAMA_*_HOST_PATH; bind mounts alone lie on OrbStack.
+      - /:/hostfs:ro
       - ${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}:/host-ollama-models:ro
       - ${OLLAMA_DATA_HOST_PATH:-/Users/alex/.ollama}:/host-ollama-data:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
