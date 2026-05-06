@@ -4,6 +4,14 @@
 # All versions are pinned. Bump versions here, push, redeploy.
 set -e
 
+# Scene file for configuration.yaml `scene: !include scenes.yaml` — must exist but is not
+# Git-managed (compose does not bind-mount it). UI-created / editor scenes persist here on
+# the volume. Empty list is valid; HA adds scenes when you use the UI.
+if [ ! -f /config/scenes.yaml ]; then
+  echo "[]" > /config/scenes.yaml
+  echo "Seeded empty /config/scenes.yaml"
+fi
+
 # ── Versions ─────────────────────────────────────────────────
 HACS_VERSION="2.0.5"
 MUSHROOM_VERSION="v5.1.1"

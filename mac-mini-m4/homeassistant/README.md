@@ -2,6 +2,10 @@
 
 All Home Assistant configuration is managed via GitOps through the `komodo-dean-gitops` repo (`mac-mini-m4/homeassistant/`). Files in `configuration/` are bind-mounted read-only into the HA container (see `../automation/compose.yaml`). That includes `python_scripts/` for Smart Lighting persistence — commit and deploy like any other config; no manual copy. Changes go through git, not the HA UI.
 
+**Scenes:** `scenes.yaml` is **not** bind-mounted. `configuration.yaml` still uses `scene: !include scenes.yaml`, but the real file lives on the `ha-config` Docker volume. `hacs-init` seeds an empty `[]` if the file is missing so HA starts cleanly. Create and edit scenes in the HA UI; they persist on the volume, not in git. The copy under `configuration/scenes.yaml` in the repo is reference-only.
+
+**Smart Lighting → Zigbee2MQTT:** `script.sl_push_config` publishes over MQTT. If Mosquitto restarts or HA loses the MQTT connection, Force Sync can fail silently until MQTT reconnects — check **Settings → Devices & services → MQTT** and HA logs. Toggling **`input_boolean.sl_enabled`** triggers a config push via automation `sl_push_config_on_sl_enabled` (GitOps) so Z2M’s retained `zigbee2mqtt/sl/config` stays in sync.
+
 ## Smart Lighting v2
 
 A fully UI-configurable lighting system that automatically applies the correct Hue scene based on the time of day, regardless of how lights are triggered (voice, physical switch, Hue dimmer, motion sensor, automation, or timer).
