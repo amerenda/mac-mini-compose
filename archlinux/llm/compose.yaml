@@ -27,8 +27,8 @@ services:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
     group_add:
-      - "${VIDEO_GID:-44}"
-      - "${RENDER_GID:-107}"
+      - "${VIDEO_GID:-985}"
+      - "${RENDER_GID:-989}"
 
   llm-agent:
     image: amerenda/llm-manager:agent-amd-${AGENT_IMAGE_TAG:-latest}
@@ -61,8 +61,8 @@ services:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
     group_add:
-      - "${VIDEO_GID:-44}"
-      - "${RENDER_GID:-107}"
+      - "${VIDEO_GID:-985}"
+      - "${RENDER_GID:-989}"
 
 volumes:
   llm-agent-tls:
