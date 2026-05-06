@@ -45,9 +45,38 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 len_line TECHNITIUM_API_TOKEN || ERR=1
+TECHNITIUM_TOK_VAL=""
+tok_line=$(grep -E "^TECHNITIUM_API_TOKEN=" "$ENV_FILE" 2>/dev/null | tail -1 || true)
+if [[ -n "$tok_line" ]]; then
+  TECHNITIUM_TOK_VAL="${tok_line#TECHNITIUM_API_TOKEN=}"
+  TECHNITIUM_TOK_VAL="${TECHNITIUM_TOK_VAL%$'\r'}"
+fi
 len_line MINI_POSTGRES_PASSWORD || ERR=1
 len_line MONGO_PASSWORD || ERR=1
 len_line GRAFANA_ADMIN_PASSWORD || ERR=1
+
+echo "=== Technitium API (token must be a user API token, not admin password) ==="
+TECHNITIUM_API_TEST_URL="${TECHNITIUM_API_TEST_URL:-http://127.0.0.1:5380}"
+if [[ -n "$TECHNITIUM_TOK_VAL" && "$TECHNITIUM_TOK_VAL" != "null" ]]; then
+  if command -v curl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    api_resp="$(curl -sS --max-time 10 "${TECHNITIUM_API_TEST_URL}/api/dashboard/stats/get?token=${TECHNITIUM_TOK_VAL}&type=LastHour&utc=true" || true)"
+    api_st="$(echo "$api_resp" | jq -r .status)"
+    if [[ "$api_st" == "ok" ]]; then
+      echo "  ${TECHNITIUM_API_TEST_URL}/api/dashboard/stats/get: OK (token accepted)"
+    else
+      api_err="$(echo "$api_resp" | jq -r '.errorMessage // empty')"
+      echo "  ${TECHNITIUM_API_TEST_URL}: status=${api_st} ${api_err}"
+      echo "  Fix: log into Technitium as the readonly user → profile → Create API token; update BWS; redeploy monitoring."
+      echo "  If Komodo wrote a second copy under /etc/komodo/stacks/.../monitoring/.env, keep it in sync with your checkout .env or recreate technitium-exporter from the canonical compose directory."
+      ERR=1
+    fi
+  else
+    echo "  (skipped: install curl and jq for live Technitium token check)"
+  fi
+else
+  echo "  (skipped: no TECHNITIUM_API_TOKEN value)"
+fi
+
 if grep -q '^MONITORING_DIR=' "$ENV_FILE" 2>/dev/null; then
   md=$(grep -E '^MONITORING_DIR=' "$ENV_FILE" | tail -1)
   mv="${md#MONITORING_DIR=}"
