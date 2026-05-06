@@ -11,13 +11,16 @@ BWS_LLM_AGENT_PSK_UUID="cdaa7917-3eba-44b5-a9ea-b41300f1dab5"
 OLLAMA_DATA_HOST_PATH="${OLLAMA_DATA_HOST_PATH:-${HOME}/.ollama}"
 OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-}"
 
-# Komodo/periphery often runs this script as root, so HOME is /var/root or /root.
-# Compose bind mounts must use real *macOS* paths (e.g. /Users/alex/.ollama). If we
-# leave /root/.ollama, the agent sees bogus statvfs (~4 GiB) under /hostfs/root/.ollama
-# while Ollama actually uses the user's APFS volume.
-if [[ "$(uname -s)" == "Darwin" ]]; then
-  if [[ "${OLLAMA_DATA_HOST_PATH}" == /root/.ollama || "${OLLAMA_DATA_HOST_PATH}" == /var/root/.ollama ]]; then
-    _cu="$(stat -f '%Su' /dev/console 2>/dev/null || true)"
+# Komodo often runs this script as root (HOME=/root) or from a *Linux* build container
+# (`uname` ≠ Darwin) while the stack targets macOS. In both cases we must not leave
+# /root/.ollama in llm/.env — the agent then stats /hostfs/root/.ollama (~4 GiB bogus)
+# instead of the real APFS tree under /Users.
+if [[ "${OLLAMA_DATA_HOST_PATH}" == /root/.ollama || "${OLLAMA_DATA_HOST_PATH}" == /var/root/.ollama ]]; then
+  if [[ -d /Users ]]; then
+    _cu=""
+    if [[ "$(uname -s)" == "Darwin" ]]; then
+      _cu="$(stat -f '%Su' /dev/console 2>/dev/null || true)"
+    fi
     if [[ -n "${_cu}" && "${_cu}" != "root" && -d "/Users/${_cu}/.ollama" ]]; then
       OLLAMA_DATA_HOST_PATH="/Users/${_cu}/.ollama"
     else
@@ -28,11 +31,11 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
       done
     fi
   fi
-  if [[ -n "${OLLAMA_MODELS_HOST_PATH}" ]] && {
-       [[ "${OLLAMA_MODELS_HOST_PATH}" == /root/.ollama/models ]] ||
-       [[ "${OLLAMA_MODELS_HOST_PATH}" == /var/root/.ollama/models ]]; }; then
-    OLLAMA_MODELS_HOST_PATH="${OLLAMA_DATA_HOST_PATH}/models"
-  fi
+fi
+if [[ -n "${OLLAMA_MODELS_HOST_PATH}" ]] && {
+     [[ "${OLLAMA_MODELS_HOST_PATH}" == /root/.ollama/models ]] ||
+     [[ "${OLLAMA_MODELS_HOST_PATH}" == /var/root/.ollama/models ]]; }; then
+  OLLAMA_MODELS_HOST_PATH="${OLLAMA_DATA_HOST_PATH}/models"
 fi
 OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-${OLLAMA_DATA_HOST_PATH}/models}"
 
