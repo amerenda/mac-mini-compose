@@ -15,6 +15,7 @@ services:
       - "11434:11434"
     env_file:
       - ollama.env
+      - ollama.ui.env
     environment:
       OLLAMA_HOST: 0.0.0.0:11434
     volumes:

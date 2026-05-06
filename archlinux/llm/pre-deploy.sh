@@ -41,6 +41,24 @@ if [[ -f llm/gitops.env ]]; then
   sed '/^[[:space:]]*#/d;/^[[:space:]]*$/d' llm/gitops.env >>llm/.env
 fi
 
+# UI overrides win for compose-interpolated path variables.
+if [[ -f llm/ollama.ui.env ]]; then
+  while IFS='=' read -r _k _v; do
+    [[ -z "${_k:-}" || "${_k}" =~ ^[[:space:]]*# ]] && continue
+    _k="$(echo "${_k}" | tr -d ' \t\r\n')"
+    case "$_k" in
+      OLLAMA_DATA_HOST_PATH|OLLAMA_MODELS_HOST_PATH)
+        grep -v "^${_k}=" llm/.env >llm/.env.tmp || true
+        mv llm/.env.tmp llm/.env
+        echo "${_k}=${_v}" >>llm/.env
+        ;;
+    esac
+  done <llm/ollama.ui.env
+fi
+
 if [[ ! -f llm/ollama.env ]]; then
   cp llm/ollama.env.example llm/ollama.env
+fi
+if [[ ! -f llm/ollama.ui.env ]]; then
+  : >llm/ollama.ui.env
 fi

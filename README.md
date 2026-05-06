@@ -60,13 +60,19 @@ Secrets flow:
 
 ```
 Bitwarden Secrets Manager
-   │  (per-host machine account, BWS access token at /etc/komodo/.bws-secret)
+   │  (per-host machine account, BWS access token at /etc/komodo/secrets/bws-access-token)
    ▼
 stack pre_deploy  →  <stack>/.env / runner-secrets / ha-token / …
    │
    ▼
 docker compose up -d
 ```
+
+For each host `llm` stack, Ollama settings follow a UI-wins precedence contract:
+
+1. `ollama.env` carries GitOps defaults.
+2. `ollama.ui.env` carries UI-managed overrides and is loaded after defaults.
+3. `pre-deploy.sh` merges path overrides (`OLLAMA_DATA_HOST_PATH`, `OLLAMA_MODELS_HOST_PATH`) into stack `.env` so compose interpolation preserves UI choices across redeploys.
 
 ## Hosts
 
@@ -100,7 +106,7 @@ is handled by [`amerenda/ansible-playbooks`](https://github.com/amerenda/ansible
 
 1. Bootstrap Docker + bws CLI + Komodo Periphery on the host (Ansible).
 2. Add a new BWS machine account scoped to the same project, drop its access
-   token at `/etc/komodo/.bws-secret` on the host.
+   token at `/etc/komodo/secrets/bws-access-token` on the host.
 3. Add a `[[server]]` block to [`resource-sync/stacks.toml`](resource-sync/stacks.toml).
 4. Create `<host>/` at the repo root and start adding stacks there.
 
