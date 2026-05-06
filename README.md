@@ -36,6 +36,7 @@ komodo-dean-gitops/
 │
 └── archlinux/                 Stacks deployed to the Arch Linux Periphery
     ├── README.md              Host overview
+    ├── scripts/               Host helpers (e.g. native Ollama bind)
     └── llm/                   llm-manager agent (native Ollama)
 ```
 
