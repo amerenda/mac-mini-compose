@@ -4,7 +4,7 @@
 # /root/.ollama/models/...). Mounting only the host's models folder to
 # /root/.ollama breaks that layout and the daemon won't see pulls.
 # pre-deploy sets OLLAMA_DATA_HOST_PATH (default ~/.ollama) and
-# OLLAMA_MODELS_HOST_PATH=$OLLAMA_DATA_HOST_PATH/models for the agent RO mount.
+# OLLAMA_MODELS_HOST_PATH (default /mnt/storage/models) for models + agent RO mount.
 name: llm-archlinux
 
 services:
@@ -20,9 +20,11 @@ services:
       - ollama.ui.env
     environment:
       OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_MODELS: /mnt/models
       HSA_OVERRIDE_GFX_VERSION: ${HSA_OVERRIDE_GFX_VERSION:-}
     volumes:
       - ${OLLAMA_DATA_HOST_PATH:-/home/alex/.ollama}:/root/.ollama
+      - ${OLLAMA_MODELS_HOST_PATH:-/mnt/storage/models}:/mnt/models
     devices:
       - /dev/kfd:/dev/kfd
       - /dev/dri:/dev/dri
@@ -55,7 +57,7 @@ services:
     volumes:
       - llm-agent-tls:/data/tls
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
+      - ${OLLAMA_MODELS_HOST_PATH:-/mnt/storage/models}:/host-ollama-models:ro
       - /sys/module/amdgpu:/sys/module/amdgpu:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
     devices:

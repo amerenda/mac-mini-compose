@@ -9,7 +9,8 @@ cd "$ROOT"
 BWS_LLM_AGENT_PSK_UUID="cdaa7917-3eba-44b5-a9ea-b41300f1dab5"
 
 OLLAMA_DATA_HOST_PATH="${OLLAMA_DATA_HOST_PATH:-${HOME}/.ollama}"
-OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-${OLLAMA_DATA_HOST_PATH}/models}"
+# Bulk model storage (same default as murderbot); Ollama uses OLLAMA_MODELS=/mnt/models in compose.
+OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-/mnt/storage/models}"
 VIDEO_GID_DETECTED="$(getent group video | cut -d: -f3 || true)"
 RENDER_GID_DETECTED="$(getent group render | cut -d: -f3 || true)"
 VIDEO_GID="${VIDEO_GID:-${VIDEO_GID_DETECTED:-985}}"
