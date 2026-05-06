@@ -9,6 +9,31 @@ cd "$ROOT"
 BWS_LLM_AGENT_PSK_UUID="cdaa7917-3eba-44b5-a9ea-b41300f1dab5"
 
 OLLAMA_DATA_HOST_PATH="${OLLAMA_DATA_HOST_PATH:-${HOME}/.ollama}"
+OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-}"
+
+# Komodo/periphery often runs this script as root, so HOME is /var/root or /root.
+# Compose bind mounts must use real *macOS* paths (e.g. /Users/alex/.ollama). If we
+# leave /root/.ollama, the agent sees bogus statvfs (~4 GiB) under /hostfs/root/.ollama
+# while Ollama actually uses the user's APFS volume.
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  if [[ "${OLLAMA_DATA_HOST_PATH}" == /root/.ollama || "${OLLAMA_DATA_HOST_PATH}" == /var/root/.ollama ]]; then
+    _cu="$(stat -f '%Su' /dev/console 2>/dev/null || true)"
+    if [[ -n "${_cu}" && "${_cu}" != "root" && -d "/Users/${_cu}/.ollama" ]]; then
+      OLLAMA_DATA_HOST_PATH="/Users/${_cu}/.ollama"
+    else
+      for _uh in /Users/*; do
+        [[ -d "${_uh}/.ollama" ]] || continue
+        OLLAMA_DATA_HOST_PATH="${_uh}/.ollama"
+        break
+      done
+    fi
+  fi
+  if [[ -n "${OLLAMA_MODELS_HOST_PATH}" ]] && {
+       [[ "${OLLAMA_MODELS_HOST_PATH}" == /root/.ollama/models ]] ||
+       [[ "${OLLAMA_MODELS_HOST_PATH}" == /var/root/.ollama/models ]]; }; then
+    OLLAMA_MODELS_HOST_PATH="${OLLAMA_DATA_HOST_PATH}/models"
+  fi
+fi
 OLLAMA_MODELS_HOST_PATH="${OLLAMA_MODELS_HOST_PATH:-${OLLAMA_DATA_HOST_PATH}/models}"
 
 export BWS_ACCESS_TOKEN="${BWS_ACCESS_TOKEN:-$(cat /run/secrets/bws-access-token)}"
