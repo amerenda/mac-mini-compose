@@ -51,8 +51,8 @@ services:
       - /:/hostfs:ro
       - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
-      # Kernel driver string for agent GPU stack UI (python:slim has no nvidia-smi; NVML may omit driver text)
-      - /proc/driver/nvidia:/proc/driver/nvidia:ro
+      # Do not bind-mount /proc/driver/nvidia into /proc/... — runc rejects it ("inside /proc")
+      # and llm-agent stays stuck in Created. Driver text in the UI comes from NVML when available.
     gpus: all
 
 volumes:
