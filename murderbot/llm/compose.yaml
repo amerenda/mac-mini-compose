@@ -21,8 +21,8 @@ services:
     volumes:
       - ${OLLAMA_DATA_HOST_PATH:-/home/alex/.ollama}:/root/.ollama
       - ${OLLAMA_MODELS_HOST_PATH:-/mnt/storage/models}:/mnt/models
-    # Keep this stack CPU-safe: murderbot has intermittent NVML/runtime issues,
-    # and forcing GPU hooks prevents both services from starting.
+    # NVIDIA: requires nvidia-container-toolkit + working driver (nvidia-smi on host).
+    gpus: all
 
   llm-agent:
     image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
@@ -50,6 +50,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
+    gpus: all
 
 volumes:
   llm-agent-tls:
