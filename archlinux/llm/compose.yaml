@@ -9,7 +9,7 @@ name: llm-archlinux
 
 services:
   ollama:
-    image: ollama/ollama:${OLLAMA_IMAGE_TAG:-0.21.0}
+    image: ollama/ollama:${OLLAMA_AMD_IMAGE_TAG:-0.21.0-rocm}
     pull_policy: always
     container_name: ollama
     restart: unless-stopped
@@ -20,13 +20,18 @@ services:
       - ollama.ui.env
     environment:
       OLLAMA_HOST: 0.0.0.0:11434
+      HSA_OVERRIDE_GFX_VERSION: ${HSA_OVERRIDE_GFX_VERSION:-}
     volumes:
       - ${OLLAMA_DATA_HOST_PATH:-/home/alex/.ollama}:/root/.ollama
-    # NVIDIA path for archlinux host; switch to ollama/ollama:*-rocm if needed.
-    gpus: all
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    group_add:
+      - "${VIDEO_GID:-44}"
+      - "${RENDER_GID:-107}"
 
   llm-agent:
-    image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
+    image: amerenda/llm-manager:agent-amd-${AGENT_IMAGE_TAG:-latest}
     pull_policy: always
     container_name: llm-agent
     restart: unless-stopped
@@ -40,6 +45,7 @@ services:
       RUNNER_HOSTNAME: archlinux
       OLLAMA_URL: http://ollama:11434
       OLLAMA_CONTAINER: ollama
+      HSA_OVERRIDE_GFX_VERSION: ${HSA_OVERRIDE_GFX_VERSION:-}
       COMPOSE_PROFILE: ""
       COMPOSE_DIR: ${HOST_LLM_COMPOSE_DIR}
       COMPOSE_DIR_LOCAL: /host/llm-compose
@@ -51,8 +57,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
-    # pynvml in the agent; requires nvidia-container-toolkit (AMD: agent-amd + dri/kfd).
-    gpus: all
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    group_add:
+      - "${VIDEO_GID:-44}"
+      - "${RENDER_GID:-107}"
 
 volumes:
   llm-agent-tls:
