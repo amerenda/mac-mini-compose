@@ -11,6 +11,10 @@ Why a userspace proxy:
   from plain sockets get routed through the Tailscale tunnel instead of
   en0. IP_BOUND_IF pins sockets to en0 so all sends go via the LAN.
 
+UDP from clients is forwarded to Technitium (OrbStack VM) using DNS over TCP.
+UDP datagrams to the VM:5354 are intermittently dropped; TCP to the same
+port is reliable in practice.
+
 Runs as root via LaunchDaemon at boot.
 """
 
@@ -148,7 +152,37 @@ def _strip_ecs_from_response(data: bytes) -> bytes:
     return data
 
 
-# ── UDP ───────────────────────────────────────────────────────────────────────
+# ── DNS-over-TCP to Technitium ────────────────────────────────────────────────
+
+def recv_dns_tcp(s: socket.socket) -> bytes:
+    """Read a DNS-over-TCP message (2-byte length prefix + payload)."""
+    raw_len = s.recv(2)
+    if len(raw_len) < 2:
+        return b""
+    msg_len = struct.unpack("!H", raw_len)[0]
+    data = b""
+    while len(data) < msg_len:
+        chunk = s.recv(msg_len - len(data))
+        if not chunk:
+            break
+        data += chunk
+    return data
+
+
+def _query_backend_tcp(query: bytes, backend_src: str) -> bytes:
+    """DNS-over-TCP to Technitium (length-prefixed wire format)."""
+    be = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    be.settimeout(TIMEOUT)
+    be.bind((backend_src, 0))
+    be.connect((BACKEND_IP, BACKEND_PORT))
+    try:
+        be.sendall(struct.pack("!H", len(query)) + query)
+        return recv_dns_tcp(be)
+    finally:
+        be.close()
+
+
+# ── UDP (client) ──────────────────────────────────────────────────────────────
 
 def handle_udp(
     data: bytes,
@@ -156,15 +190,11 @@ def handle_udp(
     listen_sock: socket.socket,
     backend_src: str,
 ) -> None:
-    be: socket.socket | None = None
     try:
         tagged = _add_ecs_to_query(data, client_addr[0])
-        be = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        be.settimeout(TIMEOUT)
-        be.bind((backend_src, 0))
-        be.connect((BACKEND_IP, BACKEND_PORT))
-        be.send(tagged)
-        resp = be.recv(4096)
+        resp = _query_backend_tcp(tagged, backend_src)
+        if not resp:
+            raise RuntimeError("empty DNS response from backend TCP")
         listen_sock.sendto(resp, client_addr)
         _bump("udp_ok")
     except Exception as e:
@@ -173,9 +203,6 @@ def handle_udp(
             syslog.LOG_WARNING,
             f"dns-proxy UDP err client={client_addr[0]}:{client_addr[1]} {e!r}",
         )
-    finally:
-        if be is not None:
-            be.close()
 
 
 def udp_listener(backend_src: str) -> None:
@@ -195,36 +222,15 @@ def udp_listener(backend_src: str) -> None:
         ).start()
 
 
-# ── TCP ───────────────────────────────────────────────────────────────────────
-
-def recv_dns_tcp(s: socket.socket) -> bytes:
-    """Read a DNS-over-TCP message (2-byte length prefix + payload)."""
-    raw_len = s.recv(2)
-    if len(raw_len) < 2:
-        return b""
-    msg_len = struct.unpack("!H", raw_len)[0]
-    data = b""
-    while len(data) < msg_len:
-        chunk = s.recv(msg_len - len(data))
-        if not chunk:
-            break
-        data += chunk
-    return data
-
+# ── TCP (client) ──────────────────────────────────────────────────────────────
 
 def handle_tcp(conn: socket.socket, client_addr: tuple, backend_src: str) -> None:
-    be: socket.socket | None = None
     try:
         conn.settimeout(TIMEOUT)
         query = recv_dns_tcp(conn)
         if not query:
             return
-        be = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        be.settimeout(TIMEOUT)
-        be.bind((backend_src, 0))
-        be.connect((BACKEND_IP, BACKEND_PORT))
-        be.sendall(struct.pack("!H", len(query)) + query)
-        resp = recv_dns_tcp(be)
+        resp = _query_backend_tcp(query, backend_src)
         if resp:
             conn.sendall(struct.pack("!H", len(resp)) + resp)
         _bump("tcp_ok")
@@ -235,8 +241,6 @@ def handle_tcp(conn: socket.socket, client_addr: tuple, backend_src: str) -> Non
             f"dns-proxy TCP err client={client_addr[0]}:{client_addr[1]} {e!r}",
         )
     finally:
-        if be is not None:
-            be.close()
         conn.close()
 
 
