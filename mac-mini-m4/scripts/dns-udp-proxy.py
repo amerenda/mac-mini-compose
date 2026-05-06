@@ -11,11 +11,10 @@ Why a userspace proxy:
   from plain sockets get routed through the Tailscale tunnel instead of
   en0. IP_BOUND_IF pins sockets to en0 so all sends go via the LAN.
 
-Client DNS is forwarded to Technitium on the VM using plain UDP on port 5354.
-DNS-over-TCP from macOS to 192.168.139.2:5354 is reset on this OrbStack/bridge
-path even though TCP works inside the VM; UDP from the Mac to the VM is the
-working transport. Backend sockets bind only to the bridge source IP
-(e.g. 192.168.139.x); the listener stays en0-bound for 10.100.20.240.
+Client DNS is forwarded to Technitium using UDP to 127.0.0.1:5354 by default.
+OrbStack publishes TCP/UDP :5354 on localhost and forwards into the Linux VM
+reliably; UDP directly to the bridge IP (192.168.139.2) is lossy. Override with
+DNS_PROXY_BACKEND_IP if your layout differs.
 
 Runs as root via LaunchDaemon at boot.
 """
@@ -33,7 +32,7 @@ import time
 
 LISTEN_IP    = "10.100.20.240"
 LISTEN_PORT  = 15354
-BACKEND_IP   = os.environ.get("DNS_PROXY_BACKEND_IP", "192.168.139.2")
+BACKEND_IP   = os.environ.get("DNS_PROXY_BACKEND_IP", "127.0.0.1")
 BACKEND_PORT = int(os.environ.get("DNS_PROXY_BACKEND_PORT", "5354"))
 TIMEOUT      = 3
 
@@ -157,9 +156,9 @@ def _strip_ecs_from_response(data: bytes) -> bytes:
 # ── Backend (Technitium on OrbStack VM) ─────────────────────────────────────
 
 def _query_backend_udp(query: bytes, backend_src: str) -> bytes:
-    """Plain DNS UDP to Technitium (host network in the Linux VM)."""
-    # Do not use en0_bound_socket here: backend_src is the OrbStack bridge
-    # address (e.g. 192.168.139.x), not an en0 alias.
+    """Plain DNS UDP to Technitium via OrbStack localhost forwarder."""
+    # Do not use en0_bound_socket: backend_src is loopback or the bridge IP,
+    # not an en0 alias.
     be = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     be.settimeout(TIMEOUT)
     try:
@@ -234,7 +233,7 @@ def handle_tcp(conn: socket.socket, client_addr: tuple, backend_src: str) -> Non
         query = recv_dns_tcp(conn)
         if not query:
             return
-        # TCP clients → backend via UDP (mac→VM TCP :5354 is not viable here).
+        # TCP clients → backend via UDP (same path as UDP clients).
         resp = _query_backend_udp(query, backend_src)
         if resp:
             conn.sendall(struct.pack("!H", len(resp)) + resp)

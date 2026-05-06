@@ -6,10 +6,10 @@
 #
 # Strategy:
 #   DNS_IP (10.100.20.240) is aliased onto en0 as the public DNS address.
-#   UDP: pf redirects DNS_IP:53 -> DNS_IP:15354 (dns-udp-proxy.py).
-#        Proxy is bound to en0 via IP_BOUND_IF, forwards to OrbStack VM.
-#   TCP: pf redirects DNS_IP:53 -> 127.0.0.1:5354. OrbStack's *:5354 TCP
-#        listener intercepts and forwards to Technitium in the VM.
+#   UDP + TCP: pf redirects DNS_IP:53 -> DNS_IP:15354 (dns-udp-proxy.py).
+#   The proxy listens on en0 (IP_BOUND_IF) and forwards to 127.0.0.1:5354
+#   (OrbStack → Technitium in the VM). Avoid forwarding UDP straight to the
+#   bridge VM IP — that path drops packets intermittently.
 #
 # Runs as root via LaunchDaemon at boot.
 
