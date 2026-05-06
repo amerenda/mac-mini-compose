@@ -14,8 +14,8 @@ Why a userspace proxy:
 Client DNS is forwarded to Technitium on the VM using plain UDP on port 5354.
 DNS-over-TCP from macOS to 192.168.139.2:5354 is reset on this OrbStack/bridge
 path even though TCP works inside the VM; UDP from the Mac to the VM is the
-working transport. Bind backend sockets to the bridge source IP and pin to en0
-so replies do not flap via Tailscale.
+working transport. Backend sockets bind only to the bridge source IP
+(e.g. 192.168.139.x); the listener stays en0-bound for 10.100.20.240.
 
 Runs as root via LaunchDaemon at boot.
 """
@@ -158,7 +158,9 @@ def _strip_ecs_from_response(data: bytes) -> bytes:
 
 def _query_backend_udp(query: bytes, backend_src: str) -> bytes:
     """Plain DNS UDP to Technitium (host network in the Linux VM)."""
-    be = en0_bound_socket(socket.SOCK_DGRAM)
+    # Do not use en0_bound_socket here: backend_src is the OrbStack bridge
+    # address (e.g. 192.168.139.x), not an en0 alias.
+    be = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     be.settimeout(TIMEOUT)
     try:
         be.bind((backend_src, 0))
