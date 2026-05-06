@@ -70,3 +70,22 @@ fi
 if [[ ! -f llm/ollama.ui.env ]]; then
   : >llm/ollama.ui.env
 fi
+
+# GPU stack strings for llm-manager Runners UI (agent-amd often cannot read amdgpu sysfs version).
+# Injected into the agent container via .env — no new image required. Skip if gitops.env already set.
+if ! grep -q '^ROCM_VERSION=' llm/.env 2>/dev/null; then
+  if [[ -f /opt/rocm/.info/version ]]; then
+    _rocm_v="$(tr -d ' \t\r\n' </opt/rocm/.info/version)"
+    if [[ -n "${_rocm_v}" ]]; then
+      echo "ROCM_VERSION=${_rocm_v}" >>llm/.env
+    fi
+  fi
+fi
+if ! grep -q '^AGENT_AMD_DRIVER_VERSION=' llm/.env 2>/dev/null; then
+  if [[ -f /proc/sys/kernel/osrelease ]]; then
+    _kr="$(tr -d ' \t\r\n' </proc/sys/kernel/osrelease)"
+    if [[ -n "${_kr}" ]]; then
+      echo "AGENT_AMD_DRIVER_VERSION=linux-${_kr}" >>llm/.env
+    fi
+  fi
+fi
