@@ -50,6 +50,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
+      # Kernel driver string for agent GPU stack UI (python:slim has no nvidia-smi; NVML may omit driver text)
+      - /proc/driver/nvidia:/proc/driver/nvidia:ro
     gpus: all
 
 volumes:
