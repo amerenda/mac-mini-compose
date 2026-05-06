@@ -56,6 +56,7 @@ services:
       - llm-agent-tls:/data/tls
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/home/alex/.ollama/models}:/host-ollama-models:ro
+      - /sys/module/amdgpu:/sys/module/amdgpu:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
     devices:
       - /dev/kfd:/dev/kfd

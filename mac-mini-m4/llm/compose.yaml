@@ -38,6 +38,7 @@ services:
       AGENT_UNIFIED_MEMORY_VRAM: "true"
       OLLAMA_URL: http://ollama:11434
       OLLAMA_CONTAINER: ollama
+      AGENT_DISK_STAT_PATH: /host-ollama-data
       COMPOSE_PROFILE: ""
       COMPOSE_DIR: ${HOST_LLM_COMPOSE_DIR}
       COMPOSE_DIR_LOCAL: /host/llm-compose
@@ -48,6 +49,7 @@ services:
       - llm-agent-tls:/data/tls
       - /var/run/docker.sock:/var/run/docker.sock
       - ${OLLAMA_MODELS_HOST_PATH:-/Users/alex/.ollama/models}:/host-ollama-models:ro
+      - ${OLLAMA_DATA_HOST_PATH:-/Users/alex/.ollama}:/host-ollama-data:ro
       - ${HOST_LLM_COMPOSE_DIR}:/host/llm-compose:rw
 
 volumes:
