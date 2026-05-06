@@ -4,7 +4,16 @@ All Home Assistant configuration is managed via GitOps through the `komodo-dean-
 
 **Scenes:** `scenes.yaml` is **not** bind-mounted. `configuration.yaml` still uses `scene: !include scenes.yaml`, but the real file lives on the `ha-config` Docker volume. `hacs-init` seeds an empty `[]` if the file is missing so HA starts cleanly. Create and edit scenes in the HA UI; they persist on the volume, not in git. The copy under `configuration/scenes.yaml` in the repo is reference-only.
 
-**Smart Lighting → Zigbee2MQTT:** `script.sl_push_config` publishes over MQTT. If Mosquitto restarts or HA loses the MQTT connection, Force Sync can fail silently until MQTT reconnects — check **Settings → Devices & services → MQTT** and HA logs. Toggling **`input_boolean.sl_enabled`** triggers a config push via automation `sl_push_config_on_sl_enabled` (GitOps) so Z2M’s retained `zigbee2mqtt/sl/config` stays in sync.
+**Smart Lighting → Zigbee2MQTT:** `script.sl_push_config` publishes over MQTT. If Mosquitto restarts or HA loses the MQTT connection, Force Sync can fail silently until MQTT reconnects — check **Settings → Devices & services → MQTT** and HA logs.
+
+Config pushes are triggered automatically by these automations (all in `automations/`):
+
+| Automation | Trigger | Why |
+|---|---|---|
+| `sl_push_config_on_sl_enabled` | `sl_enabled` toggles | Z2M only reads `sl_enabled` from retained MQTT config |
+| `sl_push_config_on_smart_power` | `sl_*_smart_power_on` helpers change | Smart wall switch flag needs to reach Z2M |
+| `sl_push_config_on_schedule_change` | Any window start time or day-profile helper changes | Keeps Z2M window schedule in sync when edited in dashboard |
+| `sl_push_config_on_ha_start` | HA starts (45 s delay) | Pushes fresh config after restart; Z2M disk cache may be stale |
 
 ## Smart Lighting v2
 
@@ -73,17 +82,16 @@ Select a room from the dropdown to configure its behavior.
 
 ### Adding a New Room
 
-1. Create 4 Hue scenes on the Hue Bridge following the naming convention: `<room>_morning`, `<room>_day`, `<room>_evening`, `<room>_night`
-2. HA discovers the scenes automatically via the Hue integration
-3. Add the room's helpers:
-   - `helpers/generated/input_boolean/sl_<room>.yaml` — motion toggles, auto/smooth transition, override
-   - `helpers/generated/input_number/sl_<room>.yaml` — motion timeout
-   - `helpers/generated/timer/sl_motion.yaml` — add a timer entry
-4. Add the room to `input_select/sl_global.yaml` → `sl_room_selector` options
-5. Add automations: `automations/sl_<room>.yaml`, `sl_<room>_motion.yaml`, `sl_<room>_motion_off.yaml`
-6. Add a conditional card to the dashboard YAML for the new room
-7. Add the room to the override clear list in `automations/sl_window_transition.yaml`
-8. Commit, push, deploy
+1. Add scene brightness/CT helpers: `helpers/generated/input_number/sl_<room>.yaml` — four windows × (brightness, color_temp, color_x, color_y)
+2. Add toggle helpers: `helpers/generated/input_boolean/sl_<room>.yaml` — motion per window, auto/smooth transition, override, smart_power_on, multi-room flags
+3. Add motion timeout: `helpers/generated/input_number/sl_<room>.yaml` (if not combined above)
+4. Add scene-name helpers: `helpers/generated/input_text/sl_<room>.yaml`
+5. Add button-action helpers: `helpers/generated/input_select/sl_<room>.yaml` (b1_short, b1_long … b4_short, b4_long)
+6. Add the room to `input_select/sl_global.yaml` → `sl_room_selector` options
+7. Add the room's light entity mapping in `scripts/set_bulb_defaults.yaml` → `room_lights`
+8. Add the room's switch config to `scripts/sl_push_config.yaml` (switches section)
+9. Add conditional cards to `dashboards/smart_lighting.yaml` (Controls, Scene Editor, Custom Scenes, Switches tabs)
+10. Commit, push, deploy — `sl_push_config_on_ha_start` will sync Z2M on next HA restart, or use Force Sync
 
 ### Switching Between v1 and v2
 
@@ -107,9 +115,11 @@ Smart Lighting is intentionally split:
 | How you turn it on | Runtime owner | What happens |
 |--------------------|---------------|--------------|
 | Hue dimmer Button 1 | Z2M extension | `_handleSwitchAction` → `_roomOn` does `scene_recall` of the current window scene (brightness + xy color, or color_temp). Works with HA down. |
-| Wall switch / mains restored | Bulb firmware | Bulb boots to whatever was last captured by the dashboard "Save as Firmware Default" button (Hue's factory default if you've never pressed it). Z2M does not touch `hue_power_on_*`. Tap the Hue dimmer to apply the current scene. |
+| Wall switch / mains restored | Bulb firmware | Bulb boots to whatever was last captured by the dashboard **"Save as Firmware Default (Wall Switch)"** button (`script.set_bulb_defaults`). Hue's factory default if you've never pressed it. Z2M **never** touches `hue_power_on_*`. Tap the Hue dimmer afterward to recall the current window scene. |
 | HA dashboard light card | HA → Zigbee | `light.turn_on` over Zigbee restores the bulb's last RAM state. **Will not** apply the window scene. Use the dimmer for scenes. |
 | HA down | — | Hue dimmer + wall switch both still work. Only saving scenes / pressing "Save as Firmware Default" needs HA. |
+
+> **Firmware Default semantics:** The "Save as Firmware Default (Wall Switch)" button in the Scene Editor is *only* for wall-switch / mains-power-on behavior. It has no effect on Hue dimmer button-1 (Z2M scene recall), window transitions, or any other control path. Window transitions never rewrite firmware defaults.
 
 #### Scene model
 
