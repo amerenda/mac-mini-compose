@@ -99,10 +99,22 @@ class SmartLighting {
         this.cmdClient.on('message', (topic, msg) => {
             const m = topic.match(/^zigbee2mqtt\/([^/]+)$/);
             if (!m) return;
+            const deviceName = m[1];
             try {
-                const s = JSON.parse(msg.toString()).state;
-                if (s === 'ON' || s === 'OFF') this._deviceStateCache[m[1]] = s;
-            } catch { /* ignore non-JSON or missing state field */ }
+                const parsed = JSON.parse(msg.toString());
+                // State cache — used by _roomAnyOn for toggle decisions
+                if (parsed.state === 'ON' || parsed.state === 'OFF') {
+                    this._deviceStateCache[deviceName] = parsed.state;
+                }
+                // Z2M 2.x: action events are published on the main device topic.
+                // cmdClient is a separate MQTT connection so it receives Z2M's own
+                // published messages even when Z2M's internal client uses noLocal.
+                if (typeof parsed.action === 'string' && parsed.action) {
+                    const sw = this.config && this.config.switches
+                        ? this.config.switches[deviceName] : null;
+                    if (sw) this._handleSwitchAction(sw, parsed.action);
+                }
+            } catch { /* ignore non-JSON */ }
         });
 
         await new Promise((resolve, reject) => {
@@ -231,28 +243,9 @@ class SmartLighting {
             return;
         }
 
-        // Z2M 2.x: action is embedded as a field in the main device state topic
-        //   topic:   zigbee2mqtt/<device>
-        //   payload: {"action": "on_press_release", "battery": 95, ...}
-        // Z2M 1.x: action was a plain string on a separate /action subtopic
-        //   topic:   zigbee2mqtt/<device>/action
-        //   payload: on_press_release
-        // Handle both so the extension works across Z2M versions.
-        const mainMatch = data.topic.match(/^zigbee2mqtt\/([^/]+)$/);
-        if (mainMatch) {
-            const device = mainMatch[1];
-            const sw = this.config && this.config.switches ? this.config.switches[device] : null;
-            if (sw) {
-                try {
-                    const msg = JSON.parse(data.message.toString());
-                    if (typeof msg.action === 'string' && msg.action) {
-                        this._handleSwitchAction(sw, msg.action);
-                    }
-                } catch { /* non-JSON device message */ }
-            }
-            return;
-        }
-
+        // Z2M 1.x fallback: action published as plain string on a separate /action subtopic.
+        // Z2M 2.x routes actions via the main device topic; those are handled in the
+        // cmdClient message handler (separate MQTT connection, receives Z2M's own publishes).
         const actionMatch = data.topic.match(/^zigbee2mqtt\/([^/]+)\/action$/);
         if (!actionMatch) return;
         const device = actionMatch[1];
