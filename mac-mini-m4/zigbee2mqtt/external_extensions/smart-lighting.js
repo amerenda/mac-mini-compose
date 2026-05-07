@@ -440,19 +440,11 @@ class SmartLighting {
         // command to the group). Fall back to per-device check so early-startup
         // calls (before the group topic is published) still work.
         if (this._deviceStateCache[roomDisplayName] !== undefined) {
-            const result = this._deviceStateCache[roomDisplayName] === 'ON';
-            this.logger.info(`[SL] _roomAnyOn ${roomDisplayName}: group=${this._deviceStateCache[roomDisplayName]} → ${result}`);
-            return result;
+            return this._deviceStateCache[roomDisplayName] === 'ON';
         }
         const roomConfig = this.config && this.config.rooms ? this.config.rooms[roomDisplayName] : null;
-        if (!roomConfig) {
-            this.logger.info(`[SL] _roomAnyOn ${roomDisplayName}: no roomConfig → false`);
-            return false;
-        }
-        const onDevices = (roomConfig.lights || []).filter(l => this._deviceStateCache[l] === 'ON');
-        const result = onDevices.length > 0;
-        this.logger.info(`[SL] _roomAnyOn ${roomDisplayName}: per-device cache=${JSON.stringify(Object.fromEntries((roomConfig.lights||[]).map(l=>[l,this._deviceStateCache[l]??'?'])))} onDevices=[${onDevices.join(',')}] → ${result}`);
-        return result;
+        if (!roomConfig) return false;
+        return (roomConfig.lights || []).some(l => this._deviceStateCache[l] === 'ON');
     }
 
     _toggleRoomDefault(sw) {
