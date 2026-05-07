@@ -231,13 +231,34 @@ class SmartLighting {
             return;
         }
 
-        const m = data.topic.match(/^zigbee2mqtt\/([^/]+)\/action$/);
-        if (!m) return;
-        const device = m[1];
+        // Z2M 2.x: action is embedded as a field in the main device state topic
+        //   topic:   zigbee2mqtt/<device>
+        //   payload: {"action": "on_press_release", "battery": 95, ...}
+        // Z2M 1.x: action was a plain string on a separate /action subtopic
+        //   topic:   zigbee2mqtt/<device>/action
+        //   payload: on_press_release
+        // Handle both so the extension works across Z2M versions.
+        const mainMatch = data.topic.match(/^zigbee2mqtt\/([^/]+)$/);
+        if (mainMatch) {
+            const device = mainMatch[1];
+            const sw = this.config && this.config.switches ? this.config.switches[device] : null;
+            if (sw) {
+                try {
+                    const msg = JSON.parse(data.message.toString());
+                    if (typeof msg.action === 'string' && msg.action) {
+                        this._handleSwitchAction(sw, msg.action);
+                    }
+                } catch { /* non-JSON device message */ }
+            }
+            return;
+        }
+
+        const actionMatch = data.topic.match(/^zigbee2mqtt\/([^/]+)\/action$/);
+        if (!actionMatch) return;
+        const device = actionMatch[1];
         const sw = this.config && this.config.switches ? this.config.switches[device] : null;
         if (!sw) return;
-        const payload = data.message.toString().trim();
-        this._handleSwitchAction(sw, payload);
+        this._handleSwitchAction(sw, data.message.toString().trim());
     }
 
     _handleSnap(messageStr) {
@@ -624,20 +645,12 @@ class SmartLighting {
             this.logger.info(`[SL] Recall skipped for ${roomName} (auto_transition off)`);
             return;
         }
-        const lights = roomConfig.lights || [];
-        const anyOn = lights.some(light => {
-            const device = this.zigbee.resolveEntity(light);
-            if (!device) return false;
-            const deviceState = this.state.get(device);
-            return deviceState && deviceState.state === 'ON';
-        });
-        if (anyOn) {
-            const payload = this._buildSceneRecallPayload(window, roomConfig);
-            if (!payload) return;
-            const secs = payload.transition ?? 'default';
-            this.logger.info(`[SL] Recalling ${window} scene on ${roomName} (lights on, transition=${secs})`);
-            this._sendCommand(`${roomName}/set`, payload);
-        }
+        if (!this._roomAnyOn(roomName)) return;
+        const payload = this._buildSceneRecallPayload(window, roomConfig);
+        if (!payload) return;
+        const secs = payload.transition ?? 'default';
+        this.logger.info(`[SL] Recalling ${window} scene on ${roomName} (lights on, transition=${secs})`);
+        this._sendCommand(`${roomName}/set`, payload);
     }
 
     // ── Schedule calculation ─────────────────────────────────
