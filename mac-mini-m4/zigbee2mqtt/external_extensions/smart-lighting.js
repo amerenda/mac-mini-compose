@@ -93,26 +93,28 @@ class SmartLighting {
             password: mqttSettings.password || undefined,
         });
 
-        // Cache device/group ON/OFF state from MQTT so _roomAnyOn works without
-        // relying on this.zigbee.resolveEntity / this.state.get, which are
-        // unstable across Z2M minor versions (wrapper types changed in 2.x).
+        this.logger.info(`[SL] Connecting cmdClient to ${brokerUrl}`);
+
         this.cmdClient.on('message', (topic, msg) => {
             const m = topic.match(/^zigbee2mqtt\/([^/]+)$/);
             if (!m) return;
             const deviceName = m[1];
             try {
                 const parsed = JSON.parse(msg.toString());
-                // State cache — used by _roomAnyOn for toggle decisions
                 if (parsed.state === 'ON' || parsed.state === 'OFF') {
                     this._deviceStateCache[deviceName] = parsed.state;
                 }
-                // Z2M 2.x: action events are published on the main device topic.
-                // cmdClient is a separate MQTT connection so it receives Z2M's own
-                // published messages even when Z2M's internal client uses noLocal.
                 if (typeof parsed.action === 'string' && parsed.action) {
-                    const sw = this.config && this.config.switches
+                    this.logger.info(`[SL] cmdClient RX action: device="${deviceName}" action="${parsed.action}"`);
+                    const knownSwitches = this.config && this.config.switches
+                        ? Object.keys(this.config.switches) : [];
+                    const sw = knownSwitches.length > 0
                         ? this.config.switches[deviceName] : null;
-                    if (sw) this._handleSwitchAction(sw, parsed.action);
+                    if (sw) {
+                        this._handleSwitchAction(sw, parsed.action);
+                    } else {
+                        this.logger.warn(`[SL] cmdClient action: no switch config for "${deviceName}". Known switches: [${knownSwitches.join(', ')}]`);
+                    }
                 }
             } catch { /* ignore non-JSON */ }
         });
@@ -139,7 +141,8 @@ class SmartLighting {
         this.config = this._loadCache();
         if (this.config) {
             this.configHash = this._hashConfig(this.config);
-            this.logger.info(`[SL] Loaded cached config from disk (hash: ${this.configHash})`);
+            const cachedSwitches = Object.keys(this.config.switches || {});
+            this.logger.info(`[SL] Loaded cached config from disk — hash=${this.configHash} switches=[${cachedSwitches.join(', ')}]`);
             this.currentWindow = this._calculateCurrentWindow();
             this.logger.info(`[SL] Current window: ${this.currentWindow}`);
         } else {
@@ -226,7 +229,8 @@ class SmartLighting {
                 this.config = newConfig;
                 this.configHash = this._hashConfig(newConfig);
                 this._saveCache(newConfig);
-                this.logger.info(`[SL] Received and cached new config from HA (hash: ${this.configHash})`);
+                const switchKeys = Object.keys(newConfig.switches || {});
+                this.logger.info(`[SL] Config received — hash=${this.configHash} switches=[${switchKeys.join(', ')}] rooms=[${Object.keys(newConfig.rooms || {}).join(', ')}]`);
                 this.currentWindow = this._calculateCurrentWindow();
                 this._refreshSwitchTopicSubscriptions()
                     .catch(e => this.logger.error(`[SL] switch subscribe: ${e.message}`));
