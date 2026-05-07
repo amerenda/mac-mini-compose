@@ -480,26 +480,29 @@ class SmartLighting {
     }
 
     /** @returns {object | null} */
-    _buildSceneRecallPayload(windowKey, roomConfig) {
-        const sid = WINDOW_SCENE_ID[windowKey];
-        if (!sid) return null;
+    _buildDirectScenePayload(windowKey, roomConfig) {
+        const scene = roomConfig.scenes && roomConfig.scenes[windowKey];
+        if (!scene) return null;
+        const cmd = { state: 'ON', brightness: scene.brightness };
+        if (scene.color) cmd.color = scene.color;
+        else if (scene.color_temp !== undefined) cmd.color_temp = scene.color_temp;
         const secs = Number(roomConfig.transition_secs) > 0 ? Number(roomConfig.transition_secs) : 0;
-        const payload = { scene_recall: sid };
-        if (secs > 0) payload.transition = secs;
-        return payload;
+        if (secs > 0) cmd.transition = secs;
+        return cmd;
     }
 
     _scheduleRoomOnReinforce(roomKey, roomDisplayName, effectiveWindow, roomConfig) {
         const prev = this._roomOnReinforceTimers[roomKey];
         if (prev) clearTimeout(prev);
+        // Capture payload now so the closure doesn't need roomConfig to be stable.
+        const payload = this._buildDirectScenePayload(effectiveWindow, roomConfig);
+        if (!payload) return;
         this._roomOnReinforceTimers[roomKey] = setTimeout(() => {
             delete this._roomOnReinforceTimers[roomKey];
             if (!this.config || !this.config.rooms) return;
             if (this.runtime.manualOverride[roomKey]) return;
-            const p = this._buildSceneRecallPayload(effectiveWindow, roomConfig);
-            if (!p) return;
             this.logger.info(`[SL] room_on reinforce (post-dimmer-bind) ${roomDisplayName}`);
-            this._sendCommand(`${roomDisplayName}/set`, p);
+            this._sendCommand(`${roomDisplayName}/set`, payload);
         }, ROOM_ON_REINFORCE_MS);
     }
 
@@ -542,14 +545,9 @@ class SmartLighting {
         }
 
         const effectiveWindow = this._getEffectiveWindow(roomDisplayName);
-        const scene = roomConfig.scenes ? roomConfig.scenes[effectiveWindow] : null;
-        if (!scene) return;
-
-        // Use Zigbee scene_recall (same storage as _fullScenePush) so color matches
-        // what HA pushed; raw group brightness/color_temp can lose to Hue dimmer bind.
-        const payload = this._buildSceneRecallPayload(effectiveWindow, roomConfig);
+        const payload = this._buildDirectScenePayload(effectiveWindow, roomConfig);
         if (!payload) return;
-        this.logger.info(`[SL] room_on scene_recall ${roomDisplayName} → ${effectiveWindow} (id=${payload.scene_recall})`);
+        this.logger.info(`[SL] room_on ${roomDisplayName} → ${effectiveWindow}`);
         this._sendCommand(`${roomDisplayName}/set`, payload);
         this._scheduleRoomOnReinforce(roomKey, roomDisplayName, effectiveWindow, roomConfig);
     }
@@ -575,10 +573,7 @@ class SmartLighting {
         } else {
             targetWindow = WINDOWS[(WINDOWS.indexOf(last) + 1) % 4];
         }
-        const scene = roomConfig.scenes[targetWindow];
-        if (!scene) return;
-
-        const payload = this._buildSceneRecallPayload(targetWindow, roomConfig);
+        const payload = this._buildDirectScenePayload(targetWindow, roomConfig);
         if (!payload) return;
         this._sendCommand(`${roomDisplayName}/set`, payload);
 
@@ -663,7 +658,7 @@ class SmartLighting {
             return;
         }
         if (!this._roomAnyOn(roomName)) return;
-        const payload = this._buildSceneRecallPayload(window, roomConfig);
+        const payload = this._buildDirectScenePayload(window, roomConfig);
         if (!payload) return;
         const secs = payload.transition ?? 'default';
         this.logger.info(`[SL] Recalling ${window} scene on ${roomName} (lights on, transition=${secs})`);
