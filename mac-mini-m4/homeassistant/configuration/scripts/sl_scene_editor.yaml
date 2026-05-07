@@ -25,23 +25,37 @@ sl_preview_scene:
           hallway: ["light.hallway_1"]
         lights: "{{ light_map[room] }}"
         bri: "{{ states('input_number.sl_' ~ room ~ '_' ~ window ~ '_brightness') | int(200) }}"
+        cx: "{{ states('input_number.sl_' ~ room ~ '_' ~ window ~ '_color_x') | float(0) }}"
+        cy: "{{ states('input_number.sl_' ~ room ~ '_' ~ window ~ '_color_y') | float(0) }}"
+        use_xy: "{{ cx > 0 and cy > 0 }}"
         ct_state: "{{ states('input_number.sl_' ~ room ~ '_' ~ window ~ '_color_temp') }}"
-        has_ct: "{{ ct_state not in ['unknown', 'unavailable', ''] }}"
+        has_ct: "{{ not use_xy and ct_state not in ['unknown', 'unavailable', ''] and ct_state | int(0) > 0 }}"
         ct: "{{ ct_state | int(0) }}"
     - repeat:
         for_each: "{{ lights }}"
         sequence:
-          - if:
-              - condition: template
-                value_template: "{{ has_ct }}"
-            then:
-              - service: light.turn_on
-                target:
-                  entity_id: "{{ repeat.item }}"
-                data:
-                  brightness: "{{ bri }}"
-                  color_temp_kelvin: "{{ (1000000 / ct) | int }}"
-            else:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ use_xy }}"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: "{{ repeat.item }}"
+                    data:
+                      brightness: "{{ bri }}"
+                      xy_color: "{{ [cx, cy] }}"
+              - conditions:
+                  - condition: template
+                    value_template: "{{ has_ct }}"
+                sequence:
+                  - service: light.turn_on
+                    target:
+                      entity_id: "{{ repeat.item }}"
+                    data:
+                      brightness: "{{ bri }}"
+                      color_temp_kelvin: "{{ (1000000 / ct) | int }}"
+            default:
               - service: light.turn_on
                 target:
                   entity_id: "{{ repeat.item }}"
