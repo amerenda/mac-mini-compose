@@ -79,6 +79,11 @@ class SmartLighting {
         this.runtime = this._loadRuntime();
         /** @type {Record<string, 'ON'|'OFF'>} Populated via cmdClient MQTT subscription */
         this._deviceStateCache = Object.create(null);
+        /** What WE last commanded each room group to be. Used for toggle direction instead of
+         *  _deviceStateCache so the Zigbee binding race can't flip the toggle the wrong way:
+         *  when B1 is pressed the dimmer binding fires "on" to the group before the action
+         *  arrives, updating _deviceStateCache; _desiredState is immune to that. */
+        this._desiredState = Object.create(null);
         /** Epoch ms before which device announces are ignored (avoids Z2M-restart flood) */
         this._smartPowerOnReadyAt = 0;
     }
@@ -455,8 +460,14 @@ class SmartLighting {
         const roomGroup = sw.room_group;
         const multi = Array.isArray(sw.multi_room_groups) ? sw.multi_room_groups : [];
         const targets = multi.length > 0 ? multi : [roomGroup];
-        const anyOn = targets.some(g => this._roomAnyOn(g));
-        this.logger.info(`[SL] toggle ${roomGroup}: anyOn=${anyOn} → ${anyOn ? 'OFF' : 'ON'}`);
+        // Use _desiredState (what we last commanded) rather than _deviceStateCache.
+        // The Zigbee binding fires "on" to the group when B1 is pressed, which can
+        // update the MQTT state cache before the action message arrives, flipping the
+        // toggle the wrong way. _desiredState is only written by our own commands.
+        const anyOn = targets.some(g =>
+            g in this._desiredState ? this._desiredState[g] === 'ON' : this._roomAnyOn(g)
+        );
+        this.logger.info(`[SL] toggle ${roomGroup}: desired=${this._desiredState[roomGroup] ?? 'unknown'} anyOn=${anyOn} → ${anyOn ? 'OFF' : 'ON'}`);
         if (anyOn) {
             for (const g of targets) {
                 const rk = GROUP_TO_ROOM_KEY[g] || roomKey;
@@ -477,6 +488,7 @@ class SmartLighting {
 
     _roomOff(roomKey, roomGroup) {
         this.logger.info(`[SL] room_off ${roomGroup}`);
+        this._desiredState[roomGroup] = 'OFF';
         if (roomKey && this._roomOnReinforceTimers[roomKey]) {
             clearTimeout(this._roomOnReinforceTimers[roomKey]);
             delete this._roomOnReinforceTimers[roomKey];
@@ -558,6 +570,7 @@ class SmartLighting {
         const payload = this._buildDirectScenePayload(effectiveWindow, roomConfig);
         if (!payload) return;
         this.logger.info(`[SL] room_on ${roomDisplayName} → ${effectiveWindow}`);
+        this._desiredState[roomDisplayName] = 'ON';
         this._sendCommand(`${roomDisplayName}/set`, payload);
         this._scheduleRoomOnReinforce(roomKey, roomDisplayName, effectiveWindow, roomConfig);
     }
