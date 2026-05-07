@@ -77,6 +77,8 @@ class SmartLighting {
         /** @type {Record<string, ReturnType<typeof setTimeout>>} */
         this._roomOnReinforceTimers = Object.create(null);
         this.runtime = this._loadRuntime();
+        /** @type {Record<string, 'ON'|'OFF'>} Populated via cmdClient MQTT subscription */
+        this._deviceStateCache = Object.create(null);
     }
 
     async start() {
@@ -91,9 +93,27 @@ class SmartLighting {
             password: mqttSettings.password || undefined,
         });
 
+        // Cache device/group ON/OFF state from MQTT so _roomAnyOn works without
+        // relying on this.zigbee.resolveEntity / this.state.get, which are
+        // unstable across Z2M minor versions (wrapper types changed in 2.x).
+        this.cmdClient.on('message', (topic, msg) => {
+            const m = topic.match(/^zigbee2mqtt\/([^/]+)$/);
+            if (!m) return;
+            try {
+                const s = JSON.parse(msg.toString()).state;
+                if (s === 'ON' || s === 'OFF') this._deviceStateCache[m[1]] = s;
+            } catch { /* ignore non-JSON or missing state field */ }
+        });
+
         await new Promise((resolve, reject) => {
             this.cmdClient.on('connect', () => {
                 this.logger.info('[SL] Command MQTT client connected');
+                // Single-level wildcard captures device + group state topics.
+                // Filtered to ON/OFF in the message handler above.
+                this.cmdClient.subscribe('zigbee2mqtt/+', err => {
+                    if (err) this.logger.warn(`[SL] state-cache subscribe: ${err.message}`);
+                    else this.logger.info('[SL] cmdClient subscribed for device/group state cache');
+                });
                 resolve();
             });
             this.cmdClient.on('error', (err) => {
@@ -373,15 +393,15 @@ class SmartLighting {
     }
 
     _roomAnyOn(roomDisplayName) {
-        const roomConfig = this.config.rooms[roomDisplayName];
+        // Prefer group-level state (single lookup, always up to date after any
+        // command to the group). Fall back to per-device check so early-startup
+        // calls (before the group topic is published) still work.
+        if (this._deviceStateCache[roomDisplayName] !== undefined) {
+            return this._deviceStateCache[roomDisplayName] === 'ON';
+        }
+        const roomConfig = this.config && this.config.rooms ? this.config.rooms[roomDisplayName] : null;
         if (!roomConfig) return false;
-        const lights = roomConfig.lights || [];
-        return lights.some(light => {
-            const device = this.zigbee.resolveEntity(light);
-            if (!device) return false;
-            const deviceState = this.state.get(device);
-            return deviceState && deviceState.state === 'ON';
-        });
+        return (roomConfig.lights || []).some(l => this._deviceStateCache[l] === 'ON');
     }
 
     _toggleRoomDefault(sw) {
