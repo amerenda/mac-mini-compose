@@ -22,9 +22,10 @@ docker exec pihole pihole -a -t 2>/dev/null && \
   docker cp pihole:/var/pihole/pi-hole-teleporter.tar.gz "${BACKUP_DIR}/pihole-teleporter.tar.gz" || \
   echo "  WARN: pihole backup failed"
 
-# Home Assistant config volume
+# Home Assistant — volume-only state (scenes, custom scene packs, helper values)
+# Skips read-only git-mounted config files; only backs up what can't be recovered from the repo.
 echo "  Home Assistant data..."
-docker cp homeassistant:/config "${BACKUP_DIR}/ha-config" 2>/dev/null || echo "  WARN: homeassistant not running"
+bash "${COMPOSE_DIR}/homeassistant/backup.sh" "${BACKUP_DIR}/ha-config"
 
 # Cleanup old backups
 echo "  Cleaning backups older than ${RETAIN_DAYS} days..."
