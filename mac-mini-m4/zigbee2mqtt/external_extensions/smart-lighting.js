@@ -79,6 +79,8 @@ class SmartLighting {
         this.runtime = this._loadRuntime();
         /** @type {Record<string, 'ON'|'OFF'>} Populated via cmdClient MQTT subscription */
         this._deviceStateCache = Object.create(null);
+        /** Epoch ms before which device announces are ignored (avoids Z2M-restart flood) */
+        this._smartPowerOnReadyAt = 0;
     }
 
     async start() {
@@ -96,6 +98,18 @@ class SmartLighting {
         this.logger.info(`[SL] Connecting cmdClient to ${brokerUrl}`);
 
         this.cmdClient.on('message', (topic, msg) => {
+            // Bridge events: device announce, etc.
+            if (topic === 'zigbee2mqtt/bridge/event') {
+                try {
+                    const ev = JSON.parse(msg.toString());
+                    if (ev.type === 'device_announce') {
+                        const fn = ev.data && ev.data.friendly_name;
+                        if (fn) this._onDeviceAnnounce(fn);
+                    }
+                } catch { /* ignore */ }
+                return;
+            }
+
             const m = topic.match(/^zigbee2mqtt\/([^/]+)$/);
             if (!m) return;
             const deviceName = m[1];
@@ -127,6 +141,10 @@ class SmartLighting {
                 this.cmdClient.subscribe('zigbee2mqtt/+', err => {
                     if (err) this.logger.warn(`[SL] state-cache subscribe: ${err.message}`);
                     else this.logger.info('[SL] cmdClient subscribed for device/group state cache');
+                });
+                this.cmdClient.subscribe('zigbee2mqtt/bridge/+', err => {
+                    if (err) this.logger.warn(`[SL] bridge subscribe: ${err.message}`);
+                    else this.logger.info('[SL] cmdClient subscribed to bridge events');
                 });
                 resolve();
             });
@@ -161,9 +179,11 @@ class SmartLighting {
         await this._refreshSwitchTopicSubscriptions();
 
         this.eventBus.onMQTTMessage(this, this._onMQTTMessage.bind(this));
-        // Device announce intentionally not handled: wall-switch power-on
-        // should land on bulb firmware defaults (managed by HA's
-        // script.set_bulb_defaults). Hue dimmer Button 1 is the scene path.
+
+        // Ignore device announces during the first 60 s so that Z2M-restart
+        // re-joins don't trigger smart_power_on for every bulb simultaneously.
+        this._smartPowerOnReadyAt = Date.now() + 60000;
+
         // Note: Z2M auto-discovers scene entities to HA via MQTT.
         // These are disabled in HA's entity registry to avoid duplicates.
         // Our HA scenes (from scenes.yaml) are the canonical ones.
@@ -648,6 +668,37 @@ class SmartLighting {
         const secs = payload.transition ?? 'default';
         this.logger.info(`[SL] Recalling ${window} scene on ${roomName} (lights on, transition=${secs})`);
         this._sendCommand(`${roomName}/set`, payload);
+    }
+
+    _onDeviceAnnounce(friendlyName) {
+        if (Date.now() < this._smartPowerOnReadyAt) return;
+        if (!this.config || !this.config.rooms) return;
+        if (this.config.sl_enabled === false) return;
+        const hm = this.config.house_mode || 'Home';
+        if (hm === 'Away') return;
+
+        for (const [roomName, roomConfig] of Object.entries(this.config.rooms)) {
+            if (!roomConfig.smart_power_on) continue;
+            if (!(roomConfig.lights || []).includes(friendlyName)) continue;
+            if (hm === 'Sleep' && !roomConfig.motion_night) {
+                this.logger.info(`[SL] smart_power_on: ${friendlyName} skipped (Sleep, motion_night off)`);
+                return;
+            }
+            const effectiveWindow = this._getEffectiveWindow(roomName);
+            const scene = roomConfig.scenes && roomConfig.scenes[effectiveWindow];
+            if (!scene) return;
+
+            // Send direct state command to the individual device so this path
+            // does not depend on Zigbee scenes having been stored via scene_add.
+            const cmd = { state: 'ON', brightness: scene.brightness };
+            if (scene.color) cmd.color = scene.color;
+            else if (scene.color_temp !== undefined) cmd.color_temp = scene.color_temp;
+
+            this.logger.info(`[SL] smart_power_on: ${friendlyName} announced → ${effectiveWindow} (${roomName})`);
+            // 2 s delay: let the bulb finish its rejoin handshake before commanding it.
+            setTimeout(() => this._sendCommand(`${friendlyName}/set`, cmd), 2000);
+            return;
+        }
     }
 
     // ── Schedule calculation ─────────────────────────────────
