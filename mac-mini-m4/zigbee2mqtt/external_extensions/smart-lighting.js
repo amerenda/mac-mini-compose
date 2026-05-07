@@ -435,11 +435,19 @@ class SmartLighting {
         // command to the group). Fall back to per-device check so early-startup
         // calls (before the group topic is published) still work.
         if (this._deviceStateCache[roomDisplayName] !== undefined) {
-            return this._deviceStateCache[roomDisplayName] === 'ON';
+            const result = this._deviceStateCache[roomDisplayName] === 'ON';
+            this.logger.info(`[SL] _roomAnyOn ${roomDisplayName}: group=${this._deviceStateCache[roomDisplayName]} → ${result}`);
+            return result;
         }
         const roomConfig = this.config && this.config.rooms ? this.config.rooms[roomDisplayName] : null;
-        if (!roomConfig) return false;
-        return (roomConfig.lights || []).some(l => this._deviceStateCache[l] === 'ON');
+        if (!roomConfig) {
+            this.logger.info(`[SL] _roomAnyOn ${roomDisplayName}: no roomConfig → false`);
+            return false;
+        }
+        const onDevices = (roomConfig.lights || []).filter(l => this._deviceStateCache[l] === 'ON');
+        const result = onDevices.length > 0;
+        this.logger.info(`[SL] _roomAnyOn ${roomDisplayName}: per-device cache=${JSON.stringify(Object.fromEntries((roomConfig.lights||[]).map(l=>[l,this._deviceStateCache[l]??'?'])))} onDevices=[${onDevices.join(',')}] → ${result}`);
+        return result;
     }
 
     _toggleRoomDefault(sw) {
@@ -448,6 +456,7 @@ class SmartLighting {
         const multi = Array.isArray(sw.multi_room_groups) ? sw.multi_room_groups : [];
         const targets = multi.length > 0 ? multi : [roomGroup];
         const anyOn = targets.some(g => this._roomAnyOn(g));
+        this.logger.info(`[SL] toggle ${roomGroup}: anyOn=${anyOn} → ${anyOn ? 'OFF' : 'ON'}`);
         if (anyOn) {
             for (const g of targets) {
                 const rk = GROUP_TO_ROOM_KEY[g] || roomKey;
@@ -467,6 +476,7 @@ class SmartLighting {
     }
 
     _roomOff(roomKey, roomGroup) {
+        this.logger.info(`[SL] room_off ${roomGroup}`);
         if (roomKey && this._roomOnReinforceTimers[roomKey]) {
             clearTimeout(this._roomOnReinforceTimers[roomKey]);
             delete this._roomOnReinforceTimers[roomKey];
