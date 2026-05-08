@@ -24,6 +24,32 @@ services:
     # NVIDIA: requires nvidia-container-toolkit + working driver (nvidia-smi on host).
     gpus: all
 
+  # vLLM: opt-in via `docker compose --profile vllm up` (or COMPOSE_PROFILES=vllm).
+  # Do NOT run alongside Ollama on the same GPU — no sharing yet.
+  # VLLM_MODEL is set via vllm.env (UI-configurable via ollama.ui.env VLLM_MODEL override).
+  vllm:
+    image: vllm/vllm-openai:${VLLM_IMAGE_TAG:-latest}
+    pull_policy: always
+    container_name: vllm
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - vllm.env
+    environment:
+      HF_HOME: /mnt/hf-cache
+    volumes:
+      - ${VLLM_MODELS_HOST_PATH:-/mnt/storage/models/vllm}:/mnt/hf-cache
+    ipc: host
+    gpus: all
+    profiles:
+      - vllm
+    command:
+      - "--model"
+      - "${VLLM_MODEL}"
+      - "--gpu-memory-utilization"
+      - "${VLLM_GPU_MEM_UTIL:-0.9}"
+
   llm-agent:
     image: amerenda/llm-manager:agent-${AGENT_IMAGE_TAG:-latest}
     pull_policy: always
@@ -39,6 +65,8 @@ services:
       RUNNER_HOSTNAME: murderbot
       OLLAMA_URL: http://ollama:11434
       OLLAMA_CONTAINER: ollama
+      BACKEND_TYPE: ${BACKEND_TYPE:-ollama}
+      VLLM_URL: http://vllm:8000
       COMPOSE_PROFILE: ""
       COMPOSE_DIR: ${HOST_LLM_COMPOSE_DIR}
       COMPOSE_DIR_LOCAL: /host/llm-compose
