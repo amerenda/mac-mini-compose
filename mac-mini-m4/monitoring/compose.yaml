@@ -112,8 +112,9 @@ services:
       - '--collect-all'
 
   # ============================================================
-  # Technitium Exporter — DNS metrics
+  # Technitium Exporter — DNS metrics (v2+ metric names; see mac-mini-dns Grafana dashboard)
   # Technitium runs on host network, accessed via host.docker.internal
+  # SERVER_LABEL must match the "Technitium server" variable on the dashboard (default: technitium).
   # ============================================================
   technitium-exporter:
     image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter@sha256:b6154a161987443d8ec6bbf272f0064bf825f109f5845acfa90d8ee580be542b

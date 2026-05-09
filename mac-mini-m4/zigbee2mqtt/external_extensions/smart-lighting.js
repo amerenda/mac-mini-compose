@@ -77,6 +77,15 @@ class SmartLighting {
         /** @type {Record<string, ReturnType<typeof setTimeout>>} */
         this._roomOnReinforceTimers = Object.create(null);
         this.runtime = this._loadRuntime();
+        /** @type {Record<string, 'ON'|'OFF'>} Populated via cmdClient MQTT subscription */
+        this._deviceStateCache = Object.create(null);
+        /** What WE last commanded each room group to be. Used for toggle direction instead of
+         *  _deviceStateCache so the Zigbee binding race can't flip the toggle the wrong way:
+         *  when B1 is pressed the dimmer binding fires "on" to the group before the action
+         *  arrives, updating _deviceStateCache; _desiredState is immune to that. */
+        this._desiredState = Object.create(null);
+        /** Epoch ms before which device announces are ignored (avoids Z2M-restart flood) */
+        this._smartPowerOnReadyAt = 0;
     }
 
     async start() {
@@ -91,9 +100,57 @@ class SmartLighting {
             password: mqttSettings.password || undefined,
         });
 
+        this.logger.info(`[SL] Connecting cmdClient to ${brokerUrl}`);
+
+        this.cmdClient.on('message', (topic, msg) => {
+            // Bridge events: device announce, etc.
+            if (topic === 'zigbee2mqtt/bridge/event') {
+                try {
+                    const ev = JSON.parse(msg.toString());
+                    if (ev.type === 'device_announce') {
+                        const fn = ev.data && ev.data.friendly_name;
+                        if (fn) this._onDeviceAnnounce(fn);
+                    }
+                } catch { /* ignore */ }
+                return;
+            }
+
+            const m = topic.match(/^zigbee2mqtt\/([^/]+)$/);
+            if (!m) return;
+            const deviceName = m[1];
+            try {
+                const parsed = JSON.parse(msg.toString());
+                if (parsed.state === 'ON' || parsed.state === 'OFF') {
+                    this._deviceStateCache[deviceName] = parsed.state;
+                }
+                if (typeof parsed.action === 'string' && parsed.action) {
+                    this.logger.info(`[SL] cmdClient RX action: device="${deviceName}" action="${parsed.action}"`);
+                    const knownSwitches = this.config && this.config.switches
+                        ? Object.keys(this.config.switches) : [];
+                    const sw = knownSwitches.length > 0
+                        ? this.config.switches[deviceName] : null;
+                    if (sw) {
+                        this._handleSwitchAction(sw, parsed.action);
+                    } else {
+                        this.logger.warn(`[SL] cmdClient action: no switch config for "${deviceName}". Known switches: [${knownSwitches.join(', ')}]`);
+                    }
+                }
+            } catch { /* ignore non-JSON */ }
+        });
+
         await new Promise((resolve, reject) => {
             this.cmdClient.on('connect', () => {
                 this.logger.info('[SL] Command MQTT client connected');
+                // Single-level wildcard captures device + group state topics.
+                // Filtered to ON/OFF in the message handler above.
+                this.cmdClient.subscribe('zigbee2mqtt/+', err => {
+                    if (err) this.logger.warn(`[SL] state-cache subscribe: ${err.message}`);
+                    else this.logger.info('[SL] cmdClient subscribed for device/group state cache');
+                });
+                this.cmdClient.subscribe('zigbee2mqtt/bridge/+', err => {
+                    if (err) this.logger.warn(`[SL] bridge subscribe: ${err.message}`);
+                    else this.logger.info('[SL] cmdClient subscribed to bridge events');
+                });
                 resolve();
             });
             this.cmdClient.on('error', (err) => {
@@ -107,7 +164,8 @@ class SmartLighting {
         this.config = this._loadCache();
         if (this.config) {
             this.configHash = this._hashConfig(this.config);
-            this.logger.info(`[SL] Loaded cached config from disk (hash: ${this.configHash})`);
+            const cachedSwitches = Object.keys(this.config.switches || {});
+            this.logger.info(`[SL] Loaded cached config from disk — hash=${this.configHash} switches=[${cachedSwitches.join(', ')}]`);
             this.currentWindow = this._calculateCurrentWindow();
             this.logger.info(`[SL] Current window: ${this.currentWindow}`);
         } else {
@@ -126,9 +184,11 @@ class SmartLighting {
         await this._refreshSwitchTopicSubscriptions();
 
         this.eventBus.onMQTTMessage(this, this._onMQTTMessage.bind(this));
-        // Device announce intentionally not handled: wall-switch power-on
-        // should land on bulb firmware defaults (managed by HA's
-        // script.set_bulb_defaults). Hue dimmer Button 1 is the scene path.
+
+        // Ignore device announces during the first 60 s so that Z2M-restart
+        // re-joins don't trigger smart_power_on for every bulb simultaneously.
+        this._smartPowerOnReadyAt = Date.now() + 60000;
+
         // Note: Z2M auto-discovers scene entities to HA via MQTT.
         // These are disabled in HA's entity registry to avoid duplicates.
         // Our HA scenes (from scenes.yaml) are the canonical ones.
@@ -194,7 +254,8 @@ class SmartLighting {
                 this.config = newConfig;
                 this.configHash = this._hashConfig(newConfig);
                 this._saveCache(newConfig);
-                this.logger.info(`[SL] Received and cached new config from HA (hash: ${this.configHash})`);
+                const switchKeys = Object.keys(newConfig.switches || {});
+                this.logger.info(`[SL] Config received — hash=${this.configHash} switches=[${switchKeys.join(', ')}] rooms=[${Object.keys(newConfig.rooms || {}).join(', ')}]`);
                 this.currentWindow = this._calculateCurrentWindow();
                 this._refreshSwitchTopicSubscriptions()
                     .catch(e => this.logger.error(`[SL] switch subscribe: ${e.message}`));
@@ -211,13 +272,15 @@ class SmartLighting {
             return;
         }
 
-        const m = data.topic.match(/^zigbee2mqtt\/([^/]+)\/action$/);
-        if (!m) return;
-        const device = m[1];
+        // Z2M 1.x fallback: action published as plain string on a separate /action subtopic.
+        // Z2M 2.x routes actions via the main device topic; those are handled in the
+        // cmdClient message handler (separate MQTT connection, receives Z2M's own publishes).
+        const actionMatch = data.topic.match(/^zigbee2mqtt\/([^/]+)\/action$/);
+        if (!actionMatch) return;
+        const device = actionMatch[1];
         const sw = this.config && this.config.switches ? this.config.switches[device] : null;
         if (!sw) return;
-        const payload = data.message.toString().trim();
-        this._handleSwitchAction(sw, payload);
+        this._handleSwitchAction(sw, data.message.toString().trim());
     }
 
     _handleSnap(messageStr) {
@@ -373,15 +436,15 @@ class SmartLighting {
     }
 
     _roomAnyOn(roomDisplayName) {
-        const roomConfig = this.config.rooms[roomDisplayName];
+        // Prefer group-level state (single lookup, always up to date after any
+        // command to the group). Fall back to per-device check so early-startup
+        // calls (before the group topic is published) still work.
+        if (this._deviceStateCache[roomDisplayName] !== undefined) {
+            return this._deviceStateCache[roomDisplayName] === 'ON';
+        }
+        const roomConfig = this.config && this.config.rooms ? this.config.rooms[roomDisplayName] : null;
         if (!roomConfig) return false;
-        const lights = roomConfig.lights || [];
-        return lights.some(light => {
-            const device = this.zigbee.resolveEntity(light);
-            if (!device) return false;
-            const deviceState = this.state.get(device);
-            return deviceState && deviceState.state === 'ON';
-        });
+        return (roomConfig.lights || []).some(l => this._deviceStateCache[l] === 'ON');
     }
 
     _toggleRoomDefault(sw) {
@@ -389,7 +452,14 @@ class SmartLighting {
         const roomGroup = sw.room_group;
         const multi = Array.isArray(sw.multi_room_groups) ? sw.multi_room_groups : [];
         const targets = multi.length > 0 ? multi : [roomGroup];
-        const anyOn = targets.some(g => this._roomAnyOn(g));
+        // Use _desiredState (what we last commanded) rather than _deviceStateCache.
+        // The Zigbee binding fires "on" to the group when B1 is pressed, which can
+        // update the MQTT state cache before the action message arrives, flipping the
+        // toggle the wrong way. _desiredState is only written by our own commands.
+        const anyOn = targets.some(g =>
+            g in this._desiredState ? this._desiredState[g] === 'ON' : this._roomAnyOn(g)
+        );
+        this.logger.info(`[SL] toggle ${roomGroup}: desired=${this._desiredState[roomGroup] ?? 'unknown'} anyOn=${anyOn} → ${anyOn ? 'OFF' : 'ON'}`);
         if (anyOn) {
             for (const g of targets) {
                 const rk = GROUP_TO_ROOM_KEY[g] || roomKey;
@@ -409,6 +479,8 @@ class SmartLighting {
     }
 
     _roomOff(roomKey, roomGroup) {
+        this.logger.info(`[SL] room_off ${roomGroup}`);
+        this._desiredState[roomGroup] = 'OFF';
         if (roomKey && this._roomOnReinforceTimers[roomKey]) {
             clearTimeout(this._roomOnReinforceTimers[roomKey]);
             delete this._roomOnReinforceTimers[roomKey];
@@ -422,26 +494,29 @@ class SmartLighting {
     }
 
     /** @returns {object | null} */
-    _buildSceneRecallPayload(windowKey, roomConfig) {
-        const sid = WINDOW_SCENE_ID[windowKey];
-        if (!sid) return null;
+    _buildDirectScenePayload(windowKey, roomConfig) {
+        const scene = roomConfig.scenes && roomConfig.scenes[windowKey];
+        if (!scene) return null;
+        const cmd = { state: 'ON', brightness: scene.brightness };
+        if (scene.color) cmd.color = scene.color;
+        else if (scene.color_temp !== undefined) cmd.color_temp = scene.color_temp;
         const secs = Number(roomConfig.transition_secs) > 0 ? Number(roomConfig.transition_secs) : 0;
-        const payload = { scene_recall: sid };
-        if (secs > 0) payload.transition = secs;
-        return payload;
+        if (secs > 0) cmd.transition = secs;
+        return cmd;
     }
 
     _scheduleRoomOnReinforce(roomKey, roomDisplayName, effectiveWindow, roomConfig) {
         const prev = this._roomOnReinforceTimers[roomKey];
         if (prev) clearTimeout(prev);
+        // Capture payload now so the closure doesn't need roomConfig to be stable.
+        const payload = this._buildDirectScenePayload(effectiveWindow, roomConfig);
+        if (!payload) return;
         this._roomOnReinforceTimers[roomKey] = setTimeout(() => {
             delete this._roomOnReinforceTimers[roomKey];
             if (!this.config || !this.config.rooms) return;
             if (this.runtime.manualOverride[roomKey]) return;
-            const p = this._buildSceneRecallPayload(effectiveWindow, roomConfig);
-            if (!p) return;
             this.logger.info(`[SL] room_on reinforce (post-dimmer-bind) ${roomDisplayName}`);
-            this._sendCommand(`${roomDisplayName}/set`, p);
+            this._sendCommand(`${roomDisplayName}/set`, payload);
         }, ROOM_ON_REINFORCE_MS);
     }
 
@@ -484,14 +559,10 @@ class SmartLighting {
         }
 
         const effectiveWindow = this._getEffectiveWindow(roomDisplayName);
-        const scene = roomConfig.scenes ? roomConfig.scenes[effectiveWindow] : null;
-        if (!scene) return;
-
-        // Use Zigbee scene_recall (same storage as _fullScenePush) so color matches
-        // what HA pushed; raw group brightness/color_temp can lose to Hue dimmer bind.
-        const payload = this._buildSceneRecallPayload(effectiveWindow, roomConfig);
+        const payload = this._buildDirectScenePayload(effectiveWindow, roomConfig);
         if (!payload) return;
-        this.logger.info(`[SL] room_on scene_recall ${roomDisplayName} → ${effectiveWindow} (id=${payload.scene_recall})`);
+        this.logger.info(`[SL] room_on ${roomDisplayName} → ${effectiveWindow}`);
+        this._desiredState[roomDisplayName] = 'ON';
         this._sendCommand(`${roomDisplayName}/set`, payload);
         this._scheduleRoomOnReinforce(roomKey, roomDisplayName, effectiveWindow, roomConfig);
     }
@@ -517,10 +588,7 @@ class SmartLighting {
         } else {
             targetWindow = WINDOWS[(WINDOWS.indexOf(last) + 1) % 4];
         }
-        const scene = roomConfig.scenes[targetWindow];
-        if (!scene) return;
-
-        const payload = this._buildSceneRecallPayload(targetWindow, roomConfig);
+        const payload = this._buildDirectScenePayload(targetWindow, roomConfig);
         if (!payload) return;
         this._sendCommand(`${roomDisplayName}/set`, payload);
 
@@ -604,19 +672,42 @@ class SmartLighting {
             this.logger.info(`[SL] Recall skipped for ${roomName} (auto_transition off)`);
             return;
         }
-        const lights = roomConfig.lights || [];
-        const anyOn = lights.some(light => {
-            const device = this.zigbee.resolveEntity(light);
-            if (!device) return false;
-            const deviceState = this.state.get(device);
-            return deviceState && deviceState.state === 'ON';
-        });
-        if (anyOn) {
-            const payload = this._buildSceneRecallPayload(window, roomConfig);
-            if (!payload) return;
-            const secs = payload.transition ?? 'default';
-            this.logger.info(`[SL] Recalling ${window} scene on ${roomName} (lights on, transition=${secs})`);
-            this._sendCommand(`${roomName}/set`, payload);
+        if (!this._roomAnyOn(roomName)) return;
+        const payload = this._buildDirectScenePayload(window, roomConfig);
+        if (!payload) return;
+        const secs = payload.transition ?? 'default';
+        this.logger.info(`[SL] Recalling ${window} scene on ${roomName} (lights on, transition=${secs})`);
+        this._sendCommand(`${roomName}/set`, payload);
+    }
+
+    _onDeviceAnnounce(friendlyName) {
+        if (Date.now() < this._smartPowerOnReadyAt) return;
+        if (!this.config || !this.config.rooms) return;
+        if (this.config.sl_enabled === false) return;
+        const hm = this.config.house_mode || 'Home';
+        if (hm === 'Away') return;
+
+        for (const [roomName, roomConfig] of Object.entries(this.config.rooms)) {
+            if (!roomConfig.smart_power_on) continue;
+            if (!(roomConfig.lights || []).includes(friendlyName)) continue;
+            if (hm === 'Sleep' && !roomConfig.motion_night) {
+                this.logger.info(`[SL] smart_power_on: ${friendlyName} skipped (Sleep, motion_night off)`);
+                return;
+            }
+            const effectiveWindow = this._getEffectiveWindow(roomName);
+            const scene = roomConfig.scenes && roomConfig.scenes[effectiveWindow];
+            if (!scene) return;
+
+            // Send direct state command to the individual device so this path
+            // does not depend on Zigbee scenes having been stored via scene_add.
+            const cmd = { state: 'ON', brightness: scene.brightness };
+            if (scene.color) cmd.color = scene.color;
+            else if (scene.color_temp !== undefined) cmd.color_temp = scene.color_temp;
+
+            this.logger.info(`[SL] smart_power_on: ${friendlyName} announced → ${effectiveWindow} (${roomName})`);
+            // 2 s delay: let the bulb finish its rejoin handshake before commanding it.
+            setTimeout(() => this._sendCommand(`${friendlyName}/set`, cmd), 2000);
+            return;
         }
     }
 

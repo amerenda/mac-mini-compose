@@ -1,1 +1,4 @@
+# Reference only: this file is NOT bind-mounted into the HA container.
+# The real /config/scenes.yaml lives on the ha-config Docker volume (see ha-init.sh).
+# Keep this copy as an empty list for local tooling / setup-config.sh.
 []

@@ -1,0 +1,19 @@
+alias: "SL: Push Z2M config after HA starts"
+id: sl_push_config_on_ha_start
+description: >
+  After HA restarts, the Z2M extension may have loaded from its disk cache
+  (sl-cache.json) which could be stale if config or scene values changed
+  while HA was down. This automation pushes a fresh config 45 seconds after
+  startup — long enough for MQTT to reconnect and Z2M to fully initialise.
+  The delay also means sl_enabled restores first (input_boolean restore happens
+  before automations fire), so the push reflects the correct enabled state.
+mode: single
+trigger:
+  - platform: homeassistant
+    event: start
+action:
+  - delay: "00:00:45"
+  - condition: state
+    entity_id: input_boolean.sl_enabled
+    state: "on"
+  - service: script.sl_push_config

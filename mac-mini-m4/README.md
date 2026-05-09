@@ -33,8 +33,7 @@ Docker Compose stacks for the Mac Mini M4, managed via Komodo GitOps from the
 |---------|---------|
 | runner-k3s-runners | GitHub Actions runner for k3s-runners repo |
 | runner-ecdysis | GitHub Actions runner for ecdysis repo |
-| runner-llm-manager | GitHub Actions runner for llm-manager repo |
-| runner-llm-agents | GitHub Actions runner for llm-agents repo |
+| runner-llm-manager | GitHub Actions runner for llm-manager repo (includes agent code paths) |
 | runner-photos | GitHub Actions runner for photos repo |
 
 ### LLM stack (`llm/compose.yaml`)
@@ -249,7 +248,7 @@ BWS secret IDs are defined in `ansible-playbooks/group_vars/macmini_hosts.yml`.
 │   ├── Dockerfile.periphery     # Periphery v2.1.2 + bws CLI
 │   └── secrets/                 # (gitignored) secret files on disk
 ├── runners/                     # GitHub Actions runners stack
-│   ├── compose.yaml             # 5 repo-scoped runners
+│   ├── compose.yaml             # repo-scoped runners (no separate llm-agents repo)
 │   ├── compose.env.example      # Template for non-secret config
 │   └── entrypoint-wrapper.sh    # Reads secrets from /run/secrets into env
 ├── llm/                         # llm-manager agent (native Ollama + agent container)

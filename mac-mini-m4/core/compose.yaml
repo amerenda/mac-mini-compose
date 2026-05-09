@@ -137,6 +137,31 @@ services:
         crond -f -l 8
       "
 
+  # ============================================================
+  # Technitium Backup — /etc/dns tarball → GCS via s3cmd
+  # Runs daily at 02:45. Retention: 7 archives (see technitium/backup.sh).
+  # ============================================================
+  technitium-backup:
+    image: alpine:3
+    container_name: technitium-backup
+    restart: unless-stopped
+    volumes:
+      - technitium-data:/etc/dns:ro
+      - ../technitium/backup.sh:/backup.sh:ro
+    environment:
+      TECHNITIUM_DATA: "/etc/dns"
+      AWS_ACCESS_KEY_ID: "${BACKUP_ACCESS_KEY}"
+      AWS_SECRET_ACCESS_KEY: "${BACKUP_SECRET_KEY}"
+      BACKUP_ENDPOINT: "${BACKUP_ENDPOINT}"
+      BACKUP_BUCKET: "amerenda-backups"
+      BACKUP_BUCKET_PATH: "us/mac-mini/dean"
+    command: >
+      sh -c "
+        apk add --no-cache s3cmd &&
+        echo '45 2 * * * sh /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+        crond -f -l 8
+      "
+
 volumes:
   technitium-data:
     external: true

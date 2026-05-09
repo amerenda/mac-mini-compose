@@ -579,9 +579,15 @@ views:
                 data:
                   room: living_room
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: markdown
+              content: >
+                **Wall switch power-on only.** Captures current brightness/color as the bulb's
+                mains-power-on default — what the bulb wakes to when a wall switch cuts and
+                restores power. Has no effect on Hue dimmer button-1 (handled by Z2M scene recall)
+                or on scene windows.
             - type: button
-              name: Save as Firmware Default
-              icon: mdi:chip
+              name: Save as Firmware Default (Wall Switch)
+              icon: mdi:electric-switch
               show_state: false
               tap_action:
                 action: call-service
@@ -711,9 +717,15 @@ views:
                 data:
                   room: bedroom
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: markdown
+              content: >
+                **Wall switch power-on only.** Captures current brightness/color as the bulb's
+                mains-power-on default — what the bulb wakes to when a wall switch cuts and
+                restores power. Has no effect on Hue dimmer button-1 (handled by Z2M scene recall)
+                or on scene windows.
             - type: button
-              name: Save as Firmware Default
-              icon: mdi:chip
+              name: Save as Firmware Default (Wall Switch)
+              icon: mdi:electric-switch
               show_state: false
               tap_action:
                 action: call-service
@@ -736,6 +748,9 @@ views:
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
+            - type: custom:mushroom-title-card
+              title: Load Stored Scene
+              subtitle: Applies stored values to lights as a starting point
             - type: horizontal-stack
               cards:
                 - type: button
@@ -837,9 +852,15 @@ views:
                 data:
                   room: bathroom
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: markdown
+              content: >
+                **Wall switch power-on only.** Captures current brightness/color as the bulb's
+                mains-power-on default — what the bulb wakes to when a wall switch cuts and
+                restores power. Has no effect on Hue dimmer button-1 (handled by Z2M scene recall)
+                or on scene windows.
             - type: button
-              name: Save as Firmware Default
-              icon: mdi:chip
+              name: Save as Firmware Default (Wall Switch)
+              icon: mdi:electric-switch
               show_state: false
               tap_action:
                 action: call-service
@@ -965,9 +986,15 @@ views:
                 data:
                   room: kitchen
                   window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: markdown
+              content: >
+                **Wall switch power-on only.** Captures current brightness/color as the bulb's
+                mains-power-on default — what the bulb wakes to when a wall switch cuts and
+                restores power. Has no effect on Hue dimmer button-1 (handled by Z2M scene recall)
+                or on scene windows.
             - type: button
-              name: Save as Firmware Default
-              icon: mdi:chip
+              name: Save as Firmware Default (Wall Switch)
+              icon: mdi:electric-switch
               show_state: false
               tap_action:
                 action: call-service
@@ -990,6 +1017,9 @@ views:
               slider: default
               onClickAction: hue-screen
               offClickAction: hue-screen
+            - type: custom:mushroom-title-card
+              title: Load Stored Scene
+              subtitle: Applies stored values to lights as a starting point
             - type: horizontal-stack
               cards:
                 - type: button
@@ -1076,9 +1106,30 @@ views:
                     data:
                       room: hallway
                       window: night
+            - type: entities
+              show_header_toggle: false
+              entities:
+                - entity: input_text.sl_custom_scene_name
+                  name: Custom Name
             - type: button
-              name: Save as Firmware Default
-              icon: mdi:chip
+              name: Save as Custom
+              icon: mdi:creation
+              show_state: false
+              tap_action:
+                action: call-service
+                service: script.sl_save_current_as_scene
+                data:
+                  room: hallway
+                  window: "{{ states('input_text.sl_custom_scene_name') | lower | replace(' ', '_') }}"
+            - type: markdown
+              content: >
+                **Wall switch power-on only.** Captures current brightness/color as the bulb's
+                mains-power-on default — what the bulb wakes to when a wall switch cuts and
+                restores power. Has no effect on Hue dimmer button-1 (handled by Z2M scene recall)
+                or on scene windows.
+            - type: button
+              name: Save as Firmware Default (Wall Switch)
+              icon: mdi:electric-switch
               show_state: false
               tap_action:
                 action: call-service
@@ -1770,7 +1821,7 @@ views:
           {% if st == 'synced' %}
           **Event:** Full scene push finished (HA config applied to groups/bulbs).
           {% elif st in ['morning', 'day', 'evening', 'night'] %}
-          **Event:** Time window changed ({{ st }}) → extension updated `hue_power_on_*` and recalled scenes on groups that were already on. This is normal; it is **not** a failed HA sync.
+          **Event:** Time window changed ({{ st }}) → extension recalled window scenes on groups whose lights were already on, and cleared manual-override flags. Firmware defaults (`hue_power_on_*`) are **not** touched here — those only change via "Save as Firmware Default" in the Scene Editor. This is normal; it is **not** a failed HA sync.
           {% elif st == 'started' %}
           **Event:** Smart Lighting extension started (may still be waiting for first config if no hash yet).
           {% elif st == 'config_updated' %}
@@ -1785,7 +1836,7 @@ views:
 
           **Config hash:** {{ hash | default('none') }}
 
-          **Last full scene push** (HA → Z2M `scene_add` + power-on defaults): {{ sync | default('never') }}
+          **Last full scene push** (HA → Z2M `scene_add` on groups): {{ sync | default('never') }}
 
           **Last status MQTT message:** {{ mqtt_ts | default('unknown') }}
 

@@ -1,0 +1,41 @@
+alias: "SL: Push Z2M config when schedule times or day profiles change"
+id: sl_push_config_on_schedule_change
+description: >
+  When the user edits any window start time or day-to-profile assignment in the
+  dashboard, Z2M's retained config becomes stale until the next Force Sync.
+  This automation re-pushes immediately so the Z2M extension recalculates
+  window boundaries without requiring a manual sync.
+mode: single
+trigger:
+  - platform: state
+    entity_id:
+      # Window start times — weekday profile
+      - input_datetime.sl_morning_start_weekday
+      - input_datetime.sl_day_start_weekday
+      - input_datetime.sl_evening_start_weekday
+      - input_datetime.sl_night_start_weekday
+      # Window start times — friday profile
+      - input_datetime.sl_morning_start_friday
+      - input_datetime.sl_day_start_friday
+      - input_datetime.sl_evening_start_friday
+      - input_datetime.sl_night_start_friday
+      # Window start times — saturday profile
+      - input_datetime.sl_morning_start_saturday
+      - input_datetime.sl_day_start_saturday
+      - input_datetime.sl_evening_start_saturday
+      - input_datetime.sl_night_start_saturday
+      # Window start times — sunday profile
+      - input_datetime.sl_morning_start_sunday
+      - input_datetime.sl_day_start_sunday
+      - input_datetime.sl_evening_start_sunday
+      - input_datetime.sl_night_start_sunday
+      # Day → profile assignment
+      - input_select.sl_profile_monday
+      - input_select.sl_profile_tuesday
+      - input_select.sl_profile_wednesday
+      - input_select.sl_profile_thursday
+      - input_select.sl_profile_friday
+      - input_select.sl_profile_saturday
+      - input_select.sl_profile_sunday
+action:
+  - service: script.sl_push_config
