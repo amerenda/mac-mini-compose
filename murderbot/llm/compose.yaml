@@ -19,7 +19,7 @@ services:
       OLLAMA_HOST: 0.0.0.0:11434
       OLLAMA_MODELS: /mnt/models
     volumes:
-      - ${OLLAMA_DATA_HOST_PATH:-/home/alex/.ollama}:/root/.ollama
+      - ${OLLAMA_DATA_HOST_PATH:-/mnt/storage/.ollama}:/root/.ollama
       - ${OLLAMA_MODELS_HOST_PATH:-/mnt/storage/models}:/mnt/models
     # NVIDIA: requires nvidia-container-toolkit + working driver (nvidia-smi on host).
     gpus: all
