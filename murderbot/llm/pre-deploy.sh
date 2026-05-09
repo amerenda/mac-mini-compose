@@ -24,9 +24,7 @@ PSK="$(jq -r .value <<<"$_bws_json")"
 _bws_list_json="$(bws secret list --access-token "$BWS_ACCESS_TOKEN" --output json 2>&1 >/dev/null)"
 BWS_HF_TOKEN_UUID="$(jq -r '.[] | select(.key == "hugging-face-read-only") | .id' <<<"$_bws_list_json" 2>/dev/null | head -1)"
 if [[ -n "$BWS_HF_TOKEN_UUID" ]]; then
-  HF_TOKEN="$(bws secret get "$BWS_HF_TOKEN_UUID" --access-token "$BWS_ACCESS_TOKEN"
-  HF_TOKEN=""
-  echo "Warning: BWS secret 'hugging-face-read-only' not found — HF_TOKEN will be empty"
+  HF_TOKEN="$(bws secret get "$BWS_HF_TOKEN_UUID" --access-token "$BWS_ACCESS_TOKEN" 2>&1 >/dev/null | jq -r .value)"
 fi
 
 BACKEND_PUBLIC="${BACKEND_PUBLIC:-https://llm-manager-backend.amer.dev}"
@@ -37,15 +35,28 @@ if [[ -z "$AGENT_IMAGE_TAG_RESOLVED" ]] && command -v curl >/dev/null && command
   curl -sfL "$BACKEND_PUBLIC/api/runners/target-version" -o /tmp/target-version.json
   AGENT_IMAGE_TAG_RESOLVED="$(jq -r '.target_version // empty' /tmp/target-version.json 2>/dev/null | tr -d ' \t\r\n')"
   if [ $? -eq 0 ]; then
-    AGENT_IMAGE_TAG_RESOLVED="$(jq -r '.target_version // empty' | tr -d ' \t\r\n')
+    AGENT_IMAGE_TAG_RESOLVED="$(jq -r '.target_version // empty' /tmp/target-version.json | tr -d ' \t\r\n')"
   fi
+  rm -f /tmp/target-version.json
+fi
 if [[ -z "$AGENT_IMAGE_TAG_RESOLVED" ]]; then
   AGENT_IMAGE_TAG_RESOLVED="latest"
 fi
 
 {
   echo "LLM_MANAGER_AGENT_PSK=${PSK}"
-  echo "BACKEND_URL
+  echo "BACKEND_URL=https://llm-manager-backend.amer.dev"
+  echo "OLLAMA_URL=http://ollama:11434"
+  echo "OLLAMA_CONTAINER=ollama"
+  echo "AGENT_IMAGE_TAG=${AGENT_IMAGE_TAG_RESOLVED}"
+  echo "OLLAMA_IMAGE_TAG=${OLLAMA_IMAGE_TAG:-0.23.0}"
+  echo "OLLAMA_DATA_HOST_PATH=${OLLAMA_DATA_HOST_PATH}"
+  echo "OLLAMA_MODELS_HOST_PATH=${OLLAMA_MODELS_HOST_PATH}"
+  echo "HOST_LLM_COMPOSE_DIR=${ROOT}/llm"
+  echo "VLLM_MODELS_HOST_PATH=${VLLM_MODELS_HOST_PATH}"
+  echo "VLLM_MODEL=${VLLM_MODEL}"
+  echo "BACKEND_TYPE=${BACKEND_TYPE}"
+} > llm/.env
 
 if [[ -f llm/gitops.env ]]; then
   sed '/^[[:space:]]*#/d;/^[[:space:]]*$/d' llm/gitops.env >>llm/.env
