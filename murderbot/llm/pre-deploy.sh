@@ -16,13 +16,13 @@ BACKEND_TYPE="${BACKEND_TYPE:-ollama}"
 
 export BWS_ACCESS_TOKEN="${BWS_ACCESS_TOKEN:-$(cat /run/secrets/bws-access-token)}"
 
-# bws commands: redirect stdout to /dev/null, keep stderr visible (prevents broken pipe during deploy)
-PSK="$(bws secret get "$BWS_LLM_AGENT_PSK_UUID" --access-token "$BWS_ACCESS_TOKEN" 2>&1 >/dev/null | jq -r .value)"
+# Avoid `bws | jq` pipe: Rust bws can panic with EPIPE if jq closes stdout early (Komodo hooks).
+_bws_json="$(bws secret get "$BWS_LLM_AGENT_PSK_UUID" --access-token "$BWS_ACCESS_TOKEN")"
+PSK="$(jq -r .value <<<"$_bws_json")"
 
 # Fetch HuggingFace read-only token for vLLM model pulls (gated models).
-BWS_HF_TOKEN_UUID="$(bws secret list --access-token "$BWS_ACCESS_TOKEN" --output json 2>&1 >/dev/null \
-  | python3 -c "import json,sys; [print(s['id']) for s in json.load(sys.stdin) if s['key'] == 'hugging-face-read-only']" \
-  2>/dev/null | head -1)"
+_bws_list_json="$(bws secret list --access-token "$BWS_ACCESS_TOKEN" --output json 2>&1 >/dev/null)"
+BWS_HF_TOKEN_UUID="$(jq -r '.[] | select(.key == "hugging-face-read-only") | .id' <<<"$_bws_list_json" 2>/dev/null | head -1)"
 if [[ -n "$BWS_HF_TOKEN_UUID" ]]; then
   HF_TOKEN="$(bws secret get "$BWS_HF_TOKEN_UUID" --access-token "$BWS_ACCESS_TOKEN"
   HF_TOKEN=""
@@ -33,9 +33,12 @@ BACKEND_PUBLIC="${BACKEND_PUBLIC:-https://llm-manager-backend.amer.dev}"
 BACKEND_PUBLIC="${BACKEND_PUBLIC%/}"
 AGENT_IMAGE_TAG_RESOLVED="${AGENT_IMAGE_TAG:-}"
 if [[ -z "$AGENT_IMAGE_TAG_RESOLVED" ]] && command -v curl >/dev/null && command -v jq >/dev/null; then
-  # curl to fetch target version: redirect stdout to prevent broken pipe
-  AGENT_IMAGE_TAG_RESOLVED="$(curl -sfL "$BACKEND_PUBLIC/api/runners/target-version" 2>&1 >/dev/null | jq -r '.target_version // empty' | tr -d ' \t\r\n' || true)"
-fi
+  # Fetch target version from backend API (curl outputs to temp file, no pipe to jq)
+  curl -sfL "$BACKEND_PUBLIC/api/runners/target-version" -o /tmp/target-version.json
+  AGENT_IMAGE_TAG_RESOLVED="$(jq -r '.target_version // empty' /tmp/target-version.json 2>/dev/null | tr -d ' \t\r\n')"
+  if [ $? -eq 0 ]; then
+    AGENT_IMAGE_TAG_RESOLVED="$(jq -r '.target_version // empty' | tr -d ' \t\r\n')
+  fi
 if [[ -z "$AGENT_IMAGE_TAG_RESOLVED" ]]; then
   AGENT_IMAGE_TAG_RESOLVED="latest"
 fi

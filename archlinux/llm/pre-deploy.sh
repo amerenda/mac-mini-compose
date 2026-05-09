@@ -18,7 +18,9 @@ RENDER_GID="${RENDER_GID:-${RENDER_GID_DETECTED:-989}}"
 
 export BWS_ACCESS_TOKEN="${BWS_ACCESS_TOKEN:-$(cat /run/secrets/bws-access-token)}"
 
-PSK="$(bws secret get "$BWS_LLM_AGENT_PSK_UUID" --access-token "$BWS_ACCESS_TOKEN" | jq -r .value)"
+# Avoid `bws | jq` pipe: Rust bws can panic with EPIPE if jq closes stdout early (Komodo hooks).
+_bws_json="$(bws secret get "$BWS_LLM_AGENT_PSK_UUID" --access-token "$BWS_ACCESS_TOKEN")"
+PSK="$(jq -r .value <<<"$_bws_json")"
 
 BACKEND_PUBLIC="${BACKEND_PUBLIC:-https://llm-manager-backend.amer.dev}"
 BACKEND_PUBLIC="${BACKEND_PUBLIC%/}"
