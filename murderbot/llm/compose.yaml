@@ -6,7 +6,7 @@ name: llm-murderbot
 
 services:
   ollama:
-    image: ollama/ollama:${OLLAMA_IMAGE_TAG:-0.21.0}
+    image: ollama/ollama:${OLLAMA_IMAGE_TAG:-0.23.0}
     pull_policy: always
     container_name: ollama
     restart: unless-stopped
