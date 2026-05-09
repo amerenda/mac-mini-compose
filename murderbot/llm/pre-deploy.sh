@@ -23,6 +23,7 @@ PSK="$(jq -r .value <<<"$_bws_json")"
 # Fetch HuggingFace read-only token for vLLM model pulls (gated models).
 _bws_list_json="$(bws secret list --access-token "$BWS_ACCESS_TOKEN" --output json 2>&1 >/dev/null)"
 BWS_HF_TOKEN_UUID="$(jq -r '.[] | select(.key == "hugging-face-read-only") | .id' <<<"$_bws_list_json" 2>/dev/null | head -1)"
+HF_TOKEN=""
 if [[ -n "$BWS_HF_TOKEN_UUID" ]]; then
   HF_TOKEN="$(bws secret get "$BWS_HF_TOKEN_UUID" --access-token "$BWS_ACCESS_TOKEN" 2>&1 >/dev/null | jq -r .value)"
 fi
