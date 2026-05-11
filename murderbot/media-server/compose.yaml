@@ -139,6 +139,28 @@ services:
       - /dev/dri:/dev/dri
     restart: unless-stopped
 
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    networks:
+      servarr:
+    dns: *dns-servers
+    environment:
+      - TZ=America/New_York
+      - PORT=5055
+    ports:
+      - 5055:5055
+    volumes:
+      - ${SEERR_CONFIG}:/app/config
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/settings/public || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    restart: unless-stopped
+
 networks:
   servarr:
     driver: bridge

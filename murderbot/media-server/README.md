@@ -15,6 +15,7 @@ repo. Deploys via Komodo Periphery on the **murderbot** host.
 | Service | Port | Image | Purpose |
 |---------|------|-------|---------|
 | `jellyfin` | 8096, 8920, 7359/udp | `linuxserver/jellyfin:10.11.4` | Streaming server (HW transcode via `/dev/dri`) |
+| `seerr` | 5055 | `ghcr.io/seerr-team/seerr:latest` | Request management UI for Jellyfin + *arr apps |
 | `radarr` | 7878 | `lscr.io/linuxserver/radarr` | Movies |
 | `sonarr` | 8989 | `linuxserver/sonarr` | TV |
 | `bazarr` | 6767 | `linuxserver/bazarr` | Subtitles |

@@ -41,6 +41,7 @@ CONFIG_ROOT=/mnt/storage/media/config
   echo "PROWLARR_CONFIG=${CONFIG_ROOT}/prowlarr/config"
   echo "SABNZBD_CONFIG=${CONFIG_ROOT}/sabnzbd/config"
   echo "JELLYFIN_CONFIG=${CONFIG_ROOT}/jellyfin/config"
+  echo "SEERR_CONFIG=${CONFIG_ROOT}/seerr/config"
   echo "DATA_BASE=/mnt/storage"
   echo "MOVIES_FOLDER=/mnt/storage/movies"
   echo "TV_FOLDER=/mnt/storage/tv"
