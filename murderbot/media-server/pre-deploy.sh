@@ -31,6 +31,14 @@ ENV=murderbot/media-server/.env
 
 umask 077
 CONFIG_ROOT=/mnt/storage/media/config
+SEERR_CONFIG_DIR="${CONFIG_ROOT}/seerr/config"
+
+# Seerr runs as the `node` user (UID/GID 1000) and writes logs below
+# /app/config. If Docker created the bind mount path as root on first boot,
+# startup fails with EACCES when Seerr tries to create /app/config/logs.
+mkdir -p "$SEERR_CONFIG_DIR"
+chown 1000:1000 "${CONFIG_ROOT}/seerr" "$SEERR_CONFIG_DIR"
+chmod 0755 "${CONFIG_ROOT}/seerr" "$SEERR_CONFIG_DIR"
 {
   echo "CONFIG_BASE=${CONFIG_ROOT}"
   echo "PROFILARR_CONFIG=${CONFIG_ROOT}/profilarr/config"
