@@ -36,3 +36,11 @@ scrape_configs:
   - job_name: mac-mini-komodo
     static_configs:
       - targets: ["host.docker.internal:9120"]
+
+  # LLM metrics — murderbot: llama.cpp metrics endpoint
+  - job_name: murderbot-llama-cpp
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["murderbot:8088"]
+        labels:
+          instance: murderbot
