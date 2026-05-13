@@ -41,6 +41,6 @@ scrape_configs:
   - job_name: murderbot-llama-cpp
     metrics_path: /metrics
     static_configs:
-      - targets: ["murderbot:8088"]
+      - targets: ["murderbot.amer.dev:8088"]
         labels:
           instance: murderbot
