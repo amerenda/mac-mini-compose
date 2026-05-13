@@ -10,9 +10,8 @@
   "liveNow": false,
   "panels": [
     {
-      "type": "rows",
+      "type": "row",
       "title": "Host selector",
-      "panels": [],
       "collapsed": true,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
       "id": 0
