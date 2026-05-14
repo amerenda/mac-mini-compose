@@ -133,44 +133,6 @@ export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
 bash mac-mini-m4/llm/pre-deploy.sh
 """
 
-# ── LLM: llm-manager agent + compose Ollama (Linux hosts) ─────────────────
-
-[[stack]]
-name = "llm-murderbot"
-description = "llm-manager agent + Ollama in compose; agent API :8090"
-tags = ["murderbot", "llm"]
-deploy = true
-[stack.config]
-server = "murderbot"
-repo = "amerenda/komodo-dean-gitops"
-branch = "main"
-file_paths = ["murderbot/llm/compose.yaml"]
-git_account = "amerenda"
-project_name = "llm-murderbot"
-[stack.config.pre_deploy]
-command = """
-export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-bash murderbot/llm/pre-deploy.sh
-"""
-
-[[stack]]
-name = "llm-archlinux"
-description = "llm-manager agent + Ollama in compose; agent API :8090"
-tags = ["archlinux", "llm"]
-deploy = true
-[stack.config]
-server = "archlinux"
-repo = "amerenda/komodo-dean-gitops"
-branch = "main"
-file_paths = ["archlinux/llm/compose.yaml"]
-git_account = "amerenda"
-project_name = "llm-archlinux"
-[stack.config.pre_deploy]
-command = """
-export BWS_ACCESS_TOKEN=$(cat /run/secrets/bws-access-token)
-bash archlinux/llm/pre-deploy.sh
-"""
-
 # ── murderbot Periphery server (Debian) ───────────────────────────────────
 # Periphery is bootstrapped on the host by Ansible
 # (playbooks/infrastructure/setup-debian-komodo.yml in ansible-playbooks).
@@ -190,7 +152,7 @@ passkey = ""
 
 [[server]]
 name = "archlinux"
-description = "Arch Linux Periphery (10.100.20.25) — llm and other stacks"
+description = "Arch Linux Periphery (10.100.20.25)"
 tags = ["archlinux"]
 [server.config]
 address = "https://10.100.20.25:8120"
