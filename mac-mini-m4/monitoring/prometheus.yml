@@ -45,15 +45,14 @@ scrape_configs:
         labels:
           node: murderbot
     relabel_configs:
-      - source_labels: [__address__]
-        regex: "([^:]+)(:\\d+)?"
-        target_label: ip
-      - replacement: murderbot
-        target_label: instance
-  # LLM metrics — murderbot: NVIDIA DCGM exporter for GPU health (nvidia_gpu_*)
-  - job_name: murderbot-dcgm
+      # Set instance to "murderbot" so {instance=~"$host"} works in Grafana
+      - target_label: instance
+        replacement: murderbot
+
+  # GPU metrics — murderbot: nvidia-exporter for GPU health (nvidia_gpu_*)
+  - job_name: murderbot-nvidia
     static_configs:
-      - targets: ["10.100.20.19:9400"]
+      - targets: ["10.100.20.19:9101"]
         labels:
           node: murderbot
 

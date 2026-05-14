@@ -1,0 +1,26 @@
+[Unit]
+Description=NVIDIA GPU Prometheus Exporter (nvidia-smi based)
+Documentation=https://github.com/amerenda/komodo-dean-gitops
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/python3 /opt/nvidia-exporter/exporter.py --port 9101 --interval 5
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nvidia-exporter
+
+# Security hardening
+ProtectSystem=strict
+ReadWritePaths=/opt/nvidia-exporter
+ProtectHome=yes
+NoNewPrivileges=no
+CapabilityBoundingSet=CAP_SYS_ADMIN
+AmbientCapabilities=CAP_SYS_ADMIN
+
+[Install]
+WantedBy=multi-user.target

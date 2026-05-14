@@ -40,10 +40,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 12,
         "x": 0,
-        "y": 2
+        "y": 3
       },
       "id": 2,
       "fieldConfig": {
@@ -86,10 +86,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 12,
         "x": 12,
-        "y": 2
+        "y": 3
       },
       "id": 3,
       "fieldConfig": {
@@ -133,7 +133,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 9
       },
       "id": 4
     },
@@ -144,10 +144,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 12,
         "x": 0,
-        "y": 4
+        "y": 11
       },
       "id": 5,
       "fieldConfig": {
@@ -190,10 +190,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 12,
         "x": 12,
-        "y": 4
+        "y": 11
       },
       "id": 6,
       "fieldConfig": {
@@ -236,10 +236,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 24,
         "x": 0,
-        "y": 13
+        "y": 19
       },
       "id": 99,
       "fieldConfig": {
@@ -282,10 +282,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 8,
+        "h": 6,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 25
       },
       "id": 100,
       "fieldConfig": {
@@ -329,7 +329,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 5
+        "y": 31
       },
       "id": 7
     },
@@ -340,10 +340,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 8,
         "x": 0,
-        "y": 6
+        "y": 33
       },
       "id": 8,
       "fieldConfig": {
@@ -403,10 +403,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 8,
         "x": 8,
-        "y": 6
+        "y": 33
       },
       "id": 9,
       "fieldConfig": {
@@ -449,10 +449,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 8,
         "x": 16,
-        "y": 6
+        "y": 33
       },
       "id": 10,
       "fieldConfig": {
@@ -496,7 +496,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 7
+        "y": 39
       },
       "id": 11
     },
@@ -510,7 +510,7 @@
         "h": 4,
         "w": 6,
         "x": 0,
-        "y": 8
+        "y": 41
       },
       "id": 12,
       "fieldConfig": {
@@ -554,7 +554,7 @@
         "h": 4,
         "w": 6,
         "x": 6,
-        "y": 8
+        "y": 41
       },
       "id": 13,
       "fieldConfig": {
@@ -598,7 +598,7 @@
         "h": 4,
         "w": 6,
         "x": 12,
-        "y": 8
+        "y": 41
       },
       "id": 14,
       "fieldConfig": {
@@ -642,7 +642,7 @@
         "h": 4,
         "w": 6,
         "x": 18,
-        "y": 8
+        "y": 41
       },
       "id": 15,
       "fieldConfig": {
@@ -684,7 +684,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 45
       },
       "id": 30
     },
@@ -695,10 +695,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
-        "w": 12,
+        "h": 6,
+        "w": 24,
         "x": 0,
-        "y": 10
+        "y": 47
       },
       "id": 31,
       "fieldConfig": {
@@ -742,10 +742,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
-        "w": 12,
-        "x": 12,
-        "y": 10
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 54
       },
       "id": 32,
       "fieldConfig": {
@@ -788,10 +788,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
-        "w": 12,
+        "h": 6,
+        "w": 24,
         "x": 0,
-        "y": 17
+        "y": 61
       },
       "id": 33,
       "fieldConfig": {
@@ -834,10 +834,10 @@
         "type": "prometheus"
       },
       "gridPos": {
-        "h": 7,
-        "w": 12,
-        "x": 12,
-        "y": 17
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 68
       },
       "id": 34,
       "fieldConfig": {
