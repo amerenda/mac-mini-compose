@@ -43,4 +43,23 @@ scrape_configs:
     static_configs:
       - targets: ["10.100.20.19:8088"]
         labels:
-          instance: murderbot
+          node: murderbot
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: "([^:]+)(:\\d+)?"
+        target_label: ip
+      - replacement: murderbot
+        target_label: instance
+  # LLM metrics — murderbot: NVIDIA DCGM exporter for GPU health (nvidia_gpu_*)
+  - job_name: murderbot-dcgm
+    static_configs:
+      - targets: ["10.100.20.19:9400"]
+        labels:
+          node: murderbot
+
+  # Server metrics — murderbot: node exporter for CPU, RAM, disk, network
+  - job_name: murderbot-node
+    static_configs:
+      - targets: ["10.100.20.19:9100"]
+        labels:
+          node: murderbot

@@ -177,7 +177,7 @@
       },
       "targets": [
         {
-          "expr": "rate(llamacpp:tokens_predicted_seconds_total{instance=~\"$host\"}[5m]) / rate(llamacpp:tokens_predicted_total{instance=~\"$host\"}[5m]) * 1000",
+          "expr": "rate(llamacpp:tokens_predicted_seconds_total{node=~\"$host\"}[5m]) / rate(llamacpp:tokens_predicted_total{node=~\"$host\"}[5m]) * 1000",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
@@ -223,8 +223,100 @@
       },
       "targets": [
         {
-          "expr": "rate(llamacpp:prompt_seconds_total{instance=~\"$host\"}[5m]) / rate(llamacpp:prompt_tokens_total{instance=~\"$host\"}[5m]) * 1000",
+          "expr": "rate(llamacpp:prompt_seconds_total{node=~\"$host\"}[5m]) / rate(llamacpp:prompt_tokens_total{node=~\"$host\"}[5m]) * 1000",
           "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Avg generation throughput (tokens/s)",
+      "datasource": {
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 99,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "tokens/s",
+          "custom": {
+            "drawDraw": "line",
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "llamacpp:predicted_tokens_seconds{node=~\"$host\"}",
+          "legendFormat": "{{instance}} - avg gen tokens/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Avg prompt throughput (tokens/s)",
+      "datasource": {
+        "type": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 21
+      },
+      "id": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "tokens/s",
+          "custom": {
+            "drawDraw": "line",
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "llamacpp:prompt_tokens_seconds{node=~\"$host\"}",
+          "legendFormat": "{{instance}} - avg prompt tokens/s",
           "refId": "A"
         }
       ]
@@ -298,7 +390,7 @@
       },
       "targets": [
         {
-          "expr": "llamacpp:requests_processing{instance=~\"$host\"}",
+          "expr": "llamacpp:requests_processing{node=~\"$host\"}",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
@@ -344,7 +436,7 @@
       },
       "targets": [
         {
-          "expr": "llamacpp:requests_deferred{instance=~\"$host\"}",
+          "expr": "llamacpp:requests_deferred{node=~\"$host\"}",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
@@ -390,7 +482,7 @@
       },
       "targets": [
         {
-          "expr": "llamacpp:n_busy_slots_per_decode{instance=~\"$host\"}",
+          "expr": "llamacpp:n_busy_slots_per_decode{node=~\"$host\"}",
           "legendFormat": "{{instance}}",
           "refId": "A"
         }
@@ -446,7 +538,7 @@
       },
       "targets": [
         {
-          "expr": "sum(irate(llamacpp:tokens_predicted_total{instance=~\"$host\"}[1h]))",
+          "expr": "sum(irate(llamacpp:tokens_predicted_total{node=~\"$host\"}[1h]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -490,7 +582,7 @@
       },
       "targets": [
         {
-          "expr": "sum(irate(llamacpp:prompt_tokens_total{instance=~\"$host\"}[1h]))",
+          "expr": "sum(irate(llamacpp:prompt_tokens_total{node=~\"$host\"}[1h]))",
           "legendFormat": "",
           "refId": "A"
         }
@@ -534,7 +626,7 @@
       },
       "targets": [
         {
-          "expr": "max(llamacpp:n_tokens_max{instance=~\"$host\"})",
+          "expr": "max(llamacpp:n_tokens_max{node=~\"$host\"})",
           "legendFormat": "",
           "refId": "A"
         }
@@ -578,7 +670,7 @@
       },
       "targets": [
         {
-          "expr": "sum(llamacpp:n_decode_total{instance=~\"$host\"})",
+          "expr": "sum(llamacpp:n_decode_total{node=~\"$host\"})",
           "legendFormat": "",
           "refId": "A"
         }
