@@ -128,6 +128,7 @@ services:
       - ${JELLYFIN_CONFIG}:/config
       - ${MOVIES_FOLDER}:/movies
       - ${TV_FOLDER}:/tv
+      - ${DISCOVER_FOLDER}:/discover
       - ${TRANSCODE_FOLDER}:/transcode
     ports:
       - 8096:8096
