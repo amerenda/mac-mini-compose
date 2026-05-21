@@ -1,0 +1,19 @@
+services:
+  gtfs-cleanup:
+    image: alpine:3.21
+    container_name: gtfs-cleanup
+    restart: unless-stopped
+    volumes:
+      - ha-config:/data:rw
+      - ./scripts/clean.sh:/clean.sh:ro
+      - ./scripts/crontab:/etc/crontabs/root:ro
+    logging:
+      driver: local
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  ha-config:
+    external: true
+    name: services_ha-config

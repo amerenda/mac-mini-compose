@@ -1,0 +1,1 @@
+0 */4 * * * /clean.sh >> /var/log/gtfs-cleanup.log 2>&1
