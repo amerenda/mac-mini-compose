@@ -58,6 +58,21 @@ git_account = "amerenda"
 project_name = "automation"
 ignore_services = ["hacs-init"]
 
+# ── GTFS Cleanup: prune GTFS realtime zips + HA backup tars ───────────────
+
+[[stack]]
+name = "gtfs-cleanup"
+description = "Alpine cron container: prunes old GTFS realtime zips and HA backup tars from ha-config volume"
+tags = ["mac-mini"]
+deploy = true
+[stack.config]
+server = "mac-mini-m4"
+repo = "amerenda/komodo-dean-gitops"
+branch = "main"
+file_paths = ["mac-mini-m4/gtfs-cleanup/compose.yaml"]
+git_account = "amerenda"
+project_name = "gtfs-cleanup"
+
 # ── Monitoring: Prometheus, Node Exporter, DB Exporters ────────────────────
 
 [[stack]]
