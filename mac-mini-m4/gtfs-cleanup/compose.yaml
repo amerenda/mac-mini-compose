@@ -3,10 +3,11 @@ services:
     image: alpine:3.21
     container_name: gtfs-cleanup
     restart: unless-stopped
+    command: ["sh", "-c", "crond -f -l 8"]
     volumes:
       - ha-config:/data:rw
       - ./scripts/clean.sh:/clean.sh:ro
-      - ./scripts/crontab:/etc/crontabs/root:ro
+      - ./crontab.txt:/etc/crontabs/root:ro
     logging:
       driver: local
       options:

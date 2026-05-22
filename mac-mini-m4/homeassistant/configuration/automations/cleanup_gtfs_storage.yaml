@@ -1,0 +1,9 @@
+alias: "Cleanup: GTFS Realtime Storage (HA automation fallback)"
+description: "Purge old GTFS realtime transit data to keep only ~24h worth. This runs inside HA as a safety net — the primary cleanup runs on the mac-mini host via launchd."
+mode: restart
+trigger:
+  - platform: time_pattern
+    hours: "/3"
+condition: []
+action:
+  - service: shell_command.cleanup_gtfs_realtime

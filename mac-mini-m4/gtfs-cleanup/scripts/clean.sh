@@ -17,13 +17,15 @@ if [ "$TOTAL" -gt "$KEEP_COUNT" ]; then
   echo "$(date): Cleaned $rm_count GTFS realtime files (removed $rm_count old .zip at ~20MB each)" >> /var/log/gtfs-cleanup.log
 fi
 
-# Also clean old HA backups — keep only the last 3
-BACKUP_DIR="/config/backups"
+# Also clean old HA backups — keep only the last 1
+# The volume is mounted at /data here (not /config like inside HA).
+# HA auto-backups are ~4.8GB each; keep only the most recent to avoid filling the volume.
+BACKUP_DIR="/data/backups"
 if [ -d "$BACKUP_DIR" ]; then
   TOTAL=$(ls -1 "$BACKUP_DIR"/*.tar 2>/dev/null | wc -l)
-  if [ "$TOTAL" -gt 3 ]; then
-    rm_count=$((TOTAL - 3))
-    ls -t "$BACKUP_DIR"/*.tar | tail -n +4 | xargs rm -f --
-    echo "$(date): Cleaned $rm_count HA backup files (removed old tars)" >> /var/log/gtfs-cleanup.log
+  if [ "$TOTAL" -gt 1 ]; then
+    rm_count=$((TOTAL - 1))
+    ls -t "$BACKUP_DIR"/*.tar | tail -n +2 | xargs rm -f --
+    echo "$(date): Cleaned $rm_count HA backup files (kept 1)" >> /var/log/gtfs-cleanup.log
   fi
 fi
