@@ -1,35 +1,23 @@
 #!/bin/bash
-# pf-dns-redirect.sh — Redirect DNS traffic to Technitium container.
+# pf-dns-redirect.sh — Configure DNS IP alias and IP forwarding.
 #
-# OrbStack intercepts *:53, *:5353, and *:5354 and does not forward LAN UDP
-# to containers. pf intercepts at the NIC before OrbStack sees packets.
+# Adds 10.100.20.240 as an alias on en0 — the dedicated DNS endpoint
+# that LAN and Tailscale clients point to. dns-udp-proxy.py (separate
+# LaunchDaemon) listens on 10.100.20.240:53 and forwards queries to
+# Technitium via OrbStack's localhost forwarder on port 5354.
 #
-# Strategy:
-#   DNS_IP (10.100.20.240) is aliased onto en0 as the public DNS address.
-#   UDP + TCP: pf redirects DNS_IP:53 -> DNS_IP:15354 (dns-udp-proxy.py).
-#   The proxy listens on en0 (IP_BOUND_IF) and forwards to 127.0.0.1:5354
-#   (OrbStack → Technitium in the VM). Avoid forwarding UDP straight to the
-#   bridge VM IP — that path drops packets intermittently.
+# Why no pf redirect:
+#   pf rdr would need to redirect en0 traffic to bridge100 (OrbStack VM),
+#   but stateful return-path tracking fails across interfaces on macOS —
+#   the reply arrives on bridge100 without matching the state created on en0.
+#   The userspace proxy (dns-udp-proxy.py) sidesteps this entirely.
 #
 # Runs as root via LaunchDaemon at boot.
 
 set -euo pipefail
 
 IFACE="en0"
-LAN_IP="10.100.20.18"    # Mac Mini primary IP
-DNS_IP="10.100.20.240"   # Public DNS IP — aliased onto en0
-DNS_PORT=53
-PROXY_PORT=15354          # dns-udp-proxy.py listener port
-
-ANCHOR_FILE="/etc/pf.anchors/com.local"
-PF_CONF="/etc/pf.conf"
-
-# Tailscale interface — DNS queries from remote Tailscale clients arrive here.
-# (utun0 is the Tailscale interface on macOS)
-TS_IFACE="utun0"
-
-ORBSTACK_VM_IP="192.168.139.2"
-TECHNITIUM_PORT=5354
+DNS_IP="10.100.20.240"
 
 # ── Add DNS IP alias to en0 ────────────────────────────────────────────────
 # Idempotent — ifconfig alias is a no-op if already present.
@@ -42,52 +30,16 @@ logger -t pf-dns-redirect "IP alias ${DNS_IP} on ${IFACE} configured"
 sysctl -w net.inet.ip.forwarding=1
 logger -t pf-dns-redirect "IP forwarding enabled"
 
-# ── Write anchor rules ──────────────────────────────────────────────────────
+# ── Clear any leftover pf anchor rules ────────────────────────────────────
+# Previous versions used pf rdr redirect to port 15354/5354.
+# Those rules are no longer needed; dns-udp-proxy.py handles port 53 directly.
 
-mkdir -p /etc/pf.anchors
-cat > "${ANCHOR_FILE}" <<EOF
-# UDP + TCP: redirect DNS on LAN interface to dns-proxy.py
-rdr pass on ${IFACE} proto udp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
-rdr pass on ${IFACE} proto tcp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
-# UDP + TCP: redirect DNS arriving via Tailscale so remote clients work
-rdr pass on ${TS_IFACE} proto udp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
-rdr pass on ${TS_IFACE} proto tcp from any to ${DNS_IP} port ${DNS_PORT} -> ${DNS_IP} port ${PROXY_PORT}
-EOF
-
-# ── Clean up any previous bad append ─────────────────────────────────────
-
-if grep -q '# Local service redirects' "${PF_CONF}"; then
-    sed -i '' '/^# Local service redirects/d' "${PF_CONF}"
+if [ -f /etc/pf.anchors/com.local ]; then
+    printf '# DNS redirects handled by dns-udp-proxy.py LaunchDaemon\n' \
+        > /etc/pf.anchors/com.local
+    pfctl -e 2>/dev/null || true
+    pfctl -f /etc/pf.conf 2>/dev/null || true
+    logger -t pf-dns-redirect "pf anchor com.local cleared"
 fi
 
-sed -i '' '/^load anchor "com.local\/dns-redirect"/d' "${PF_CONF}" 2>/dev/null || true
-
-# ── Ensure pf.conf references our anchors ─────────────────────────────────
-# pf requires strict ordering: normalization, translation (rdr), filtering.
-# Insert each directive after its corresponding com.apple counterpart.
-# Safe to re-run (idempotent).
-
-if ! grep -q 'rdr-anchor "com.local"' "${PF_CONF}"; then
-    sed -i '' 's|rdr-anchor "com.apple/\*"|rdr-anchor "com.apple/*"\
-rdr-anchor "com.local"|' "${PF_CONF}"
-    logger -t pf-dns-redirect "Added rdr-anchor com.local to ${PF_CONF}"
-fi
-
-if ! grep -q '^anchor "com.local"' "${PF_CONF}"; then
-    sed -i '' 's|^anchor "com.apple/\*"|anchor "com.apple/*"\
-anchor "com.local"|' "${PF_CONF}"
-    logger -t pf-dns-redirect "Added anchor com.local to ${PF_CONF}"
-fi
-
-if ! grep -q 'load anchor "com.local"' "${PF_CONF}"; then
-    sed -i '' 's|load anchor "com.apple" from.*|&\
-load anchor "com.local" from "/etc/pf.anchors/com.local"|' "${PF_CONF}"
-    logger -t pf-dns-redirect "Added load anchor com.local to ${PF_CONF}"
-fi
-
-# ── Enable pf and reload ───────────────────────────────────────────────────
-
-pfctl -e 2>/dev/null || true
-pfctl -f "${PF_CONF}"
-
-logger -t pf-dns-redirect "DNS redirect active: UDP+TCP ${DNS_IP}:${DNS_PORT} -> Technitium via proxy/OrbStack"
+logger -t pf-dns-redirect "Setup complete: ${DNS_IP} alias on ${IFACE}, dns-udp-proxy handles :53"

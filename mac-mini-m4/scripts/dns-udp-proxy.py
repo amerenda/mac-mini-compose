@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-dns-proxy.py — UDP + TCP DNS proxy: 10.100.20.240:15354 -> OrbStack VM:5354
+dns-udp-proxy.py — UDP + TCP DNS proxy: 10.100.20.240:53 → 127.0.0.1:5354 (Technitium)
 
-pf-dns-redirect.sh redirects DNS port 53 (UDP and TCP) to port 15354.
-This script receives those packets and forwards them to Technitium
-running inside the OrbStack VM (network_mode: host).
+Listens directly on port 53 (requires root / LaunchDaemon) on the dedicated
+DNS alias IP and forwards to Technitium running inside the OrbStack VM via
+OrbStack's localhost forwarder on port 5354.
 
-Why a userspace proxy:
-  Tailscale installs a route for 10.100.20.0/24 via utun0, so replies
-  from plain sockets get routed through the Tailscale tunnel instead of
-  en0. IP_BOUND_IF pins sockets to en0 so all sends go via the LAN.
+Why a userspace proxy (not pf rdr):
+  pf rdr redirects packets across interfaces (en0 → bridge100), but stateful
+  return-path tracking breaks across interface boundaries on macOS — the VM's
+  reply arrives on bridge100 without matching the state created on en0, so
+  responses are never delivered. A userspace proxy on the Mac host receives on
+  en0/utun0, forwards to 127.0.0.1:5354 (loopback), and returns replies to
+  the original client — all without crossing interface boundaries.
 
-Client DNS is forwarded to Technitium using UDP to 127.0.0.1:5354 by default.
 OrbStack publishes TCP/UDP :5354 on localhost and forwards into the Linux VM
-reliably; UDP directly to the bridge IP (192.168.139.2) is lossy. Override with
-DNS_PROXY_BACKEND_IP if your layout differs.
+reliably. Override with DNS_PROXY_BACKEND_IP env var if your layout differs.
 
 Runs as root via LaunchDaemon at boot.
 """
@@ -31,15 +32,12 @@ import ipaddress
 import time
 
 LISTEN_IP    = "10.100.20.240"
-LISTEN_PORT  = 15354
+LISTEN_PORT  = 53
 BACKEND_IP   = os.environ.get("DNS_PROXY_BACKEND_IP", "127.0.0.1")
 BACKEND_PORT = int(os.environ.get("DNS_PROXY_BACKEND_PORT", "5354"))
 TIMEOUT      = 3
 
-# macOS <netinet/in.h> — bind socket to a specific interface index
-IP_BOUND_IF  = 25
-
-# Optional: force source IP for backend sockets (OrbStack bridge). If unset, resolved at startup.
+# Optional: force source IP for backend sockets. If unset, resolved at startup.
 BACKEND_SRC_IP = os.environ.get("DNS_PROXY_BACKEND_SRC", "").strip() or None
 
 # Lightweight counters (best-effort; UDP errors are the main signal).
@@ -80,11 +78,13 @@ def _bump(stat: str) -> None:
             )
 
 
-def en0_bound_socket(kind: int) -> socket.socket:
-    """Create a socket bound to en0 so replies go via LAN, not Tailscale."""
+def make_listen_socket(kind: int) -> socket.socket:
+    """Create a listening socket bound to LISTEN_IP:LISTEN_PORT.
+    Binding to LISTEN_IP (not 0.0.0.0) means the kernel routes replies via
+    whichever interface owns that IP — en0 for LAN clients, utun0 for
+    Tailscale clients — automatically, without needing IP_BOUND_IF."""
     s = socket.socket(socket.AF_INET, kind)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.setsockopt(socket.IPPROTO_IP, IP_BOUND_IF, socket.if_nametoindex("en0"))
     return s
 
 
@@ -209,7 +209,7 @@ def handle_udp(
 
 
 def udp_listener(backend_src: str) -> None:
-    sock = en0_bound_socket(socket.SOCK_DGRAM)
+    sock = make_listen_socket(socket.SOCK_DGRAM)
     sock.bind((LISTEN_IP, LISTEN_PORT))
     syslog.syslog(syslog.LOG_INFO, f"dns-proxy: UDP listening on {LISTEN_IP}:{LISTEN_PORT}")
     while True:
@@ -249,7 +249,7 @@ def handle_tcp(conn: socket.socket, client_addr: tuple, backend_src: str) -> Non
 
 
 def tcp_listener(backend_src: str) -> None:
-    sock = en0_bound_socket(socket.SOCK_STREAM)
+    sock = make_listen_socket(socket.SOCK_STREAM)
     sock.bind((LISTEN_IP, LISTEN_PORT))
     sock.listen(32)
     syslog.syslog(syslog.LOG_INFO, f"dns-proxy: TCP listening on {LISTEN_IP}:{LISTEN_PORT}")
