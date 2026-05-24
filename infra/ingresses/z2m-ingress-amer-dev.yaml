@@ -7,9 +7,9 @@ metadata:
   namespace: default
 spec:
   ports:
-    - port: 8099
-      targetPort: 8099
-      protocol: TCP
+  - port: 8099
+    targetPort: 8099
+    protocol: TCP
 ---
 apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
@@ -20,14 +20,14 @@ metadata:
     kubernetes.io/service-name: z2m-external
 addressType: IPv4
 endpoints:
-  - addresses:
-      - 10.100.20.18
-    conditions:
-      ready: true
+- addresses:
+  - 10.100.20.19
+  conditions:
+    ready: true
 ports:
-  - name: ""
-    port: 8099
-    protocol: TCP
+- name: ""
+  port: 8099
+  protocol: TCP
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -43,17 +43,17 @@ metadata:
 spec:
   ingressClassName: infra-traefik
   tls:
-    - hosts:
-        - z2m-dean-1.amer.dev
-      secretName: z2m-dean-1-amer-dev-tls
+  - hosts:
+    - z2m-dean-1.amer.dev
+    secretName: z2m-dean-1-amer-dev-tls
   rules:
-    - host: z2m-dean-1.amer.dev
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: z2m-external
-                port:
-                  number: 8099
+  - host: z2m-dean-1.amer.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: z2m-external
+            port:
+              number: 8099
