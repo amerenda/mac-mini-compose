@@ -244,8 +244,9 @@ fi
 # ── Update Komodo git provider PAT ──────────────────────────────────────────
 
 log "Updating Komodo git provider PAT..."
-ADMIN_PASS=$(cat "$COMPOSE_DIR/komodo/secrets/komodo-dean-admin-password" 2>/dev/null)
-GITOPS_PAT=$(cat "$RUNNER_SECRETS_DIR/github-pat-k3s-dean-gitops" 2>/dev/null)
+# Use || true on cat so a missing file doesn't kill the script under set -e
+ADMIN_PASS=$(cat "$COMPOSE_DIR/komodo/secrets/komodo-dean-admin-password" 2>/dev/null || true)
+GITOPS_PAT=$(cat "$RUNNER_SECRETS_DIR/github-pat-k3s-dean-gitops" 2>/dev/null || true)
 
 if [[ -n "$ADMIN_PASS" ]] && [[ -n "$GITOPS_PAT" ]]; then
     # Wait for Komodo to be reachable (may not be up yet at boot)
@@ -259,16 +260,20 @@ if [[ -n "$ADMIN_PASS" ]] && [[ -n "$GITOPS_PAT" ]]; then
     done
 
     if "$KOMODO_UP"; then
+        # Use || JWT="" so a failed login (e.g. HTTP 4xx) doesn't kill the
+        # script under set -eo pipefail — curl -sf exits non-zero on HTTP
+        # errors, which propagates through the pipeline and command substitution.
         JWT=$(curl -sf http://localhost:9120/auth/login/LoginLocalUser \
             -H 'Content-Type: application/json' \
             -d "{\"username\":\"admin\",\"password\":\"${ADMIN_PASS}\"}" \
-            | /opt/homebrew/bin/jq -r '.data.jwt')
+            2>/dev/null | /opt/homebrew/bin/jq -r '.data.jwt' 2>/dev/null) || JWT=""
 
         if [[ -n "$JWT" ]] && [[ "$JWT" != "null" ]]; then
             PROVIDER_ID=$(curl -sf http://localhost:9120/read/ListGitProviderAccounts \
                 -H 'Content-Type: application/json' \
                 -H "Authorization: $JWT" \
-                -d '{}' | /opt/homebrew/bin/jq -r '.[0]._id["$oid"] // empty')
+                -d '{}' 2>/dev/null \
+                | /opt/homebrew/bin/jq -r '.[0]._id["$oid"] // empty' 2>/dev/null) || PROVIDER_ID=""
 
             if [[ -n "$PROVIDER_ID" ]]; then
                 curl -sf http://localhost:9120/write/UpdateGitProviderAccount \
