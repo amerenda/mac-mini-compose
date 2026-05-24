@@ -177,6 +177,84 @@ PIHOLE_PW=$("$BWS_BIN" secret get "c8157be0-0195-41f3-b3c6-b37100d27645" 2>/dev/
 } > "$COMPOSE_DIR/.env"
 chown "$OWNER" "$COMPOSE_DIR/.env" 2>/dev/null || true
 
+# ── Core stack .env — Docker Compose YAML interpolation ─────────────────────
+# core/compose.yaml uses YAML interpolation for DB passwords, Technitium,
+# and backup credentials. Docker Compose reads from core/.env (same dir as
+# compose.yaml). Komodo pre_deploy also writes this; inject-secrets writes it
+# at boot so core stack containers can start/restart before Komodo is up.
+
+log "Injecting core/.env..."
+CORE_MINI_PG=$("$BWS_BIN" secret get "a280e465-8813-4b48-9972-b4210149cb60" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+CORE_MINI_PG=$(printf '%s' "$CORE_MINI_PG" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+CORE_PG_TODO=$("$BWS_BIN" secret get "081051dc-3adb-4499-ad0f-b421014a114f" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+CORE_PG_TODO=$(printf '%s' "$CORE_PG_TODO" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+CORE_AGENT_KB=$("$BWS_BIN" secret get "549c2404-4417-48bd-9fa1-b41c00e6365c" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+CORE_AGENT_KB=$(printf '%s' "$CORE_AGENT_KB" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+CORE_MONGO=$("$BWS_BIN" secret get "d0213758-1881-4d35-8fd2-b39d015cb7b9" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+CORE_MONGO=$(printf '%s' "$CORE_MONGO" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+CORE_BACKUP_KEY=$("$BWS_BIN" secret get "af4a292f-1f9f-45b1-9c56-b37300df69dc" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+CORE_BACKUP_KEY=$(printf '%s' "$CORE_BACKUP_KEY" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+CORE_BACKUP_SECRET=$("$BWS_BIN" secret get "d2d87681-b2e3-4a3e-b821-b37300df7ce5" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+CORE_BACKUP_SECRET=$(printf '%s' "$CORE_BACKUP_SECRET" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+CORE_BACKUP_ENDPOINT=$("$BWS_BIN" secret get "2c95ebd0-9330-455b-abbd-b37300e580b0" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
+CORE_BACKUP_ENDPOINT=$(printf '%s' "$CORE_BACKUP_ENDPOINT" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+
+CORE_ENV="$COMPOSE_DIR/core/.env"
+mkdir -p "$COMPOSE_DIR/core"
+{
+    if [[ -n "$TECHNITIUM_PW" ]] && [[ "$TECHNITIUM_PW" != "null" ]]; then
+        printf 'TECHNITIUM_ADMIN_PASSWORD=%s\n' "$TECHNITIUM_PW"
+    else
+        log "WARN: failed to fetch TECHNITIUM_ADMIN_PASSWORD for core/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$CORE_MINI_PG" ]] && [[ "$CORE_MINI_PG" != "null" ]]; then
+        printf 'MINI_POSTGRES_PASSWORD=%s\n' "$CORE_MINI_PG"
+    else
+        log "WARN: failed to fetch MINI_POSTGRES_PASSWORD for core/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$CORE_PG_TODO" ]] && [[ "$CORE_PG_TODO" != "null" ]]; then
+        printf 'MINI_POSTGRES_TODO_PASSWORD=%s\n' "$CORE_PG_TODO"
+    else
+        log "WARN: failed to fetch MINI_POSTGRES_TODO_PASSWORD for core/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$CORE_AGENT_KB" ]] && [[ "$CORE_AGENT_KB" != "null" ]]; then
+        printf 'AGENT_KB_PASSWORD=%s\n' "$CORE_AGENT_KB"
+    else
+        log "WARN: failed to fetch AGENT_KB_PASSWORD for core/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$CORE_MONGO" ]] && [[ "$CORE_MONGO" != "null" ]]; then
+        printf 'MONGO_PASSWORD=%s\n' "$CORE_MONGO"
+    else
+        log "WARN: failed to fetch MONGO_PASSWORD for core/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$CORE_BACKUP_KEY" ]] && [[ "$CORE_BACKUP_KEY" != "null" ]]; then
+        printf 'BACKUP_ACCESS_KEY=%s\n' "$CORE_BACKUP_KEY"
+    else
+        log "WARN: failed to fetch BACKUP_ACCESS_KEY for core/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$CORE_BACKUP_SECRET" ]] && [[ "$CORE_BACKUP_SECRET" != "null" ]]; then
+        printf 'BACKUP_SECRET_KEY=%s\n' "$CORE_BACKUP_SECRET"
+    else
+        log "WARN: failed to fetch BACKUP_SECRET_KEY for core/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+    if [[ -n "$CORE_BACKUP_ENDPOINT" ]] && [[ "$CORE_BACKUP_ENDPOINT" != "null" ]]; then
+        printf 'BACKUP_ENDPOINT=%s\n' "$CORE_BACKUP_ENDPOINT"
+    else
+        log "WARN: failed to fetch BACKUP_ENDPOINT for core/.env"
+        ERRORS=$((ERRORS + 1))
+    fi
+} > "$CORE_ENV"
+chmod 600 "$CORE_ENV"
+chown "$OWNER" "$CORE_ENV" 2>/dev/null || true
+log "core/.env written for Docker Compose interpolation."
+
 mkdir -p "$COMPOSE_DIR/bind9/keys"
 BIND_KEY=$("$BWS_BIN" secret get "9904dc3d-6dd4-4727-907e-b3700178ea19" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
 if [[ -n "$BIND_KEY" ]] && [[ "$BIND_KEY" != "null" ]]; then
