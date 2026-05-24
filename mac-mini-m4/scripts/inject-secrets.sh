@@ -100,7 +100,7 @@ RUNNER_SCOPE=repo
 RUNNER_WORKDIR=/_work
 RANDOM_RUNNER_SUFFIX=false
 EOF
-chown "$OWNER" "$COMPOSE_DIR/runners/compose.env"
+chown "$OWNER" "$COMPOSE_DIR/runners/compose.env" 2>/dev/null || true
 
 # ── Komodo secrets → komodo/secrets/ ────────────────────────────────────────
 
@@ -114,7 +114,7 @@ fetch_secret "13dc9058-7086-40db-8a49-b417012a6978" "$COMPOSE_DIR/komodo/secrets
 fetch_secret "f9dec46d-9203-456a-a5d3-b417012a69b5" "$COMPOSE_DIR/komodo/secrets/komodo-dean-jwt-secret"
 fetch_secret "44e040b1-20d8-4f7e-bbfa-b417012a69f9" "$COMPOSE_DIR/komodo/secrets/komodo-dean-admin-password"
 
-chown -R "$OWNER" "$COMPOSE_DIR/komodo/secrets"
+chown -R "$OWNER" "$COMPOSE_DIR/komodo/secrets" 2>/dev/null || true
 
 # ── Komodo compose.env — inject secret values into placeholders ─────────────
 
@@ -126,11 +126,27 @@ if [[ -f "$KOMODO_ENV" ]]; then
     ADMIN_PASS=$(cat "$COMPOSE_DIR/komodo/secrets/komodo-dean-admin-password")
     PASSKEY=$(cat "$COMPOSE_DIR/komodo/secrets/komodo-dean-passkey")
 
-    # BSD sed: -i '' for in-place without backup
+    # BSD sed: -i '' for in-place without backup.
+    # Each sed replaces an existing key=value line; the compose.env in the repo
+    # ships with ANSIBLE_WILL_REPLACE_THIS placeholders for all three keys so
+    # these substitutions always have a target to match.
     sed -i '' "s|^KOMODO_DB_PASSWORD=.*|KOMODO_DB_PASSWORD=${DB_PASS}|" "$KOMODO_ENV"
     sed -i '' "s|^KOMODO_INIT_ADMIN_PASSWORD=.*|KOMODO_INIT_ADMIN_PASSWORD=${ADMIN_PASS}|" "$KOMODO_ENV"
     sed -i '' "s|^PERIPHERY_PASSKEYS=.*|PERIPHERY_PASSKEYS=${PASSKEY}|" "$KOMODO_ENV"
-    chown "$OWNER" "$KOMODO_ENV"
+    chown "$OWNER" "$KOMODO_ENV" 2>/dev/null || true
+
+    # ── Komodo .env — Docker Compose YAML interpolation ─────────────────────
+    # compose.yaml uses ${KOMODO_DB_USERNAME} / ${KOMODO_DB_PASSWORD} for
+    # variable substitution in postgres/ferretdb/core service environment
+    # blocks. Docker Compose interpolation reads from the .env file next to
+    # compose.yaml, not from env_file: (which is per-container only).
+    KOMODO_DOT_ENV="$COMPOSE_DIR/komodo/.env"
+    printf 'KOMODO_DB_USERNAME=%s\nKOMODO_DB_PASSWORD=%s\n' \
+        "$(grep '^KOMODO_DB_USERNAME=' "$KOMODO_ENV" | cut -d= -f2-)" \
+        "$DB_PASS" > "$KOMODO_DOT_ENV"
+    chmod 600 "$KOMODO_DOT_ENV"
+    chown "$OWNER" "$KOMODO_DOT_ENV" 2>/dev/null || true
+    log "komodo/.env written for Docker Compose interpolation."
 else
     log "WARN: $KOMODO_ENV not found, skipping"
     ERRORS=$((ERRORS + 1))
@@ -156,13 +172,13 @@ PIHOLE_PW=$("$BWS_BIN" secret get "c8157be0-0195-41f3-b3c6-b37100d27645" 2>/dev/
         ERRORS=$((ERRORS + 1))
     fi
 } > "$COMPOSE_DIR/.env"
-chown "$OWNER" "$COMPOSE_DIR/.env"
+chown "$OWNER" "$COMPOSE_DIR/.env" 2>/dev/null || true
 
 mkdir -p "$COMPOSE_DIR/bind9/keys"
 BIND_KEY=$("$BWS_BIN" secret get "9904dc3d-6dd4-4727-907e-b3700178ea19" 2>/dev/null | /opt/homebrew/bin/jq -r .value)
 if [[ -n "$BIND_KEY" ]] && [[ "$BIND_KEY" != "null" ]]; then
     printf 'key "externaldns-key." { algorithm hmac-sha256; secret "%s"; };\n' "$BIND_KEY" > "$COMPOSE_DIR/bind9/keys/key.conf"
-    chown -R "$OWNER" "$COMPOSE_DIR/bind9/keys"
+    chown -R "$OWNER" "$COMPOSE_DIR/bind9/keys" 2>/dev/null || true
 else
     log "WARN: failed to fetch bind9 TSIG key"
     ERRORS=$((ERRORS + 1))

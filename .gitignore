@@ -12,6 +12,7 @@ mac-mini-m4/llm/.ansible-memory-bytes
 mac-mini-m4/llm/ollama.env
 mac-mini-m4/bind9/keys/key.conf
 mac-mini-m4/komodo/secrets/
+mac-mini-m4/komodo/.env
 
 # murderbot stack secrets (written by pre_deploy)
 murderbot/media-server/.env
