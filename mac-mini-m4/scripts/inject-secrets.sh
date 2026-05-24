@@ -341,26 +341,27 @@ if [[ -n "$ADMIN_PASS" ]] && [[ -n "$GITOPS_PAT" ]]; then
     done
 
     if "$KOMODO_UP"; then
-        # Use || JWT="" so a failed login (e.g. HTTP 4xx) doesn't kill the
-        # script under set -eo pipefail — curl -sf exits non-zero on HTTP
-        # errors, which propagates through the pipeline and command substitution.
-        JWT=$(curl -sf http://localhost:9120/auth/login/LoginLocalUser \
+        # Komodo v2 API: POST /auth/login with {"type":"LoginLocalUser","params":{...}}
+        # Use || JWT="" so a failed login doesn't kill the script under set -eo pipefail.
+        JWT=$(curl -sf -X POST http://localhost:9120/auth/login \
             -H 'Content-Type: application/json' \
-            -d "{\"username\":\"admin\",\"password\":\"${ADMIN_PASS}\"}" \
+            -d "{\"type\":\"LoginLocalUser\",\"params\":{\"username\":\"admin\",\"password\":\"${ADMIN_PASS}\"}}" \
             2>/dev/null | /opt/homebrew/bin/jq -r '.data.jwt' 2>/dev/null) || JWT=""
 
         if [[ -n "$JWT" ]] && [[ "$JWT" != "null" ]]; then
-            PROVIDER_ID=$(curl -sf http://localhost:9120/read/ListGitProviderAccounts \
+            # Komodo v2 API: POST /read with {"type":"...","params":{}}
+            PROVIDER_ID=$(curl -sf -X POST http://localhost:9120/read \
                 -H 'Content-Type: application/json' \
-                -H "Authorization: $JWT" \
-                -d '{}' 2>/dev/null \
+                -H "Authorization: Bearer ${JWT}" \
+                -d '{"type":"ListGitProviderAccounts","params":{}}' 2>/dev/null \
                 | /opt/homebrew/bin/jq -r '.[0]._id["$oid"] // empty' 2>/dev/null) || PROVIDER_ID=""
 
             if [[ -n "$PROVIDER_ID" ]]; then
-                curl -sf http://localhost:9120/write/UpdateGitProviderAccount \
+                # Komodo v2 API: POST /write with {"type":"...","params":{...}}
+                curl -sf -X POST http://localhost:9120/write \
                     -H 'Content-Type: application/json' \
-                    -H "Authorization: $JWT" \
-                    -d "{\"id\":\"${PROVIDER_ID}\",\"account\":{\"domain\":\"github.com\",\"https\":true,\"username\":\"amerenda\",\"token\":\"${GITOPS_PAT}\"}}" \
+                    -H "Authorization: Bearer ${JWT}" \
+                    -d "{\"type\":\"UpdateGitProviderAccount\",\"params\":{\"id\":\"${PROVIDER_ID}\",\"account\":{\"domain\":\"github.com\",\"https\":true,\"username\":\"amerenda\",\"token\":\"${GITOPS_PAT}\"}}}" \
                     >/dev/null 2>&1 && log "Komodo git provider PAT updated." \
                     || log "WARN: failed to update Komodo git provider PAT"
             else
