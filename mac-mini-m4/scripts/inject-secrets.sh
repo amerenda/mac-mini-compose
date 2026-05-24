@@ -138,12 +138,15 @@ if [[ -f "$KOMODO_ENV" ]]; then
     # ── Komodo .env — Docker Compose YAML interpolation ─────────────────────
     # compose.yaml uses ${KOMODO_DB_USERNAME} / ${KOMODO_DB_PASSWORD} for
     # variable substitution in postgres/ferretdb/core service environment
-    # blocks. Docker Compose interpolation reads from the .env file next to
+    # blocks. Also uses ${COMPOSE_KOMODO_IMAGE_TAG} to pin the image version.
+    # Docker Compose interpolation reads from the .env file next to
     # compose.yaml, not from env_file: (which is per-container only).
     KOMODO_DOT_ENV="$COMPOSE_DIR/komodo/.env"
-    printf 'KOMODO_DB_USERNAME=%s\nKOMODO_DB_PASSWORD=%s\n' \
+    printf 'KOMODO_DB_USERNAME=%s\nKOMODO_DB_PASSWORD=%s\nCOMPOSE_KOMODO_IMAGE_TAG=%s\n' \
         "$(grep '^KOMODO_DB_USERNAME=' "$KOMODO_ENV" | cut -d= -f2-)" \
-        "$DB_PASS" > "$KOMODO_DOT_ENV"
+        "$DB_PASS" \
+        "$(grep '^COMPOSE_KOMODO_IMAGE_TAG=' "$KOMODO_ENV" | cut -d= -f2-)" \
+        > "$KOMODO_DOT_ENV"
     chmod 600 "$KOMODO_DOT_ENV"
     chown "$OWNER" "$KOMODO_DOT_ENV" 2>/dev/null || true
     log "komodo/.env written for Docker Compose interpolation."
