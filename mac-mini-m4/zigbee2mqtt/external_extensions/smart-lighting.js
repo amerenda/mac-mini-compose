@@ -197,16 +197,23 @@ class SmartLighting {
         // Check window transitions every 30s
         this.checkInterval = setInterval(() => this._checkWindowTransition(), 30000);
 
-        // Startup scene push — only if config changed since last successful push.
-        // Scenes are persistent in bulb flash and survive Z2M/coordinator restarts,
-        // so re-pushing on every startup is unnecessary and triggers SET_MULTICAST_TABLE_ENTRY
-        // on the SLZB coordinator, which causes RESET_SOFTWARE crashes on firmware 8.0.2 b397.
-        // Push happens immediately when config changes via CONFIG_TOPIC regardless of this guard.
+        // No startup scene push.
+        // Scenes are stored in bulb flash and persist across Z2M restarts, coordinator
+        // resets, and power cycles. Re-pushing on startup is unnecessary, and on SLZB
+        // firmware 8.0.2 b397, sending scene_add multicasts triggers SET_MULTICAST_TABLE_ENTRY
+        // → RESET_SOFTWARE → crash loop.
+        //
+        // Scenes are pushed in two places:
+        //   1. Here (config change): _onMQTTMessage handles CONFIG_TOPIC → _fullScenePush()
+        //   2. On startup: NOT done — bulbs already have the correct scenes in flash.
+        //
+        // To force a re-push (e.g., after a bulb factory reset), send a new config from HA.
         if (this.config && this.currentWindow) {
             const pushedHash = this._loadPushedHash();
-            if (this.configHash !== pushedHash) {
-                this.logger.info(`[SL] Config changed since last push (${pushedHash ?? 'never'} → ${this.configHash}) — scheduling startup scene push`);
-                setTimeout(() => this._fullScenePush(), 5000);
+            if (pushedHash === null) {
+                this.logger.info(`[SL] No previous push record — scenes assumed current on bulbs (skip startup push). Trigger a config push from HA to force re-push.`);
+            } else if (this.configHash !== pushedHash) {
+                this.logger.info(`[SL] Config hash changed (${pushedHash} → ${this.configHash}) — scenes will be pushed on next config update from HA`);
             } else {
                 this.logger.info(`[SL] Scenes up to date on bulbs (hash=${this.configHash}) — skipping startup push`);
             }
