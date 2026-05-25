@@ -203,19 +203,21 @@ class SmartLighting {
         // firmware 8.0.2 b397, sending scene_add multicasts triggers SET_MULTICAST_TABLE_ENTRY
         // → RESET_SOFTWARE → crash loop.
         //
-        // Scenes are pushed in two places:
-        //   1. Here (config change): _onMQTTMessage handles CONFIG_TOPIC → _fullScenePush()
-        //   2. On startup: NOT done — bulbs already have the correct scenes in flash.
+        // _fullScenePush() is only called from _onMQTTMessage when config hash changes.
+        // We bootstrap the pushed hash here so HA's startup config push (same config,
+        // same hash) is treated as "no change" and does not trigger a scene push.
         //
-        // To force a re-push (e.g., after a bulb factory reset), send a new config from HA.
+        // To force a re-push after SLZB firmware update: bump any scene value in HA
+        // (or delete sl-pushed-hash.json from the data volume) to trigger a hash change.
         if (this.config && this.currentWindow) {
             const pushedHash = this._loadPushedHash();
             if (pushedHash === null) {
-                this.logger.info(`[SL] No previous push record — scenes assumed current on bulbs (skip startup push). Trigger a config push from HA to force re-push.`);
+                this.logger.info(`[SL] Bootstrapping pushed hash (${this.configHash}) — scenes assumed current on bulbs`);
+                this._savePushedHash(this.configHash);
             } else if (this.configHash !== pushedHash) {
-                this.logger.info(`[SL] Config hash changed (${pushedHash} → ${this.configHash}) — scenes will be pushed on next config update from HA`);
+                this.logger.info(`[SL] Config hash changed since last push (${pushedHash} → ${this.configHash}) — will push on next config update from HA`);
             } else {
-                this.logger.info(`[SL] Scenes up to date on bulbs (hash=${this.configHash}) — skipping startup push`);
+                this.logger.info(`[SL] Scenes up to date on bulbs (hash=${this.configHash})`);
             }
         }
 
@@ -277,7 +279,17 @@ class SmartLighting {
                 this.currentWindow = this._calculateCurrentWindow();
                 this._refreshSwitchTopicSubscriptions()
                     .catch(e => this.logger.error(`[SL] switch subscribe: ${e.message}`));
-                this._fullScenePush();
+                // Only push scenes if config actually changed since last successful push.
+                // Scenes are persistent in bulb flash — re-pushing on every HA restart or
+                // Z2M reconnect is unnecessary and triggers coordinator crashes on SLZB
+                // firmware 8.0.2 b397 (SET_MULTICAST_TABLE_ENTRY → RESET_SOFTWARE).
+                const pushedHash = this._loadPushedHash();
+                if (this.configHash !== pushedHash) {
+                    this.logger.info(`[SL] Config changed (${pushedHash ?? 'never'} → ${this.configHash}) — pushing scenes to bulbs`);
+                    this._fullScenePush();
+                } else {
+                    this.logger.info(`[SL] Config unchanged (hash=${this.configHash}) — skipping scene push`);
+                }
                 this._publishStatus('config_updated');
             } catch (e) {
                 this.logger.error(`[SL] Failed to parse config: ${e.message}`);
