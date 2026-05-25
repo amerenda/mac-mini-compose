@@ -87,32 +87,36 @@ services:
 
   # ============================================================
   # Mosquitto — MQTT broker (used by Zigbee2MQTT + HA)
+  # Host network for direct port binding and mDNS discovery.
   # ============================================================
   mosquitto:
     image: eclipse-mosquitto@sha256:a908c65cc8e67ec9d292ef27c2c0360dbaaee7eb1b935cdd194e67697f15dea1
     container_name: mosquitto
     restart: unless-stopped
+    network_mode: host
     volumes:
       - mosquitto-data:/mosquitto/data
       - ../mosquitto/config:/mosquitto/config:ro
-    ports:
-      - "1883:1883"
 
   # ============================================================
   # Zigbee2MQTT — Zigbee coordinator bridge
   # Connects to SMLIGHT SLZB-06MG24 at 10.100.20.179:6638
+  # Host network for direct port binding and MQTT access.
   # ============================================================
   zigbee2mqtt:
-    image: koenkk/zigbee2mqtt:2.9.2
+    # Pinned to 2.9.1 (herdsman 9.0.9): SLZB-06MG24 firmware 8.0.2 build 397
+    # sends RESET_SOFTWARE on SET_CONFIGURATION_VALUE with herdsman 10.x (2.9.2+).
+    # To upgrade: first update SLZB firmware via http://10.100.20.179 web UI
+    # (Settings → Firmware update → Flash latest Zigbee coordinator firmware).
+    image: koenkk/zigbee2mqtt:2.9.1
     container_name: zigbee2mqtt
     restart: unless-stopped
     depends_on:
       - mosquitto
+    network_mode: host
     volumes:
       - zigbee2mqtt-data:/app/data
       - ../zigbee2mqtt/external_extensions/smart-lighting.js:/app/data/external_extensions/smart-lighting.js:ro
-    ports:
-      - "8099:8099"
     environment:
       TZ: "America/New_York"
 

@@ -13,29 +13,29 @@ scrape_configs:
 
   - job_name: mac-mini-node
     static_configs:
-      - targets: ["node-exporter:9100"]
+      - targets: ["localhost:9100"]
 
   - job_name: mac-mini-homeassistant
     metrics_path: /api/prometheus
     bearer_token_file: /etc/prometheus/ha-token
     static_configs:
-      - targets: ["host.docker.internal:8123"]
+      - targets: ["localhost:8123"]
 
   - job_name: mac-mini-postgres
     static_configs:
-      - targets: ["postgres-exporter:9187"]
+      - targets: ["localhost:9187"]
 
   - job_name: mac-mini-mongodb
     static_configs:
-      - targets: ["mongodb-exporter:9216"]
+      - targets: ["localhost:9216"]
 
   - job_name: mac-mini-dns
     static_configs:
-      - targets: ["technitium-exporter:9105"]
+      - targets: ["localhost:9105"]
 
   - job_name: mac-mini-komodo
     static_configs:
-      - targets: ["host.docker.internal:9120"]
+      - targets: ["localhost:9120"]
 
   # LLM metrics — murderbot: llama.cpp metrics endpoint
   - job_name: murderbot-llama-cpp

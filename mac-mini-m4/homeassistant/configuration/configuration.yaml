@@ -71,6 +71,12 @@ homeassistant:
     pets: /config/www/pets
     intruders: /config/www/intruders
 
+# Recorder retention — keeps SQLite DB small in backups. Purges history after 14 days, auto-repacks to reclaim disk space.
+recorder:
+  purge_keep_days: 14
+  auto_purge: true
+  auto_repack: true
+
 # MQTT sensors — Z2M Smart Lighting sync status
 mqtt:
   sensor:

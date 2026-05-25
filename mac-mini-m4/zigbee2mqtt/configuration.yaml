@@ -1,6 +1,6 @@
 mqtt:
   base_topic: zigbee2mqtt
-  server: mqtt://mosquitto:1883
+  server: mqtt://10.100.20.18:1883
 
 serial:
   port: tcp://10.100.20.179:6638
@@ -25,4 +25,3 @@ availability:
 
 device_options:
   retain: true
-
