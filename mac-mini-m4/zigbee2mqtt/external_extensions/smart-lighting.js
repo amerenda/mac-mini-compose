@@ -5,6 +5,7 @@ const mqtt = require('mqtt');
 
 const CACHE_FILE = path.join(__dirname, 'sl-cache.json');
 const RUNTIME_FILE = path.join(__dirname, 'sl-runtime.json');
+const PUSHED_HASH_FILE = path.join(__dirname, 'sl-pushed-hash.json');
 const CONFIG_TOPIC = 'zigbee2mqtt/sl/config';
 const SNAP_TOPIC = 'zigbee2mqtt/sl/snap';
 const STATUS_TOPIC = 'zigbee2mqtt/sl/status';
@@ -196,9 +197,19 @@ class SmartLighting {
         // Check window transitions every 30s
         this.checkInterval = setInterval(() => this._checkWindowTransition(), 30000);
 
-        // Initial full push after Z2M finishes starting
+        // Startup scene push — only if config changed since last successful push.
+        // Scenes are persistent in bulb flash and survive Z2M/coordinator restarts,
+        // so re-pushing on every startup is unnecessary and triggers SET_MULTICAST_TABLE_ENTRY
+        // on the SLZB coordinator, which causes RESET_SOFTWARE crashes on firmware 8.0.2 b397.
+        // Push happens immediately when config changes via CONFIG_TOPIC regardless of this guard.
         if (this.config && this.currentWindow) {
-            setTimeout(() => this._fullScenePush(), 5000);
+            const pushedHash = this._loadPushedHash();
+            if (this.configHash !== pushedHash) {
+                this.logger.info(`[SL] Config changed since last push (${pushedHash ?? 'never'} → ${this.configHash}) — scheduling startup scene push`);
+                setTimeout(() => this._fullScenePush(), 5000);
+            } else {
+                this.logger.info(`[SL] Scenes up to date on bulbs (hash=${this.configHash}) — skipping startup push`);
+            }
         }
 
         this._publishStatus('started');
@@ -635,6 +646,7 @@ class SmartLighting {
         await this._sendCommandsStaggered(commands);
 
         this.lastSyncTime = new Date().toISOString();
+        this._savePushedHash(this.configHash);
         this._publishStatus(`synced`);
     }
 
@@ -782,6 +794,16 @@ class SmartLighting {
 
     _hashConfig(config) {
         return crypto.createHash('sha256').update(JSON.stringify(config)).digest('hex').substring(0, 12);
+    }
+
+    _loadPushedHash() {
+        try { return JSON.parse(fs.readFileSync(PUSHED_HASH_FILE, 'utf8')).hash || null; }
+        catch { return null; }
+    }
+
+    _savePushedHash(hash) {
+        try { fs.writeFileSync(PUSHED_HASH_FILE, JSON.stringify({ hash, pushedAt: new Date().toISOString() })); }
+        catch (e) { this.logger.error(`[SL] Failed to save pushed hash: ${e.message}`); }
     }
 
     _publishStatus(status) {
