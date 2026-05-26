@@ -2,64 +2,76 @@
 
 ## Summary
 
-Z2M crashes every ~35 seconds (7 seconds after startup) due to SLZB firmware bug
-in SLZB-06MG24 firmware **8.0.2 build 397** that sends `RESET_SOFTWARE` in response
-to certain EZSP commands at runtime.
+Z2M crashes every ~35 seconds due to two compounding firmware issues. One is
+partially mitigated; the other requires a manual EFR32 firmware update.
 
-**Permanent fix:** Update SLZB coordinator firmware at http://10.100.20.179
-(Settings → Firmware update → Flash latest Zigbee coordinator firmware).
+**The only permanent fix: update the EFR32 coordinator firmware at http://10.100.20.179**
 
 ---
 
-## Root Cause
+## Root Causes
 
-### Issue 1 — SLZB-OS device firmware 3.3.1 (ESP32 layer) — PRIMARY CRASH CAUSE
+### Issue 1 — SLZB-OS 3.3.1 (ESP32 layer) — PARTIALLY MITIGATED
 
 **SLZB-OS 3.3.1** added: *"OS will now reboot the EFR32 radios at startup"*.
-This hard-resets the EFR32 when the SLZB device boots, which wipes/resets the EFR32's
-NVM state and triggers `RESET_SOFTWARE` at runtime (~7s after `Zigbee2MQTT started!`)
-as the EFR32 finishes its re-initialization. With herdsman 9.x, runtime `RESET_SOFTWARE`
-has no retry → `Adapter disconnected, stopping` → crash loop.
+This hard-resets the EFR32 when the SLZB device boots, wiping its NVM state.
 
-**The crash loop started immediately after upgrading SLZB-OS 3.2.4 → 3.3.1.**
+**Status:** SLZB-OS downgraded to **3.2.4** (2026-05-25). The EFR32 is no longer
+force-rebooted on each SLZB startup. However, the NVM was already wiped by 3.3.1,
+and the crash loop continues due to Issue 2 below.
 
-**Fix: Downgrade SLZB-OS to 3.2.4** (http://10.100.20.179 → Settings → Core firmware).
-Version 3.2.4 is the last known-good. All 3.2.x versions are safe; the EFR32 reboot
-behavior was only added in 3.3.1. Do NOT upgrade to 3.3.1+.
+### Issue 2 — EFR32 Zigbee coordinator firmware 8.0.2 b397 — REQUIRES FIRMWARE UPDATE
 
-Two RESET_SOFTWARE events per session (with 3.3.1):
+After the EFR32's NVM was wiped by 3.3.1, every Z2M session triggers two
+RESET_SOFTWARE events:
 
-1. **During startup (~17s in):** `SET_CONFIGURATION_VALUE` EZSP → RESET_SOFTWARE.
-   Herdsman 9.x has one startup retry — re-establishes ASH without RST, continues.
+1. **Init-phase (T+17s, SET_CONFIGURATION_VALUE):** herdsman 9.x handles with
+   one startup retry — re-establishes ASH, continues to "Zigbee2MQTT started!".
 
-2. **At runtime (~7s after started!):** `SEND_UNICAST` (availability ping) → RESET_SOFTWARE.
-   No retries left at runtime → `Adapter disconnected, stopping` → crash.
+2. **Runtime (T+7s after started!):** EFR32 sends RESET_SOFTWARE spontaneously
+   at exactly ~7 seconds after "started!" with no triggering Z2M command. No
+   debug EZSP frames appear between "started!" and the crash — the reset is
+   purely internal to the EFR32 firmware. This is a bug in EFR32 8.0.2 b397.
 
-### Issue 2 — EFR32 coordinator firmware 8.0.2 b397 — Z2M UPGRADE BLOCKER
+   Confirmed non-causes (tested):
+   - NOT the availability ping (crash persists with availability disabled)
+   - NOT SET_CONFIGURATION_VALUE (happens 7s after startup completes, not during init)
+   - NOT any Z2M command (zero EZSP frames logged in the 7s window)
 
-Once SLZB-OS is downgraded to 3.2.4 and Z2M 2.9.1 is stable again, the secondary issue
-remains: herdsman 10.x (Z2M 2.9.2+) triggers `SET_CONFIGURATION_VALUE → RESET_SOFTWARE`
-on EFR32 8.0.2 b397. Do not upgrade Z2M past 2.9.1 until the EFR32 coordinator firmware
-is updated via the SLZB web UI (Settings → Firmware update → Flash latest Zigbee
-coordinator firmware). After that, Z2M 2.10.x + herdsman 10.x + SLZB-OS 3.3.1 works
-(confirmed by community reports).
+**No proxy or software workaround can prevent the runtime RESET_SOFTWARE.**
+The EFR32 firmware 8.0.2 b397 has this bug. Updating it is the only fix.
 
 ---
 
-## Crash Timeline (observed)
+## Crash Timeline (current)
 
 ```
 T+0s   : Docker restarts Z2M
-T+1-11s: Z2M connects to slzb-proxy, proxy is still in drain period
-T+12s  : Proxy drain complete, Z2M connects to SLZB
-T+12-17s: Z2M sends RST → RSTACK → EZSP init sequence starts
+T+0-12s: Z2M waits for slzb-proxy drain period to end
+T+12s  : Z2M connects to SLZB via proxy
 T+17s  : RESET_SOFTWARE (SET_CONFIGURATION_VALUE) — STARTUP, handled by herdsman retry
-T+27s  : Zigbee2MQTT started!
-T+34s  : RESET_SOFTWARE (SEND_UNICAST, availability ping) — RUNTIME, FATAL
-T+34s  : Adapter disconnected, stopping → Z2M process exits
-T+35s  : Docker restarts Z2M (restart: unless-stopped)
+T+22s  : Zigbee2MQTT started!
+T+29s  : RESET_SOFTWARE (spontaneous, runtime bug in EFR32 8.0.2 b397) — FATAL
+T+29s  : Adapter disconnected, stopping → Z2M process exits
+T+30s  : Docker restarts Z2M (restart: unless-stopped)
 … repeat …
 ```
+
+---
+
+## ⚠️ REQUIRED ACTION: Update EFR32 Coordinator Firmware
+
+**Go to http://10.100.20.179 → Settings → Firmware update → Flash latest
+Zigbee coordinator firmware**
+
+This replaces EFR32 8.0.2 b397 with a version that does not have the runtime
+RESET_SOFTWARE bug. Community confirms: SLZB-OS 3.3.1 + Z2M 2.10.x + updated
+EFR32 firmware works stably.
+
+After updating:
+- Delete `sl-pushed-hash.json` from zigbee2mqtt-data volume to trigger a scene
+  re-push: `docker run --rm -v services_zigbee2mqtt-data:/data alpine rm /data/sl-pushed-hash.json`
+- Then restart Z2M to push scenes to all bulbs
 
 ---
 
@@ -70,33 +82,22 @@ T+35s  : Docker restarts Z2M (restart: unless-stopped)
 **Before:** Extension had `setTimeout(() => this._fullScenePush(), 5000)` on every start.
 Each `scene_add` command → `SET_MULTICAST_TABLE_ENTRY` → RESET_SOFTWARE → crash.
 
-**After:** Startup push removed entirely. Hash-based guard added to both the startup
-bootstrapping and the HA config-push path. HA's periodic `zigbee2mqtt/sl/config`
-push (on every Z2M restart) now only triggers `_fullScenePush()` if the config hash
+**After:** Startup push removed entirely. Hash-based guard added. HA's periodic
+`zigbee2mqtt/sl/config` push only triggers `_fullScenePush()` if the config hash
 has actually changed since the last successful push.
 
-Files: `external_extensions/smart-lighting.js` — new constants:
-- `PUSHED_HASH_FILE` (`sl-pushed-hash.json` in the data volume)
-- `_loadPushedHash()`, `_savePushedHash()` helpers
-- Bootstrap in `start()`: writes hash on first run so HA's startup push is a no-op
-
 **Verification:** Logs show `[SL] Scenes up to date on bulbs (hash=d97535f0097c)` — no
-scene push triggered. Extension is working correctly.
+scene push triggered.
 
-### 2. Removed stray ingress from komodo-dean-gitops (commit 553c3ca)
+### 2. Removed stray ingress (commit 553c3ca)
 
-`infra/ingresses/z2m-ingress-amer-dev.yaml` had wrong IP (`10.100.20.19` instead of
-`10.100.20.18`) and should not have been in this repo. DNS/ingress config belongs in
-`k3s-dean-gitops` only. Deleted entire `infra/` directory.
-
-The correct ingress is in `k3s-dean-gitops/infra/ingresses/z2m-ingress-amer-dev.yaml`
-with the correct EndpointSlice IP `10.100.20.18`.
+`infra/ingresses/z2m-ingress-amer-dev.yaml` had wrong IP and wrong repo. Deleted.
 
 ### 3. Cleared stale MQTT retained extension message
 
-Z2M stores its loaded extension code as a retained message on
+Z2M stores its loaded extension code as a retained MQTT message on
 `zigbee2mqtt/bridge/extensions`. If Z2M crashes and restarts with new file code,
-the retained MQTT message (old code) overrides the file. Fix procedure:
+the retained message (old code) overrides the file. Fix procedure:
 
 ```bash
 # Stop Z2M, clear retained message, start Z2M (in this order!)
@@ -106,30 +107,29 @@ docker exec mosquitto mosquitto_pub -h 127.0.0.1 -p 1883 \
 docker start zigbee2mqtt
 ```
 
+### 4. Downgraded SLZB-OS to 3.2.4
+
+Downgraded from 3.3.1 to 3.2.4 via http://10.100.20.179 → Settings → Core firmware.
+This stops the EFR32 from being force-rebooted on each SLZB startup. The crash loop
+continues due to the runtime RESET_SOFTWARE bug in EFR32 8.0.2 b397 (Issue 2).
+
+### 5. slzb-proxy.py — stale connection detection + improved drain cycle
+
+`slzb-proxy.py` updated with:
+- `POST_DISCONNECT_DELAY = 45s` (was 12s) — long enough to drain stale RSTACK data
+  from the SLZB buffer after each Z2M crash
+- `SLZB_RECONNECT_PAUSE = 20s` (was 2s) — close and reopen SLZB TCP after each Z2M
+  disconnect, waiting 20s for the EFR32 to detect a host disconnect and commit NVM
+- `MIN_REAL_SESSION_DURATION = 5.0s` — skip drain cycle for stale connections
+  (Z2M instances that crashed before the proxy accepted their connection)
+
+The proxy now correctly handles the init-phase RESET_SOFTWAREs and prevents
+HOST_FATAL_ERROR from stale RSTACK data. The runtime RESET_SOFTWARE at T+7s
+after "started!" cannot be prevented by the proxy.
+
 ---
 
-## Outstanding — REQUIRES MANUAL ACTION
-
-### SLZB firmware update
-
-**This is the only permanent fix.** Until updated, Z2M will crash every ~35s.
-
-1. Open http://10.100.20.179 in a browser
-2. Go to Settings → Firmware update
-3. Click "Flash latest Zigbee coordinator firmware"
-4. Wait for update to complete (EFR32 will reboot)
-5. After update: trigger a scene re-push from HA so all 4 windows are stored on bulbs.
-   Easiest way: delete `sl-pushed-hash.json` from the zigbee2mqtt-data Docker volume,
-   then restart Z2M. The SL extension will push scenes on the next HA config push.
-
-**Current firmware:** 8.0.2 build 397 (confirmed in logs)
-**Adapter page:** http://10.100.20.179
-**Z2M version lock:** DO NOT upgrade Z2M past 2.9.1 until SLZB firmware is updated
-  (herdsman 10.x in Z2M 2.9.2+ has worse SET_CONFIGURATION_VALUE trigger behavior)
-
----
-
-## Architecture (for context)
+## Architecture
 
 ```
 [Z2M container] → tcp://127.0.0.1:6639 → [slzb-proxy.py] → tcp://10.100.20.179:6638
@@ -137,10 +137,23 @@ docker start zigbee2mqtt
                                                                     → [EFR32MG24 Zigbee chip]
 ```
 
-**slzb-proxy.py** keeps the SLZB TCP connection alive across Z2M restarts and drains
-stale RSTACK frames for 12s after each Z2M disconnect (prevents HOST_FATAL_ERROR on
-reconnect due to stale RSTACK in the TCP buffer).
+**slzb-proxy.py** keeps the SLZB TCP connection alive across Z2M restarts, drains
+stale RSTACK frames after each Z2M disconnect, and cycles the SLZB TCP connection
+to let the EFR32 detect host disconnect (NVM burn-in). Deployed on mac-mini-m4 at
+`~/docker/zigbee2mqtt/slzb-proxy.py` (PID managed manually; autostart via launchd TBD).
 
 **Scenes are stored in bulb flash** — not in Z2M, not in the coordinator. They survive
 Z2M restarts, coordinator resets, and power cycles. HA is NOT in the critical path for
 lighting (switches → scene_recall ZCL → bulb applies stored scene directly).
+
+---
+
+## Upgrade Path (after EFR32 firmware update)
+
+1. ✅ (done) Downgrade SLZB-OS to 3.2.4
+2. ⬜ **Update EFR32 coordinator firmware** (the immediate fix needed)
+3. ⬜ Then optionally upgrade SLZB-OS back to 3.3.1 (or keep 3.2.4)
+4. ⬜ Then upgrade Z2M to 2.10.x in compose.yaml (after EFR32 update)
+
+**DO NOT upgrade Z2M past 2.9.1 until EFR32 firmware is updated** — herdsman 10.x
+(Z2M 2.9.2+) triggers SET_CONFIGURATION_VALUE → RESET_SOFTWARE on EFR32 8.0.2 b397.

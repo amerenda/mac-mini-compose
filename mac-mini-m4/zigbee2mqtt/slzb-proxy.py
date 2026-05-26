@@ -1,30 +1,39 @@
 #!/usr/bin/env python3
 """
-slzb-proxy v3 — TCP keep-alive proxy for SLZB-06MG24 with drain + timeout
+slzb-proxy v4 — TCP keep-alive proxy for SLZB-06MG24 with drain + timeout
 
-Problem: zigbee-herdsman 9.x treats any unexpected RSTACK mid-session as
-HOST_FATAL_ERROR, causing Z2M to crash every time the EFR32 sends
-RESET_SOFTWARE (which it does for each NVM value that differs from the
-stored value on first init).
+Background: SLZB-OS 3.3.1 "reboot EFR32 at startup" wiped the EFR32's NVM.
+This causes Z2M (herdsman 9.x) to crash via RESET_SOFTWARE at runtime.
 
-The burn-in approach: let Z2M crash → EFR32 commits the NVM value to
-flash → next restart, that value no longer triggers RESET_SOFTWARE.
-Eventually all values are burned in and Z2M starts cleanly.
+What this proxy fixes (3 failure modes):
 
-Two failure modes this proxy fixes:
-
-1. HOST_FATAL_ERROR on new connection — stale RSTACK data from the
-   EFR32's RESET_SOFTWARE boot accumulates in the SLZB TCP receive
-   buffer while Z2M is crashed. When Z2M reconnects, _slzb_to_client
-   reads and forwards the stale RSTACK before Z2M has even sent RST,
-   causing immediate HOST_FATAL_ERROR. Fix: drain (discard) data from
-   the SLZB socket during the post-disconnect hold period.
+1. HOST_FATAL_ERROR on new connection — stale RSTACK data accumulates in
+   the SLZB TCP receive buffer while Z2M is crashed. When Z2M reconnects,
+   _slzb_to_client reads and forwards the stale RSTACK before Z2M has even
+   sent RST, causing immediate HOST_FATAL_ERROR. Fix: drain (discard) data
+   from the SLZB socket during the post-disconnect hold period. Also cycles
+   the SLZB TCP connection after each Z2M disconnect to let the EFR32 detect
+   a host disconnect and commit pending NVM values to flash (burn-in).
 
 2. _slzb_to_client hangs forever — if Z2M crashes with ASH_ERROR_TIMEOUTS
    (adapter sent no data), _slzb_to_client is blocked on recv() with no
    data coming, so session.run() never returns and the hold/drain loop
    never starts. Fix: use select() with a timeout in _slzb_to_client so
    it can check _stop and exit promptly.
+
+3. Stale-connection churn — during the drain period Z2M crashes and restarts
+   multiple times. The OS queues these stale TCP connections in the backlog.
+   When the drain ends and the proxy calls accept(), it gets a stale CLOSE_WAIT
+   connection that immediately returns EOF, triggering another unnecessary drain
+   cycle. Fix: track session duration; sessions < MIN_REAL_SESSION_DURATION are
+   stale and skipped (SLZB not cycled, no drain started).
+
+What this proxy DOES NOT fix:
+  - The EFR32 firmware bug (8.0.2 b397) that sends RESET_SOFTWARE at runtime
+    ~7s after "Zigbee2MQTT started!" regardless of Z2M's commands. This is an
+    EFR32 firmware bug — no proxy timing can prevent it. Only updating the
+    EFR32 Zigbee coordinator firmware via http://10.100.20.179 → Settings →
+    Firmware update → Flash latest Zigbee coordinator firmware will fix this.
 
 Listen: 127.0.0.1:6639  →  SLZB: 10.100.20.179:6638
 """
@@ -44,8 +53,26 @@ LISTEN_PORT          = int(os.environ.get("PROXY_LISTEN_PORT", "6639"))
 SLZB_HOST            = os.environ.get("SLZB_HOST", "10.100.20.179")
 SLZB_PORT            = int(os.environ.get("SLZB_PORT", "6638"))
 RECONNECT_DELAY      = 2    # seconds between SLZB reconnect attempts
-POST_DISCONNECT_DELAY = 12  # seconds to drain/hold after each Z2M disconnect
+POST_DISCONNECT_DELAY = 45  # seconds to drain/hold after each Z2M disconnect
+# Minimum session duration to be considered a "real" Z2M connection. Sessions
+# shorter than this are stale sockets (Z2M crashed before the proxy accepted them)
+# and should not trigger a SLZB drain cycle.
+MIN_REAL_SESSION_DURATION = 5.0  # seconds
 SLZB_SELECT_TIMEOUT  = 1.0  # select() timeout in _slzb_to_client (lets _stop be checked)
+# After each Z2M disconnect, close and reconnect the SLZB TCP connection before
+# draining. This lets the EFR32 detect a host disconnect and complete its
+# post-hard-reset initialization (triggered by SLZB-OS 3.3.1 "reboot EFR32 at
+# startup"). After the proxy reconnects to SLZB, the EFR32 starts a new
+# initialization cycle:
+#   T+0s : proxy reconnects TCP to SLZB-OS
+#   T+8s : EFR32 completes init, spontaneously sends RESET_SOFTWARE
+#   T+13s: EFR32 finishes post-reset boot and is stable
+# The drain period (POST_DISCONNECT_DELAY - SLZB_RECONNECT_PAUSE) must be > 13s
+# to let the EFR32's post-init reset + boot complete before Z2M connects.
+# With SLZB_RECONNECT_PAUSE=20 and POST_DISCONNECT_DELAY=45: drain=25s > 13s ✓
+# Set to False to revert to the original keep-alive behavior.
+RECONNECT_SLZB_AFTER_Z2M_DISCONNECT = True
+SLZB_RECONNECT_PAUSE = 20.0  # seconds to wait after closing before reconnecting
 
 _log_lock = threading.Lock()
 
@@ -99,6 +126,26 @@ class SlzbConnection:
                     pass
                 self._sock = None
         log("Reconnecting to SLZB...", syslog.LOG_WARNING)
+        self.connect()
+
+    def reconnect_after_pause(self, pause: float) -> None:
+        """Close SLZB connection, wait pause seconds, then reconnect.
+
+        The pause lets the EFR32 detect the host disconnect and commit pending
+        NVM values to flash before we reconnect. Called after each Z2M session
+        ends to enable NVM burn-in convergence.
+        """
+        self._connected.clear()
+        with self._lock:
+            if self._sock:
+                try:
+                    self._sock.close()
+                except OSError:
+                    pass
+                self._sock = None
+        log(f"SLZB connection closed — waiting {pause}s for EFR32 NVM commit",
+            syslog.LOG_INFO)
+        time.sleep(pause)
         self.connect()
 
     def stop(self) -> None:
@@ -259,13 +306,30 @@ def serve(slzb: SlzbConnection) -> None:
     last_disconnect = None  # None = first run, no hold needed
 
     while True:
-        # Hold and drain after each Z2M disconnect
+        # Hold and drain after each real Z2M disconnect.
+        # last_disconnect is cleared (set to None) after drain completes, so
+        # stale connections (< MIN_REAL_SESSION_DURATION) don't re-trigger drain.
         if last_disconnect is not None:
             elapsed = time.monotonic() - last_disconnect
             remaining = POST_DISCONNECT_DELAY - elapsed
             if remaining > 0:
-                log(f"Holding {remaining:.1f}s — draining stale adapter data")
-                slzb.drain(remaining)
+                if RECONNECT_SLZB_AFTER_Z2M_DISCONNECT:
+                    # Close and reconnect to SLZB so the EFR32 detects a host
+                    # disconnect and completes its post-hard-reset initialization.
+                    # SLZB_RECONNECT_PAUSE must be long enough for the EFR32 to
+                    # complete its init cycle and spontaneous reset before Z2M
+                    # reconnects (see module docstring for timing details).
+                    log(f"Cycling SLZB connection — closing to trigger EFR32 NVM commit, "
+                        f"reconnecting in {SLZB_RECONNECT_PAUSE}s")
+                    slzb.reconnect_after_pause(SLZB_RECONNECT_PAUSE)
+                    # Recalculate remaining drain time after reconnect
+                    elapsed = time.monotonic() - last_disconnect
+                    remaining = POST_DISCONNECT_DELAY - elapsed
+                if remaining > 0:
+                    log(f"Holding {remaining:.1f}s — draining stale adapter data")
+                    slzb.drain(remaining)
+            # Clear after drain — stale connections won't re-trigger drain cycle
+            last_disconnect = None
 
         try:
             client_sock, addr = server.accept()
@@ -273,8 +337,22 @@ def serve(slzb: SlzbConnection) -> None:
             log(f"Accept error: {e}", syslog.LOG_ERR)
             break
 
+        session_start = time.monotonic()
         session = ClientSession(client_sock, addr, slzb)
         session.run()  # synchronous — only one Z2M client at a time
+        session_duration = time.monotonic() - session_start
+
+        if session_duration < MIN_REAL_SESSION_DURATION:
+            # Very short session = stale socket (Z2M crashed before proxy accepted it,
+            # leaving a CLOSE_WAIT connection in the OS backlog). The EFR32 state
+            # has not been disturbed — skip the SLZB drain cycle and just try the
+            # next accept() to get a fresh connection from Docker's restarted Z2M.
+            # last_disconnect is already None at this point (cleared above), so the
+            # next loop iteration will skip the drain check and go straight to accept().
+            log(f"Short session ({session_duration:.1f}s) — stale connection, "
+                "skipping SLZB cycle")
+            continue
+
         last_disconnect = time.monotonic()
 
 
