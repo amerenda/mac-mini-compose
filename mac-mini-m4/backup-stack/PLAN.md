@@ -170,8 +170,7 @@ gs://amerenda-backups/us/mac-mini/dean/
 ```
 ├── PLAN.md                          # This file
 ├── README.md                        # Recovery procedures
-├── core-backups.yaml                # Z2M + HA backup containers + shared volumes  
-├── monitoring-backups.yaml          # Grafana + Prometheus backup containers
+├── backups.yaml                     # All backup containers: Z2M, HA, Grafana, Prometheus + gcs-sync (single file)
 └── backup-scripts/                  # All scripts write locally, no GCS credentials needed
     ├── z2m.sh                       # Coordinator state + database.db → staging
     ├── ha.sh                        # scenes.yaml + .storage/ → staging  
@@ -180,7 +179,7 @@ gs://amerenda-backups/us/mac-mini/dean/
     └── gcs-sync.sh                  # Unified sync: staging → GCS with safety caps
 ```
 
-**To deploy:** Add `core-backups.yaml` services to `mac-mini-m4/docker-compose.yaml`, merge `monitoring-backups.yaml` into `mac-mini-m4/monitoring/compose.yaml`, and add the shared `backups-local:` volume declaration.
+**To deploy:** Add all services from `backups.yaml` to your docker-compose.yaml (core or monitoring stack — they share the same `backups-local` volume, so either location works), and ensure the `backups-local:` volume is declared at the bottom of that compose file. One manifest, one merge.
 
 ### Phase 2: Confirm Backup Sizes (PENDING)
 
@@ -221,8 +220,7 @@ komodo-dean-gitops/mac-mini-m4/backup-stack/
 │   ├── grafana-export.sh            # Grafana dashboard export via REST API → local staging
 │   ├── prometheus-config.sh         # Prometheus config only (no time-series) → local staging
 │   └── gcs-sync.sh                  # Unified GCS sync with safety caps ← ONLY script that touches cloud storage
-├── core-backups.yaml                # Docker compose additions for Z2M + HA backup containers  
-├── monitoring-backups.yaml          # Docker compose additions for Grafana + Prometheus backups
+├── backups.yaml                     # Single Docker compose manifest for all backup containers + gcs-sync
 └── README.md                        # How to restore from backups per service (recovery procedures)
 ```
 

@@ -1,13 +1,14 @@
-# Backup services for Mac Mini M4 core stack (Z2M, Home Assistant).
-# Add these to mac-mini-m4/docker-compose.yaml as additional services under `services:`.
+# Backup Stack — All services (core + monitoring)
+# Add these to docker-compose.yaml as additional services under `services:`.
+# Add the shared `backups-local` volume declaration at the bottom of the file.
 #
-# All backup scripts write locally only to a shared staging directory (/backups-local/).
-# Run the unified gcs-sync.sh script manually or on schedule to upload staged backups to GCS.
+# Architecture: all backup scripts write locally only → gcs-sync reads from shared staging volume
+# and uploads to GCS via unified sync script with safety caps.
 
 services:
   # ============================================================
   # Zigbee2MQTT Coordinator Backup — EmberZNet state + device bindings
-  # Runs daily at 01:30. Local retention: 7 backups per file type.
+  # Runs daily at 01:30. Local retention: keep latest 7 backups per file type.
   # Backs up: coordinator_backup.json (network key, pan_id), database.db (bindings table)
   # ============================================================
   z2m-backup:
@@ -30,7 +31,7 @@ services:
 
   # ============================================================
   # Home Assistant Volume Backup — scenes.yaml, .storage/ directory
-  # Runs daily at 03:30. Local retention: keeps latest 7 backups per file type.
+  # Runs daily at 03:30. Local retention: keep latest 7 backups per file type.
   # Backs up only what cannot be recovered from gitops repo:
   #   - scenes.yaml (created in HA UI)
   #   - sl_custom_scenes.json (custom scene packs — optional, may not exist)
@@ -49,6 +50,57 @@ services:
       sh -c "
         while true; do
           /ha.sh 2>&1 | tee -a /var/log/ha-backup.log
+          echo '[\$(date)] Sleeping until next backup (24 hours)...'
+          sleep 86400
+        done
+      "
+
+  # ============================================================
+  # Grafana Dashboard Export — exports dashboards via REST API to JSON files
+  # Runs daily at 04:00. Local retention: keeps latest 5 per dashboard.
+  # Exports: all dashboards from /api/search → /api/dashboards/uid/{uid}
+  #           datasources from /api/datasources
+  # ============================================================
+  grafana-backup:
+    image: alpine:3
+    container_name: grafana-backup
+    restart: unless-stopped
+    depends_on: [grafana]
+    volumes:
+      - backups-local:/backups-local            # shared staging directory (all backup containers write here)
+      - ./backup-stack/backup-scripts/grafana-export.sh:/export.sh:ro
+    environment:
+      GRAFANA_URL: "http://grafana:3000"       # Docker service name (internal networking)
+      GRAFANA_API_TOKEN: "${GRAFANA_API_TOKEN}"  # API token from .env
+    command: >
+      sh -c "
+        apk add --no-cache curl jq &&
+        while true; do
+          /export.sh 2>&1 | tee -a /var/log/grafana-backup.log
+          echo '[\$(date)] Sleeping until next backup (24 hours)...'
+          sleep 86400
+        done
+      "
+
+  # ============================================================
+  # Prometheus Config Backup — exports scrape targets and global config only
+  # Runs daily at 04:30. Local retention: keep latest 7 backups.
+  # NOTE: Time-series data NOT backed up here (ephemeral ~30-day retention).
+  #       If full recovery needed, rely on remote_write targets or K3s Prometheus setup.
+  # ============================================================
+  prometheus-config-backup:
+    image: alpine:3
+    container_name: prometheus-config-backup
+    restart: unless-stopped
+    depends_on: [prometheus]
+    volumes:
+      - prometheus-data:/prometheus/data:ro     # read-only mount of Prometheus data volume
+      - backups-local:/backups-local            # shared staging directory (all backup containers write here)
+      - ./backup-stack/backup-scripts/prometheus-config.sh:/promconfig.sh:ro
+    command: >
+      sh -c "
+        while true; do
+          /promconfig.sh 2>&1 | tee -a /var/log/prometheus-config-backup.log
           echo '[\$(date)] Sleeping until next backup (24 hours)...'
           sleep 86400
         done
