@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
 """
-slzb-proxy v4 — TCP keep-alive proxy for SLZB-06MG24 with drain + timeout
+slzb-proxy v5 — TCP keep-alive proxy for SLZB-06MG24 with drain + timeout
 
 Background: SLZB-OS 3.3.1 "reboot EFR32 at startup" wiped the EFR32's NVM.
-This causes Z2M (herdsman 9.x) to crash via RESET_SOFTWARE at runtime.
+EFR32 firmware 8.0.2 b397 has a bug where NVM token writes trigger
+RESET_SOFTWARE at runtime ~7-8s after "Zigbee2MQTT started!". This is the
+EmberZNet NVM save timer firing and writing configuration tokens to flash,
+which causes a spontaneous EFR32 soft reset.
+
+Root cause of crash loop:
+  coordinator_backup.json frame_counter > EFR32's current frame counter after
+  each crash-reset causes herdsman to restore the high counter via EZSP, which
+  dirties an NVM token, which the NVM save timer writes 7-8s later →
+  RESET_SOFTWARE → crash → repeat. Fix: keep coordinator_backup.json
+  frame_counter=0 so herdsman never writes a frame counter to EFR32 (EFR32
+  always has counter >= 0, so no write is needed).
 
 What this proxy fixes (3 failure modes):
 
@@ -11,9 +22,8 @@ What this proxy fixes (3 failure modes):
    the SLZB TCP receive buffer while Z2M is crashed. When Z2M reconnects,
    _slzb_to_client reads and forwards the stale RSTACK before Z2M has even
    sent RST, causing immediate HOST_FATAL_ERROR. Fix: drain (discard) data
-   from the SLZB socket during the post-disconnect hold period. Also cycles
-   the SLZB TCP connection after each Z2M disconnect to let the EFR32 detect
-   a host disconnect and commit pending NVM values to flash (burn-in).
+   from the SLZB socket during the post-disconnect hold period (drain-only
+   mode: SLZB TCP connection is kept alive; no cycling).
 
 2. _slzb_to_client hangs forever — if Z2M crashes with ASH_ERROR_TIMEOUTS
    (adapter sent no data), _slzb_to_client is blocked on recv() with no
@@ -26,14 +36,19 @@ What this proxy fixes (3 failure modes):
    When the drain ends and the proxy calls accept(), it gets a stale CLOSE_WAIT
    connection that immediately returns EOF, triggering another unnecessary drain
    cycle. Fix: track session duration; sessions < MIN_REAL_SESSION_DURATION are
-   stale and skipped (SLZB not cycled, no drain started).
+   stale and skipped (no drain started).
 
-What this proxy DOES NOT fix:
-  - The EFR32 firmware bug (8.0.2 b397) that sends RESET_SOFTWARE at runtime
-    ~7s after "Zigbee2MQTT started!" regardless of Z2M's commands. This is an
-    EFR32 firmware bug — no proxy timing can prevent it. Only updating the
-    EFR32 Zigbee coordinator firmware via http://10.100.20.179 → Settings →
-    Firmware update → Flash latest Zigbee coordinator firmware will fix this.
+Root cause that STILL requires an EFR32 firmware update:
+  - SET_CONFIGURATION_VALUE commands from herdsman during init dirty NVM tokens.
+    EmberZNet's NVM save timer fires ~7-8s after init completes and writes those
+    tokens to flash. EFR32 firmware 8.0.2 b397 sends RESET_SOFTWARE when writing
+    NVM (known bug), crashing Z2M. This NVM write is INDEPENDENT of the
+    coordinator_backup.json frame_counter. Burn-in (repeated cycles) may
+    eventually converge if writes succeed before RESET_SOFTWARE, but the 8.0.2
+    b397 bug may prevent convergence entirely.
+  - Fix: update EFR32 coordinator firmware via http://10.100.20.179 → Settings →
+    Firmware update → Flash latest Zigbee coordinator firmware. Try dev builds if
+    no newer stable build is available.
 
 Listen: 127.0.0.1:6639  →  SLZB: 10.100.20.179:6638
 """
@@ -53,24 +68,25 @@ LISTEN_PORT          = int(os.environ.get("PROXY_LISTEN_PORT", "6639"))
 SLZB_HOST            = os.environ.get("SLZB_HOST", "10.100.20.179")
 SLZB_PORT            = int(os.environ.get("SLZB_PORT", "6638"))
 RECONNECT_DELAY      = 2    # seconds between SLZB reconnect attempts
+# Total hold period after each real Z2M disconnect. With RECONNECT=True the
+# breakdown is: 20s SLZB_RECONNECT_PAUSE (quiet period for EFR32 NVM loop to
+# stabilise in isolation) + ~2s reconnect + ~23s drain = 45s total.
+# Must be > SLZB_RECONNECT_PAUSE + EFR32 boot time (~5s) = ~27s.
 POST_DISCONNECT_DELAY = 45  # seconds to drain/hold after each Z2M disconnect
 # Minimum session duration to be considered a "real" Z2M connection. Sessions
 # shorter than this are stale sockets (Z2M crashed before the proxy accepted them)
 # and should not trigger a SLZB drain cycle.
 MIN_REAL_SESSION_DURATION = 5.0  # seconds
 SLZB_SELECT_TIMEOUT  = 1.0  # select() timeout in _slzb_to_client (lets _stop be checked)
-# After each Z2M disconnect, close and reconnect the SLZB TCP connection before
-# draining. This lets the EFR32 detect a host disconnect and complete its
-# post-hard-reset initialization (triggered by SLZB-OS 3.3.1 "reboot EFR32 at
-# startup"). After the proxy reconnects to SLZB, the EFR32 starts a new
-# initialization cycle:
-#   T+0s : proxy reconnects TCP to SLZB-OS
-#   T+8s : EFR32 completes init, spontaneously sends RESET_SOFTWARE
-#   T+13s: EFR32 finishes post-reset boot and is stable
-# The drain period (POST_DISCONNECT_DELAY - SLZB_RECONNECT_PAUSE) must be > 13s
-# to let the EFR32's post-init reset + boot complete before Z2M connects.
-# With SLZB_RECONNECT_PAUSE=20 and POST_DISCONNECT_DELAY=45: drain=25s > 13s ✓
-# Set to False to revert to the original keep-alive behavior.
+# After each Z2M disconnect, close and reconnect the SLZB TCP connection.
+# The 20s quiet period (SLZB_RECONNECT_PAUSE) gives EFR32 time to complete
+# its rapid NVM crash loop in isolation (no host to send RSTACK to). After
+# reconnect, the proxy drains the single RSTACK from EFR32's final boot, then
+# allows Z2M to connect to a stable EFR32.
+# When False: SLZB stays connected; proxy drains all RSTACK frames directly —
+# but EFR32's rapid crash loop keeps firing through the open TCP, which prevents
+# EFR32 from stabilising before Z2M connects (observed: 560+ bytes vs ~31 bytes
+# of stale data when True). Use False only for diagnostics.
 RECONNECT_SLZB_AFTER_Z2M_DISCONNECT = True
 SLZB_RECONNECT_PAUSE = 20.0  # seconds to wait after closing before reconnecting
 
