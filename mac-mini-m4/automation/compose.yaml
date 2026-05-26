@@ -124,7 +124,6 @@ services:
     network_mode: host
     volumes:
       - zigbee2mqtt-data:/app/data
-      - ../zigbee2mqtt/external_extensions/smart-lighting.js:/app/data/external_extensions/smart-lighting.js:ro
     environment:
       TZ: "America/New_York"
 
