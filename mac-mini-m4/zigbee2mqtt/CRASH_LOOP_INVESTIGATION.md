@@ -13,34 +13,36 @@ to certain EZSP commands at runtime.
 
 ## Root Cause
 
-### Firmware bug
+### Issue 1 — SLZB-OS device firmware 3.3.1 (ESP32 layer) — PRIMARY CRASH CAUSE
 
-SLZB 8.0.2 b397 sends `RESET_SOFTWARE` to the host (Z2M) in response to EZSP commands
-that involve NVM operations. With zigbee-herdsman 9.x (Z2M 2.9.1), `RESET_SOFTWARE`
-during runtime is treated as `HOST_FATAL_ERROR` → Z2M stops.
+**SLZB-OS 3.3.1** added: *"OS will now reboot the EFR32 radios at startup"*.
+This hard-resets the EFR32 when the SLZB device boots, which wipes/resets the EFR32's
+NVM state and triggers `RESET_SOFTWARE` at runtime (~7s after `Zigbee2MQTT started!`)
+as the EFR32 finishes its re-initialization. With herdsman 9.x, runtime `RESET_SOFTWARE`
+has no retry → `Adapter disconnected, stopping` → crash loop.
 
-Two RESET_SOFTWARE events per session:
+**The crash loop started immediately after upgrading SLZB-OS 3.2.4 → 3.3.1.**
 
-1. **During startup (~17s in):** Triggered by `SET_CONFIGURATION_VALUE` EZSP command.
-   Herdsman 9.x has one startup retry — it re-establishes ASH without RST and continues.
-   Z2M starts successfully.
+**Fix: Downgrade SLZB-OS to 3.2.4** (http://10.100.20.179 → Settings → Core firmware).
+Version 3.2.4 is the last known-good. All 3.2.x versions are safe; the EFR32 reboot
+behavior was only added in 3.3.1. Do NOT upgrade to 3.3.1+.
 
-2. **At runtime (~7s after started!):** Triggered by `SEND_UNICAST` (Z2M availability
-   check ping to Zigbee devices). At runtime, herdsman has no retries left →
-   `Adapter disconnected, stopping` → crash.
+Two RESET_SOFTWARE events per session (with 3.3.1):
 
-### Why "burn-in" isn't completing
+1. **During startup (~17s in):** `SET_CONFIGURATION_VALUE` EZSP → RESET_SOFTWARE.
+   Herdsman 9.x has one startup retry — re-establishes ASH without RST, continues.
 
-The proxy keeps the SLZB TCP connection alive across Z2M restarts, which was designed
-to prevent stale RSTACK frames from crashing Z2M on reconnect. However, this also
-means the EFR32 doesn't reliably commit NVM values to flash between sessions.
-Each Z2M session hits the same RESET_SOFTWARE triggers.
+2. **At runtime (~7s after started!):** `SEND_UNICAST` (availability ping) → RESET_SOFTWARE.
+   No retries left at runtime → `Adapter disconnected, stopping` → crash.
 
-### Z2M 2.9.2+ doesn't help
+### Issue 2 — EFR32 coordinator firmware 8.0.2 b397 — Z2M UPGRADE BLOCKER
 
-The compose.yaml comment documents this: herdsman 10.x (Z2M 2.9.2+) triggers
-`SET_CONFIGURATION_VALUE → RESET_SOFTWARE` even more aggressively than 9.x.
-**Do NOT upgrade Z2M until SLZB firmware is updated.**
+Once SLZB-OS is downgraded to 3.2.4 and Z2M 2.9.1 is stable again, the secondary issue
+remains: herdsman 10.x (Z2M 2.9.2+) triggers `SET_CONFIGURATION_VALUE → RESET_SOFTWARE`
+on EFR32 8.0.2 b397. Do not upgrade Z2M past 2.9.1 until the EFR32 coordinator firmware
+is updated via the SLZB web UI (Settings → Firmware update → Flash latest Zigbee
+coordinator firmware). After that, Z2M 2.10.x + herdsman 10.x + SLZB-OS 3.3.1 works
+(confirmed by community reports).
 
 ---
 

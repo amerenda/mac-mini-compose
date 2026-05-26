@@ -104,10 +104,18 @@ services:
   # Host network for direct port binding and MQTT access.
   # ============================================================
   zigbee2mqtt:
-    # Pinned to 2.9.1 (herdsman 9.0.9): SLZB-06MG24 firmware 8.0.2 build 397
-    # sends RESET_SOFTWARE on SET_CONFIGURATION_VALUE with herdsman 10.x (2.9.2+).
-    # To upgrade: first update SLZB firmware via http://10.100.20.179 web UI
-    # (Settings → Firmware update → Flash latest Zigbee coordinator firmware).
+    # Pinned to 2.9.1 (herdsman 9.0.9).
+    #
+    # SLZB-OS (device firmware) version lock:
+    #   SLZB-OS 3.3.1 introduced "reboot EFR32 at startup" which breaks Z2M 2.9.1
+    #   by triggering RESET_SOFTWARE at runtime (~7s after startup, fatal with
+    #   herdsman 9.x). Downgrade SLZB-OS to 3.2.4 to fix. (http://10.100.20.179)
+    #
+    # EFR32 coordinator firmware: 8.0.2 build 397
+    #   herdsman 10.x (Z2M 2.9.2+) sends SET_CONFIGURATION_VALUE which triggers
+    #   RESET_SOFTWARE on EFR32 8.0.2 b397. Do not upgrade Z2M until EFR32
+    #   coordinator firmware is updated via http://10.100.20.179 →
+    #   Settings → Firmware update → Flash latest Zigbee coordinator firmware.
     image: koenkk/zigbee2mqtt:2.9.1
     container_name: zigbee2mqtt
     restart: unless-stopped
