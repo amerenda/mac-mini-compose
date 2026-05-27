@@ -8,7 +8,7 @@
 set -e
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-STAGING_DIR="${BACKUP_STAGING:-/tmp/backups-local/staging/homeassistant}"
+STAGING_DIR="${BACKUP_STAGING:-/backups-local/staging/homeassistant}"
 mkdir -p "$STAGING_DIR"
 
 CONFIG_DIR="/config"

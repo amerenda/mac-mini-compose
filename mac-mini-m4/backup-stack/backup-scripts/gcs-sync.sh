@@ -18,7 +18,7 @@ ACCESS_KEY="${GCS_ACCESS_KEY:?ERROR: GCS_ACCESS_KEY must be set — from BWS .en
 SECRET_KEY="${GCS_SECRET_KEY:?ERROR: GCS_SECRET_KEY must be set — from BWS .env BACKUP_SECRET_KEY}"
 
 # Local staging directory where all backup scripts write to
-STAGING_DIR="${BACKUP_STAGING:-/tmp/backups-local/staging}"
+STAGING_DIR="${BACKUP_STAGING:-/backups-local/staging}"
 
 # Remote prefix on GCS (change this per-environment for dev/staging/prod)
 REMOTE_PREFIX="${GCS_REMOTE_PREFIX:-us/mac-mini/dean}"
