@@ -124,17 +124,40 @@ services:
       - PGID=1000
       - TZ=America/New_York
       - JELLYFIN_PublishedServerUrl=$JELLYFIN_URL
+      # VAAPI via nvidia-vaapi-driver (avoids CUDA context; works alongside llama.cpp).
+      # Requires: sudo apt install nvidia-vaapi-driver (provides nvidia_drv_video.so).
+      # After install, enable VAAPI in Jellyfin Dashboard → Playback → Transcoding.
+      - LIBVA_DRIVER_NAME=nvidia
+      - LIBVA_DRIVERS_PATH=/usr/lib/x86_64-linux-gnu/dri
     volumes:
       - ${JELLYFIN_CONFIG}:/config
       - ${MOVIES_FOLDER}:/movies
       - ${TV_FOLDER}:/tv
       - ${DISCOVER_FOLDER}:/discover
       - ${TRANSCODE_FOLDER}:/transcode
+      # --- VAAPI / nvidia-vaapi-driver ---
+      # The driver .so itself (installed on host via apt install nvidia-vaapi-driver).
+      - /usr/lib/x86_64-linux-gnu/dri/nvidia_drv_video.so:/usr/lib/x86_64-linux-gnu/dri/nvidia_drv_video.so:ro
+      # GLVND EGL dispatcher + its internal dep, and the NVIDIA EGL ICD it dispatches to.
+      - /usr/lib/x86_64-linux-gnu/libEGL.so.1:/usr/lib/x86_64-linux-gnu/libEGL.so.1:ro
+      - /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0:/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0:ro
+      - /usr/lib/x86_64-linux-gnu/libEGL_nvidia.so.0:/usr/lib/x86_64-linux-gnu/libEGL_nvidia.so.0:ro
+      - /usr/share/glvnd/egl_vendor.d/10_nvidia.json:/usr/share/glvnd/egl_vendor.d/10_nvidia.json:ro
+      # GStreamer codec-parsers (direct dep of nvidia_drv_video.so) + its cascade.
+      - /usr/lib/x86_64-linux-gnu/libgstcodecparsers-1.0.so.0:/usr/lib/x86_64-linux-gnu/libgstcodecparsers-1.0.so.0:ro
+      - /usr/lib/x86_64-linux-gnu/libgstbase-1.0.so.0:/usr/lib/x86_64-linux-gnu/libgstbase-1.0.so.0:ro
+      - /usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so.0:/usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so.0:ro
+      - /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0:/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0:ro
+      - /usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0:/usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0:ro
+      - /usr/lib/x86_64-linux-gnu/libgmodule-2.0.so.0:/usr/lib/x86_64-linux-gnu/libgmodule-2.0.so.0:ro
+      - /usr/lib/x86_64-linux-gnu/libatomic.so.1:/usr/lib/x86_64-linux-gnu/libatomic.so.1:ro
+      # Already in container: libffi.so.8, libpcre2-8.so.0, libm.so.6, libc.so.6
     ports:
       - 8096:8096
       - 7359:7359/udp
       - 8920:8920
-    # Prefer NVIDIA when available (nvidia-container-toolkit); keep /dev/dri for VAAPI fallback.
+    # nvidia-container-toolkit injects CUDA/NVENC/NVDEC libs + libEGL_nvidia.so.595.58.03.
+    # /dev/dri for VAAPI device access.
     gpus: all
     devices:
       - /dev/dri:/dev/dri
