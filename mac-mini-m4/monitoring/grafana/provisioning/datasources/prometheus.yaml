@@ -1,13 +1,12 @@
 apiVersion: 1
 
-# No fixed uid: Grafana 12.x can fail provisioning with uid=prometheus + SQLite (see grafana/grafana#110740).
-# Dashboards use type-only Prometheus references; the default datasource below is resolved automatically.
 datasources:
   - name: Prometheus
+    uid: prometheus
     orgId: 1
     type: prometheus
     access: proxy
-    url: http://prometheus:9090
+    url: http://localhost:9090
     isDefault: true
     editable: true
     jsonData:
