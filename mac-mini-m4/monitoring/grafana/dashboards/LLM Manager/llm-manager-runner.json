@@ -1,0 +1,454 @@
+{
+  "title": "LLM Manager \u2014 Runner",
+  "uid": "llm-manager-runner",
+  "tags": [
+    "llm-manager"
+  ],
+  "refresh": "30s",
+  "time": {
+    "from": "now-3h",
+    "to": "now"
+  },
+  "schemaVersion": 38,
+  "templating": {
+    "list": [
+      {
+        "name": "runner",
+        "label": "Runner",
+        "type": "query",
+        "definition": "label_values(llm_runner_is_idle, runner)",
+        "query": {
+          "query": "label_values(llm_runner_is_idle, runner)",
+          "refId": "StandardVariableQuery"
+        },
+        "datasource": null,
+        "refresh": 2,
+        "includeAll": false,
+        "multi": false,
+        "hide": 0,
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Status",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "colorMode": "background"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": {
+                  "text": "BUSY",
+                  "color": "red"
+                },
+                "1": {
+                  "text": "IDLE",
+                  "color": "green"
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "llm_runner_is_idle{runner=\"$runner\"}",
+          "legendFormat": "status"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Heartbeat Age",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "none",
+        "colorMode": "background"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 60
+              },
+              {
+                "color": "red",
+                "value": 120
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "llm_backend_runner_last_seen_seconds{runner=\"$runner\"}",
+          "legendFormat": "last seen"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "VRAM Used",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "graphMode": "area",
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decbytes",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 18000000000
+              },
+              {
+                "color": "red",
+                "value": 23000000000
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "llm_runner_vram_used_bytes{runner=\"$runner\"}",
+          "legendFormat": "used"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "VRAM %",
+      "type": "gauge",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "llm_runner_vram_used_bytes{runner=\"$runner\"} / llm_runner_vram_total_bytes{runner=\"$runner\"} * 100",
+          "legendFormat": "VRAM %"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "VRAM Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decbytes",
+          "custom": {
+            "fillOpacity": 20
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "llm_runner_vram_used_bytes{runner=\"$runner\"}",
+          "legendFormat": "used"
+        },
+        {
+          "expr": "llm_runner_vram_total_bytes{runner=\"$runner\"}",
+          "legendFormat": "total"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Token Throughput",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "fillOpacity": 10
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(llm_inference_completion_tokens_total{runner=\"$runner\"}[2m])",
+          "legendFormat": "{{model}} out tok/s"
+        },
+        {
+          "expr": "rate(llm_inference_prompt_tokens_total{runner=\"$runner\"}[2m])",
+          "legendFormat": "{{model}} in tok/s"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Inference Duration (fast-path)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(llm_fastpath_duration_seconds_bucket[5m])) by (le, model))",
+          "legendFormat": "{{model}} p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(llm_fastpath_duration_seconds_bucket[5m])) by (le, model))",
+          "legendFormat": "{{model}} p95"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Model Swap Rate",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "targets": [
+        {
+          "expr": "rate(llm_scheduler_v2_model_swap_total{runner=\"$runner\"}[5m]) * 3600",
+          "legendFormat": "{{from_model}} \u2192 {{to_model}}"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Swap Duration P95",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 30
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(llm_scheduler_v2_model_swap_seconds_bucket{runner=\"$runner\"}[5m])) by (le))",
+          "legendFormat": "p95 swap time"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Queue Wait by App",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(llm_scheduler_v2_job_wait_by_app_seconds_bucket[5m])) by (le, app))",
+          "legendFormat": "{{app}} p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(llm_scheduler_v2_job_wait_by_app_seconds_bucket[5m])) by (le, app))",
+          "legendFormat": "{{app}} p95"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Recent Swaps",
+      "type": "table",
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "options": {
+        "sortBy": [
+          {
+            "displayName": "Value",
+            "desc": true
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "targets": [
+        {
+          "expr": "increase(llm_scheduler_v2_model_swap_total{runner=\"$runner\"}[6h]) > 0",
+          "legendFormat": "{{from_model}} \u2192 {{to_model}}",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "renameByName": {
+              "from_model": "From",
+              "to_model": "To",
+              "Value": "Swaps (6h)"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -27,7 +27,8 @@
       "title": "Nodes Ready",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -72,7 +73,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(kube_node_status_condition{condition=\"Ready\",status=\"true\"})",
           "legendFormat": "",
@@ -85,7 +87,8 @@
       "title": "Total Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -130,7 +133,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(kube_pod_status_phase{phase=\"Running\"})",
           "legendFormat": "",
@@ -143,7 +147,8 @@
       "title": "Cluster CPU %",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -196,7 +201,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "100 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))*100",
           "legendFormat": "",
@@ -209,7 +215,8 @@
       "title": "Cluster Memory %",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -262,7 +269,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "100 * (1 - sum(node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes))",
           "legendFormat": "",
@@ -275,7 +283,8 @@
       "title": "Cluster Disk %",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -328,7 +337,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "100 * (1 - sum(node_filesystem_avail_bytes{mountpoint=\"/\"}) / sum(node_filesystem_size_bytes{mountpoint=\"/\"}))",
           "legendFormat": "",
@@ -341,7 +351,8 @@
       "title": "API Server Request Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -417,7 +428,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(apiserver_request_total[5m])) by (code)",
           "legendFormat": "{{code}}",
@@ -445,7 +457,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -494,7 +507,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"argocd.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -507,7 +521,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -560,7 +575,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"argocd.*\"}[24h]))",
           "legendFormat": "",
@@ -573,7 +589,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -649,7 +666,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"argocd.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -664,7 +682,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -740,7 +759,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"argocd.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -768,7 +788,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -817,7 +838,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"infra-traefik.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -830,7 +852,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -883,7 +906,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"infra-traefik.*\"}[24h]))",
           "legendFormat": "",
@@ -896,7 +920,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -972,7 +997,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"infra-traefik.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -987,7 +1013,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -1063,7 +1090,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"infra-traefik.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -1091,7 +1119,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -1140,7 +1169,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"metallb-system\", pod=~\".*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -1153,7 +1183,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -1206,7 +1237,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"metallb-system\", pod=~\".*\"}[24h]))",
           "legendFormat": "",
@@ -1219,7 +1251,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -1295,7 +1328,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"metallb-system\", pod=~\".*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -1310,7 +1344,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -1386,7 +1421,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"metallb-system\", pod=~\".*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -1414,7 +1450,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -1463,7 +1500,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"longhorn.*\", pod=~\".*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -1476,7 +1514,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -1529,7 +1568,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"longhorn.*\", pod=~\".*\"}[24h]))",
           "legendFormat": "",
@@ -1542,7 +1582,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -1618,7 +1659,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"longhorn.*\", pod=~\".*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -1633,7 +1675,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -1709,7 +1752,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"longhorn.*\", pod=~\".*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -1737,7 +1781,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -1786,7 +1831,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"kube-system\", pod=~\"coredns.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -1799,7 +1845,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -1852,7 +1899,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"kube-system\", pod=~\"coredns.*\"}[24h]))",
           "legendFormat": "",
@@ -1865,7 +1913,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -1941,7 +1990,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"kube-system\", pod=~\"coredns.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -1956,7 +2006,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -2032,7 +2083,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"kube-system\", pod=~\"coredns.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -2060,7 +2112,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -2109,7 +2162,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"bind9.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -2122,7 +2176,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -2175,7 +2230,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"bind9.*\"}[24h]))",
           "legendFormat": "",
@@ -2188,7 +2244,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -2264,7 +2321,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"bind9.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -2279,7 +2337,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -2355,7 +2414,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"bind9.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -2383,7 +2443,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -2432,7 +2493,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"infra-cert-manager.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -2445,7 +2507,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -2498,7 +2561,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"infra-cert-manager.*\"}[24h]))",
           "legendFormat": "",
@@ -2511,7 +2575,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -2587,7 +2652,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"infra-cert-manager.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -2602,7 +2668,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -2678,7 +2745,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"infra-cert-manager.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -2706,7 +2774,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -2755,7 +2824,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"infra-external-dns.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -2768,7 +2838,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -2821,7 +2892,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"infra-external-dns.*\"}[24h]))",
           "legendFormat": "",
@@ -2834,7 +2906,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -2910,7 +2983,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"infra-external-dns.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -2925,7 +2999,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -3001,7 +3076,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"infra-external-dns.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -3029,7 +3105,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -3078,7 +3155,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"external-secrets.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -3091,7 +3169,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -3144,7 +3223,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"external-secrets.*\"}[24h]))",
           "legendFormat": "",
@@ -3157,7 +3237,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -3233,7 +3314,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"external-secrets.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -3248,7 +3330,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -3324,7 +3407,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"external-secrets.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -3352,7 +3436,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -3401,7 +3486,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"kube-system\", pod=~\"kube-flannel.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -3414,7 +3500,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -3467,7 +3554,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\"}[24h]))",
           "legendFormat": "",
@@ -3480,7 +3568,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -3556,7 +3645,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -3571,7 +3661,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -3647,7 +3738,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"kube-system\", pod=~\"kube-flannel.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -3675,7 +3767,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -3724,7 +3817,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"tailscale.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -3737,7 +3831,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -3790,7 +3885,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"tailscale.*\"}[24h]))",
           "legendFormat": "",
@@ -3803,7 +3899,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -3879,7 +3976,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"tailscale.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -3894,7 +3992,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -3970,7 +4069,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"tailscale.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -3998,7 +4098,8 @@
       "title": "Pods",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -4047,7 +4148,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\".*reloader.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -4060,7 +4162,8 @@
       "title": "Restarts",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -4113,7 +4216,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\".*reloader.*\"}[24h]))",
           "legendFormat": "",
@@ -4126,7 +4230,8 @@
       "title": "CPU",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -4202,7 +4307,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\".*reloader.*\", container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -4217,7 +4323,8 @@
       "title": "Memory",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 6,
@@ -4293,7 +4400,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\".*reloader.*\", container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",

@@ -314,7 +314,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Queue depth (pool + per-runner attached)",
+      "title": "Queue Depth Over Time",
       "id": 11,
       "datasource": {
         "type": "prometheus"
@@ -335,7 +335,7 @@
             "showPoints": "never",
             "spanNulls": true,
             "stacking": {
-              "mode": "none"
+              "mode": "normal"
             }
           }
         }
@@ -353,23 +353,18 @@
       "targets": [
         {
           "expr": "max(llm_queue_depth)",
-          "legendFormat": "queued (pool)",
+          "legendFormat": "queued",
           "refId": "A"
         },
         {
           "expr": "max(llm_queue_active_jobs)",
-          "legendFormat": "running (total)",
+          "legendFormat": "running",
           "refId": "B"
         },
         {
           "expr": "max(llm_queue_loading_jobs)",
-          "legendFormat": "loading model (total)",
+          "legendFormat": "loading model",
           "refId": "C"
-        },
-        {
-          "expr": "llm_runner_attached_jobs{runner=~\"$runner\"}",
-          "legendFormat": "{{runner}} attached (run+load)",
-          "refId": "D"
         }
       ]
     },
@@ -543,12 +538,12 @@
       "targets": [
         {
           "expr": "60 * ((sum by (model, runner) (rate(llm_scheduler_job_tokens_total{type=\"completion\"}[5m]))) or (sum by (model, runner) (rate(llm_inference_completion_tokens_total{runner=~\"$runner\"}[5m]))))",
-          "legendFormat": "{{runner}} — {{model}} completion",
+          "legendFormat": "{{runner}} \u2014 {{model}} completion",
           "refId": "A"
         },
         {
           "expr": "60 * ((sum by (model, runner) (rate(llm_scheduler_job_tokens_total{type=\"prompt\"}[5m]))) or (sum by (model, runner) (rate(llm_inference_prompt_tokens_total{runner=~\"$runner\"}[5m]))))",
-          "legendFormat": "{{runner}} — {{model}} prompt",
+          "legendFormat": "{{runner}} \u2014 {{model}} prompt",
           "refId": "B"
         }
       ]
@@ -1219,5 +1214,5 @@
   "timezone": "browser",
   "title": "LLM Manager",
   "uid": "llm-manager",
-  "version": 5
+  "version": 4
 }

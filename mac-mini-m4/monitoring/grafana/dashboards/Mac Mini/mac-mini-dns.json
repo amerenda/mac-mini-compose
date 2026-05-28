@@ -12,7 +12,6 @@
       }
     ]
   },
-  "description": "Technitium metrics from guycalledseven/technitium-dns-prometheus-exporter v2+ (window stats + zone info). If the Technitium server dropdown is empty or API shows Down, fix the exporter (token, TECHNITIUM_BASE_URL) before metrics appear.",
   "editable": true,
   "graphTooltip": 1,
   "id": null,
@@ -36,84 +35,6 @@
         "type": "prometheus",
         "uid": "${datasource}"
       },
-      "description": "Technitium HTTP API as seen by technitium-exporter. If Down, check TECHNITIUM_BASE_URL (port 5380), TECHNITIUM_API_TOKEN, and exporter logs.",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "text": "Down"
-                },
-                "1": {
-                  "text": "Up"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 1
-              }
-            ]
-          },
-          "unit": "none"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 3,
-        "x": 0,
-        "y": 1
-      },
-      "id": 50,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "10.0.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "technitium_up{job=\"mac-mini-dns\",server=\"$server\"}",
-          "legendFormat": "API",
-          "refId": "A"
-        }
-      ],
-      "title": "Technitium API",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "description": "Query volume in the configured stats window (TECHNITIUM_STATS_RANGE on the exporter), not lifetime totals.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -134,8 +55,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 3,
+        "w": 5,
+        "x": 0,
         "y": 1
       },
       "id": 2,
@@ -160,7 +81,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"all\"}",
+          "expr": "technitium_dns_queries_total{job=\"mac-mini-dns\"}",
           "legendFormat": "Total Queries",
           "refId": "A"
         }
@@ -201,8 +122,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 7,
+        "w": 5,
+        "x": 5,
         "y": 1
       },
       "id": 3,
@@ -227,7 +148,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"blocked\"}",
+          "expr": "technitium_dns_blocked{job=\"mac-mini-dns\"}",
           "legendFormat": "Blocked Queries",
           "refId": "A"
         }
@@ -274,8 +195,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 11,
+        "w": 5,
+        "x": 10,
         "y": 1
       },
       "id": 4,
@@ -298,7 +219,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "100 * sum(technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"blocked\"}) / clamp_min(sum(technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"all\"}), 1)",
+          "expr": "(technitium_dns_blocked{job=\"mac-mini-dns\"} / technitium_dns_queries_total{job=\"mac-mini-dns\"}) * 100",
           "legendFormat": "Block %",
           "refId": "A"
         }
@@ -357,12 +278,11 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_clients_window{job=\"mac-mini-dns\",server=\"$server\"}",
+          "expr": "technitium_dns_clients{job=\"mac-mini-dns\"}",
           "legendFormat": "Clients",
           "refId": "A"
         }
       ],
-      "description": "Unique clients seen in the current Technitium stats window (same window as Total Queries).",
       "title": "Unique Clients",
       "type": "stat"
     },
@@ -429,7 +349,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "100 * sum(technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"cached\"}) / clamp_min(sum(technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"all\"}), 1)",
+          "expr": "(technitium_dns_cached{job=\"mac-mini-dns\"} / technitium_dns_queries_total{job=\"mac-mini-dns\"}) * 100",
           "legendFormat": "Cache Hit %",
           "refId": "A"
         }
@@ -555,7 +475,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"all\"}",
+          "expr": "technitium_dns_queries_total{job=\"mac-mini-dns\"}",
           "legendFormat": "Total",
           "refId": "A"
         },
@@ -564,7 +484,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"cached\"}",
+          "expr": "technitium_dns_cached{job=\"mac-mini-dns\"}",
           "legendFormat": "Cached",
           "refId": "B"
         },
@@ -573,7 +493,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"recursive\"}",
+          "expr": "technitium_dns_recursive{job=\"mac-mini-dns\"}",
           "legendFormat": "Recursive",
           "refId": "C"
         },
@@ -582,7 +502,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"authoritative\"}",
+          "expr": "technitium_dns_authoritative{job=\"mac-mini-dns\"}",
           "legendFormat": "Authoritative",
           "refId": "D"
         },
@@ -591,7 +511,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"blocked\"}",
+          "expr": "technitium_dns_blocked{job=\"mac-mini-dns\"}",
           "legendFormat": "Blocked",
           "refId": "E"
         }
@@ -747,7 +667,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"no_error\"}",
+          "expr": "technitium_dns_no_error{job=\"mac-mini-dns\"}",
           "legendFormat": "NoError",
           "refId": "A"
         },
@@ -756,7 +676,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"servfail\"}",
+          "expr": "technitium_dns_server_failure{job=\"mac-mini-dns\"}",
           "legendFormat": "SERVFAIL",
           "refId": "B"
         },
@@ -765,7 +685,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"nxdomain\"}",
+          "expr": "technitium_dns_nx_domain{job=\"mac-mini-dns\"}",
           "legendFormat": "NXDOMAIN",
           "refId": "C"
         },
@@ -774,7 +694,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "technitium_dns_queries_window{job=\"mac-mini-dns\",server=\"$server\",category=\"refused\"}",
+          "expr": "technitium_dns_refused{job=\"mac-mini-dns\"}",
           "legendFormat": "Refused",
           "refId": "D"
         }
@@ -882,7 +802,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "topk(20, technitium_dns_top_domain_hits{job=\"mac-mini-dns\",server=\"$server\"})",
+          "expr": "topk(20, technitium_top_domains{job=\"mac-mini-dns\"})",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -898,8 +818,7 @@
               "Time": true,
               "__name__": true,
               "instance": true,
-              "job": true,
-              "server": true
+              "job": true
             },
             "indexByName": {},
             "renameByName": {
@@ -998,7 +917,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "topk(20, technitium_dns_top_blocked_domain_hits{job=\"mac-mini-dns\",server=\"$server\"})",
+          "expr": "topk(20, technitium_top_blocked_domains{job=\"mac-mini-dns\"})",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1014,8 +933,7 @@
               "Time": true,
               "__name__": true,
               "instance": true,
-              "job": true,
-              "server": true
+              "job": true
             },
             "indexByName": {},
             "renameByName": {
@@ -1056,7 +974,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "client_ip"
+              "options": "client"
             },
             "properties": [
               {
@@ -1114,7 +1032,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "topk(20, technitium_dns_top_client_hits{job=\"mac-mini-dns\",server=\"$server\"})",
+          "expr": "topk(20, technitium_top_clients{job=\"mac-mini-dns\"})",
           "format": "table",
           "instant": true,
           "legendFormat": "",
@@ -1130,14 +1048,12 @@
               "Time": true,
               "__name__": true,
               "instance": true,
-              "job": true,
-              "server": true
+              "job": true
             },
             "indexByName": {},
             "renameByName": {
               "Value": "Queries",
-              "client_ip": "Client",
-              "client_name": "Name"
+              "client": "Client"
             }
           }
         }
@@ -1159,7 +1075,6 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "description": "Zones from technitium_zone_info (exporter v2). Per-zone query totals are not exposed; use Technitium UI or API for that detail.",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1180,42 +1095,7 @@
                 ]
               }
             },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Status"
-                },
-                "properties": [
-                  {
-                    "id": "mappings",
-                    "value": [
-                      {
-                        "options": {
-                          "false": {
-                            "color": "green",
-                            "index": 1,
-                            "text": "Active"
-                          },
-                          "true": {
-                            "color": "red",
-                            "index": 0,
-                            "text": "Disabled"
-                          }
-                        },
-                        "type": "value"
-                      }
-                    ]
-                  },
-                  {
-                    "id": "custom.cellOptions",
-                    "value": {
-                      "type": "color-background"
-                    }
-                  }
-                ]
-              }
-            ]
+            "overrides": []
           },
           "gridPos": {
             "h": 10,
@@ -1236,8 +1116,8 @@
             "showHeader": true,
             "sortBy": [
               {
-                "desc": false,
-                "displayName": "Zone Name"
+                "desc": true,
+                "displayName": "Queries"
               }
             ]
           },
@@ -1248,36 +1128,28 @@
                 "type": "prometheus",
                 "uid": "${datasource}"
               },
-              "expr": "technitium_zone_info{job=\"mac-mini-dns\",server=\"$server\",internal=\"false\"}",
+              "expr": "technitium_zone_queries_total{job=\"mac-mini-dns\"}",
               "format": "table",
               "instant": true,
               "legendFormat": "",
               "refId": "A"
             }
           ],
-          "title": "Zones",
+          "title": "Zone Query Counts",
           "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {}
-            },
             {
               "id": "organize",
               "options": {
                 "excludeByName": {
                   "Time": true,
-                  "Value": true,
                   "__name__": true,
                   "instance": true,
-                  "job": true,
-                  "server": true
+                  "job": true
                 },
                 "indexByName": {},
                 "renameByName": {
-                  "disabled": "Status",
-                  "serial": "SOA serial",
-                  "type": "Type",
-                  "zone": "Zone Name"
+                  "Value": "Queries",
+                  "zone": "Zone"
                 }
               }
             }
@@ -1317,29 +1189,6 @@
         "regex": "",
         "skipUrlSync": false,
         "type": "datasource"
-      },
-      {
-        "current": {},
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${datasource}"
-        },
-        "definition": "label_values(technitium_up{job=\"mac-mini-dns\"}, server)",
-        "hide": 0,
-        "includeAll": false,
-        "label": "Technitium server",
-        "multi": false,
-        "name": "server",
-        "options": [],
-        "query": {
-          "query": "label_values(technitium_up{job=\"mac-mini-dns\"}, server)",
-          "refId": "StandardVariableQuery"
-        },
-        "refresh": 1,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 1,
-        "type": "query"
       }
     ]
   },
@@ -1351,5 +1200,5 @@
   "timezone": "browser",
   "title": "Mac Mini \u2014 Technitium DNS",
   "uid": "mac-mini-dns",
-  "version": 2
+  "version": 1
 }

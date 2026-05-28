@@ -25,7 +25,8 @@
       "type": "stat",
       "title": "CPU Usage per Node",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -72,7 +73,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
           "legendFormat": "{{instance}}",
@@ -84,7 +86,8 @@
       "type": "timeseries",
       "title": "CPU Usage % by Node",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -123,7 +126,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
           "legendFormat": "{{instance}}",
@@ -135,7 +139,8 @@
       "type": "timeseries",
       "title": "CPU Usage by Mode (All Nodes)",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -176,7 +181,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "avg by (mode) (rate(node_cpu_seconds_total{mode!=\"idle\"}[5m])) * 100",
           "legendFormat": "{{mode}}",
@@ -200,7 +206,8 @@
       "type": "timeseries",
       "title": "System Load Average (1m)",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -237,7 +244,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "node_load1",
           "legendFormat": "{{instance}}",
@@ -249,7 +257,8 @@
       "type": "timeseries",
       "title": "System Load Average (5m)",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -286,7 +295,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "node_load5",
           "legendFormat": "{{instance}}",
@@ -298,7 +308,8 @@
       "type": "timeseries",
       "title": "System Load Average (15m)",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 7,
@@ -335,7 +346,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "node_load15",
           "legendFormat": "{{instance}}",
@@ -359,7 +371,8 @@
       "type": "stat",
       "title": "Memory Usage per Node",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -406,7 +419,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "100 * (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes))",
           "legendFormat": "{{instance}}",
@@ -418,7 +432,8 @@
       "type": "timeseries",
       "title": "Memory Usage by Node",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -459,7 +474,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
           "legendFormat": "{{instance}} used",
@@ -467,7 +483,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "node_memory_MemTotal_bytes",
           "legendFormat": "{{instance}} total",
@@ -479,7 +496,8 @@
       "type": "timeseries",
       "title": "Memory Breakdown (All Nodes)",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -520,7 +538,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes - node_memory_Cached_bytes - node_memory_Buffers_bytes)",
           "legendFormat": "Used (excl. cache)",
@@ -528,7 +547,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(node_memory_Cached_bytes)",
           "legendFormat": "Cached",
@@ -536,7 +556,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(node_memory_Buffers_bytes)",
           "legendFormat": "Buffers",
@@ -544,7 +565,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(node_memory_MemAvailable_bytes)",
           "legendFormat": "Available",
@@ -568,7 +590,8 @@
       "type": "stat",
       "title": "Root Filesystem Usage per Node",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 4,
@@ -615,7 +638,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "100 - (node_filesystem_avail_bytes{mountpoint=\"/\",fstype!=\"tmpfs\"} / node_filesystem_size_bytes{mountpoint=\"/\",fstype!=\"tmpfs\"} * 100)",
           "legendFormat": "{{instance}}",
@@ -627,7 +651,8 @@
       "type": "timeseries",
       "title": "Filesystem Used % by Mountpoint",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -683,7 +708,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "100 - (node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay\",mountpoint!~\"/var/lib/kubelet.*\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|overlay\",mountpoint!~\"/var/lib/kubelet.*\"} * 100)",
           "legendFormat": "{{instance}} {{mountpoint}}",
@@ -695,7 +721,8 @@
       "type": "timeseries",
       "title": "Disk I/O Rate",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -732,7 +759,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "rate(node_disk_read_bytes_total[5m])",
           "legendFormat": "{{instance}} {{device}} read",
@@ -740,7 +768,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "rate(node_disk_written_bytes_total[5m])",
           "legendFormat": "{{instance}} {{device}} write",
@@ -764,7 +793,8 @@
       "type": "timeseries",
       "title": "Network Traffic Received",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -801,7 +831,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "rate(node_network_receive_bytes_total{device!~\"lo|cni.*|flannel.*|veth.*\"}[5m])",
           "legendFormat": "{{instance}} {{device}}",
@@ -813,7 +844,8 @@
       "type": "timeseries",
       "title": "Network Traffic Transmitted",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -850,7 +882,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "rate(node_network_transmit_bytes_total{device!~\"lo|cni.*|flannel.*|veth.*\"}[5m])",
           "legendFormat": "{{instance}} {{device}}",
@@ -862,7 +895,8 @@
       "type": "timeseries",
       "title": "Network Errors",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -899,7 +933,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "rate(node_network_receive_errs_total{device!~\"lo|cni.*|flannel.*|veth.*\"}[5m])",
           "legendFormat": "{{instance}} {{device}} rx errors",
@@ -907,7 +942,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "rate(node_network_transmit_errs_total{device!~\"lo|cni.*|flannel.*|veth.*\"}[5m])",
           "legendFormat": "{{instance}} {{device}} tx errors",
@@ -919,7 +955,8 @@
       "type": "timeseries",
       "title": "Network Traffic by Node (Total)",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -960,7 +997,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum by (instance) (rate(node_network_receive_bytes_total{device!~\"lo|cni.*|flannel.*|veth.*\"}[5m]))",
           "legendFormat": "{{instance}} rx",
@@ -968,7 +1006,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "- sum by (instance) (rate(node_network_transmit_bytes_total{device!~\"lo|cni.*|flannel.*|veth.*\"}[5m]))",
           "legendFormat": "{{instance}} tx",

@@ -27,7 +27,8 @@
       "title": "Pod Network Receive by Node",
       "description": "Flannel overlay network inbound traffic per node",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -103,7 +104,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\"}[5m])) by (node)",
           "legendFormat": "{{node}}",
@@ -118,7 +120,8 @@
       "title": "Pod Network Transmit by Node",
       "description": "Flannel overlay network outbound traffic per node",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -194,7 +197,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_bytes_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\"}[5m])) by (node)",
           "legendFormat": "{{node}}",
@@ -209,7 +213,8 @@
       "title": "Network Errors by Node",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -285,7 +290,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_errors_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\"}[5m])) by (node)",
           "legendFormat": "{{node}} rx errors",
@@ -295,7 +301,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_errors_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\"}[5m])) by (node)",
           "legendFormat": "{{node}} tx errors",
@@ -310,7 +317,8 @@
       "title": "Packet Drops by Node",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -386,7 +394,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_packets_dropped_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\"}[5m])) by (node)",
           "legendFormat": "{{node}} rx drops",
@@ -396,7 +405,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_packets_dropped_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\"}[5m])) by (node)",
           "legendFormat": "{{node}} tx drops",
@@ -424,7 +434,8 @@
       "title": "Flannel CPU Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -500,7 +511,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"kube-system\", pod=~\"kube-flannel.*\",container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -515,7 +527,8 @@
       "title": "Flannel Memory Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -591,7 +604,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"kube-system\", pod=~\"kube-flannel.*\",container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",
@@ -619,7 +633,8 @@
       "title": "Total Pod Network Traffic by Namespace",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -695,7 +710,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_bytes_total[5m])) by (namespace)",
           "legendFormat": "{{namespace}} rx",
@@ -710,7 +726,8 @@
       "title": "Inter-Pod Packet Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -786,7 +803,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_packets_total[5m])) by (namespace)",
           "legendFormat": "{{namespace}}",

@@ -27,7 +27,8 @@
       "title": "Total Applications",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -72,7 +73,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(argocd_app_info)",
           "legendFormat": "",
@@ -85,7 +87,8 @@
       "title": "Synced Apps",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -130,7 +133,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(argocd_app_info{sync_status=\"Synced\"})",
           "legendFormat": "",
@@ -143,7 +147,8 @@
       "title": "Out of Sync",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -192,7 +197,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(argocd_app_info{sync_status=\"OutOfSync\"})",
           "legendFormat": "",
@@ -205,7 +211,8 @@
       "title": "Healthy Apps",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -250,7 +257,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(argocd_app_info{health_status=\"Healthy\"})",
           "legendFormat": "",
@@ -263,7 +271,8 @@
       "title": "Degraded Apps",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -312,7 +321,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(argocd_app_info{health_status=\"Degraded\"})",
           "legendFormat": "",
@@ -338,7 +348,8 @@
       "title": "Sync Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -414,7 +425,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(argocd_app_sync_total[5m])) by (phase)",
           "legendFormat": "{{phase}}",
@@ -429,7 +441,8 @@
       "title": "Reconcile Duration p50/p95",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -505,7 +518,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.5, sum(rate(argocd_app_reconcile_bucket[5m])) by (le))",
           "legendFormat": "p50",
@@ -515,7 +529,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "histogram_quantile(0.95, sum(rate(argocd_app_reconcile_bucket[5m])) by (le))",
           "legendFormat": "p95",
@@ -543,7 +558,8 @@
       "title": "Cluster Connection",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -592,7 +608,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "argocd_cluster_connection_status",
           "legendFormat": "",
@@ -605,7 +622,8 @@
       "title": "K8s API Request Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -681,7 +699,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(argocd_app_k8s_request_total[5m])) by (verb)",
           "legendFormat": "{{verb}}",
@@ -696,7 +715,8 @@
       "title": "Redis Request Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -772,7 +792,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(argocd_redis_request_total[5m]))",
           "legendFormat": "requests",
@@ -800,7 +821,8 @@
       "title": "CPU Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -876,7 +898,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\",pod=~\"argocd.*\",container!=\"\"}[5m])) by (pod)",
           "legendFormat": "{{pod}}",
@@ -891,7 +914,8 @@
       "title": "Memory Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -967,7 +991,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\",pod=~\"argocd.*\",container!=\"\"}) by (pod)",
           "legendFormat": "{{pod}}",

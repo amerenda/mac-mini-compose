@@ -27,7 +27,8 @@
       "title": "Pod Running",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -76,7 +77,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "count(kube_pod_status_phase{namespace=\"default\", pod=~\"tailscale.*\", phase=\"Running\"})",
           "legendFormat": "",
@@ -89,7 +91,8 @@
       "title": "Restarts (24h)",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 3,
@@ -138,7 +141,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"default\", pod=~\"tailscale.*\"}[24h]))",
           "legendFormat": "",
@@ -151,7 +155,8 @@
       "title": "Network Traffic",
       "description": "Tailscale subnet router network traffic \u2014 indicates VPN usage",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -227,7 +232,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_bytes_total{namespace=\"default\", pod=~\"tailscale.*\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} rx",
@@ -237,7 +243,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_bytes_total{namespace=\"default\", pod=~\"tailscale.*\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} tx",
@@ -252,7 +259,8 @@
       "title": "Packet Rate",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -328,7 +336,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_receive_packets_total{namespace=\"default\", pod=~\"tailscale.*\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} rx",
@@ -338,7 +347,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_network_transmit_packets_total{namespace=\"default\", pod=~\"tailscale.*\"}[5m])) by (pod)",
           "legendFormat": "{{pod}} tx",
@@ -366,7 +376,8 @@
       "title": "CPU Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -442,7 +453,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"default\", pod=~\"tailscale.*\",container!=\"\"}[5m])) by (container)",
           "legendFormat": "{{container}}",
@@ -457,7 +469,8 @@
       "title": "Memory Usage",
       "description": "",
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
         "h": 8,
@@ -533,7 +546,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "sum(container_memory_working_set_bytes{namespace=\"default\", pod=~\"tailscale.*\",container!=\"\"}) by (container)",
           "legendFormat": "{{container}}",

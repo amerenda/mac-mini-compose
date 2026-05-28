@@ -26,7 +26,8 @@
         "y": 0
       },
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -69,7 +70,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "last_over_time(speedtest_download_bits_per_second[20m]) / 1e6",
           "refId": "A",
@@ -88,7 +90,8 @@
         "y": 0
       },
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -131,7 +134,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "last_over_time(speedtest_upload_bits_per_second[20m]) / 1e6",
           "refId": "A",
@@ -150,7 +154,8 @@
         "y": 0
       },
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -193,7 +198,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "last_over_time(speedtest_ping_latency_milliseconds[20m])",
           "refId": "A",
@@ -212,7 +218,8 @@
         "y": 0
       },
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -255,7 +262,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "expr": "last_over_time(speedtest_jitter_latency_milliseconds[20m])",
           "refId": "A",
@@ -274,7 +282,8 @@
         "y": 4
       },
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -341,7 +350,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "last_over_time(speedtest_download_bits_per_second[20m]) / 1e6",
@@ -362,7 +372,8 @@
         "y": 4
       },
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -429,7 +440,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "last_over_time(speedtest_upload_bits_per_second[20m]) / 1e6",
@@ -450,7 +462,8 @@
         "y": 13
       },
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "fieldConfig": {
         "defaults": {
@@ -516,7 +529,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "last_over_time(speedtest_ping_latency_milliseconds[20m])",
@@ -526,7 +540,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
           "editorMode": "code",
           "expr": "last_over_time(speedtest_jitter_latency_milliseconds[20m])",
