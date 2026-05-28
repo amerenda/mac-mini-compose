@@ -31,6 +31,16 @@ providers:
     options:
       path: "/etc/grafana/dashboards/Infra"
 
+  - name: migrated-llm-manager
+    orgId: 1
+    folder: "LLM Manager"
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 15
+    allowUiUpdates: true
+    options:
+      path: "/etc/grafana/dashboards/LLM Manager"
+
   - name: migrated-mac-mini
     orgId: 1
     folder: "Mac Mini"
