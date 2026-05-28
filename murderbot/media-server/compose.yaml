@@ -90,7 +90,6 @@ services:
       - ${SONARR_CONFIG}:/config
       - ${TV_FOLDER}:/tv
       - ${USENET_DOWNLOADS}:/downloads
-      - ${SONARR_SCRIPTS}:/scripts
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -162,6 +161,19 @@ services:
       retries: 3
     restart: unless-stopped
 
+ recyclarr:
+     container_name: recyclarr
+     image: ghcr.io/recyclarr/recyclarr:7
+     user: "1000:1000"
+     environment:
+       - TZ=America/New_York
+     volumes:
+       - ${RECYCLARR_CONFIG}:/config
+     networks:
+       servarr:
+     dns: *dns-servers
+     restart: unless-stopped
+
 networks:
-  servarr:
-    driver: bridge
+   servarr:
+     driver: bridge

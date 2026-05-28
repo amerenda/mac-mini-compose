@@ -45,7 +45,7 @@ chmod 0755 "${CONFIG_ROOT}/seerr" "$SEERR_CONFIG_DIR"
   echo "RADARR_CONFIG=${CONFIG_ROOT}/radarr/config"
   echo "BAZARR_CONFIG=${CONFIG_ROOT}/bazarr/config"
   echo "SONARR_CONFIG=${CONFIG_ROOT}/sonarr/config"
-  echo "SONARR_SCRIPTS=${CONFIG_ROOT}/sonarr/scripts"
+  echo "RECYCLARR_CONFIG=${CONFIG_ROOT}/recyclarr/config"
   echo "PROWLARR_CONFIG=${CONFIG_ROOT}/prowlarr/config"
   echo "SABNZBD_CONFIG=${CONFIG_ROOT}/sabnzbd/config"
   echo "JELLYFIN_CONFIG=${CONFIG_ROOT}/jellyfin/config"
@@ -64,5 +64,4 @@ chmod 0755 "${CONFIG_ROOT}/seerr" "$SEERR_CONFIG_DIR"
 # Sanity check: assert media-server compose file is at the expected path so
 # Komodo's `docker compose up` doesn't silently use the wrong cwd.
 test -f murderbot/media-server/compose.yaml \
-  && test -d murderbot/media-server/scripts \
-  || { echo "media-server pre-deploy: layout check failed in $(pwd)" >&2; exit 1; }
+  || { echo "media-server pre-deploy: compose file missing in $(pwd)" >&2; exit 1; }
