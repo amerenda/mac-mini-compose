@@ -26,6 +26,30 @@ services:
       retries: 3
 
   # ============================================================
+  # Alertmanager — Receives firing alerts from Prometheus, manages silences and notifications.
+  # No receivers configured yet — alerts visible in UI only for now.
+  # ============================================================
+  alertmanager:
+    image: prom/alertmanager:v0.27.1
+    container_name: alertmanager
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - alertmanager-data:/alertmanager
+      - ${MONITORING_DIR:-.}/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9093/-/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================
   # Grafana — Primary dashboards/UI on mac-mini
   # Reads from local Prometheus TSDB.
   # ============================================================
@@ -115,5 +139,6 @@ services:
 
 volumes:
   prometheus-data:
+  alertmanager-data:
   grafana-data:
 

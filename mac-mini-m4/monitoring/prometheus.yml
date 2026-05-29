@@ -5,6 +5,11 @@ global:
     site: mac-mini
     role: primary
 
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['localhost:9093']
+
 # Local scrape targets — all on the Mac Mini
 scrape_configs:
   - job_name: mac-mini-prometheus
