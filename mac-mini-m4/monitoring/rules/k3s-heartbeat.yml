@@ -1,0 +1,17 @@
+groups:
+  - name: cross-stack-heartbeat
+    rules:
+      # Alert when k3s Prometheus health endpoint stops responding
+      - alert: K3sPrometheusDown
+        expr: probe_success{job="k3s-prometheus-heartbeat"} == 0 or up{job="k3s-prometheus-heartbeat"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          stack: k3s-dean
+          kind: heartbeat
+        annotations:
+          summary: "K3s Prometheus is unreachable"
+          description: >
+            The K3s cluster's Prometheus instance ({{ $labels.instance }}) has been
+            unreachable for more than 2 minutes. This may indicate the entire k3s
+            monitoring stack is down or network connectivity is lost.
