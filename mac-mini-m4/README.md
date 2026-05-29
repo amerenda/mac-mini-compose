@@ -1,4 +1,4 @@
-# Mac Mini M4 — Core Home Lab Services
+# Mac Mini M4 - Core Home Lab Services
 
 Docker Compose stacks for the Mac Mini M4, managed via Komodo GitOps from the
 [`komodo-dean-gitops`](https://github.com/amerenda/komodo-dean-gitops) repo
@@ -24,8 +24,8 @@ Docker Compose stacks for the Mac Mini M4, managed via Komodo GitOps from the
 | Prometheus | bridge | 9090 | Primary metrics TSDB + remote_write receiver |
 | Grafana | bridge | 3000 | Primary monitoring dashboards/UI |
 | Node Exporter | bridge | 9100 | Host metrics for Prometheus |
-| Postgres backup | — | — | Daily backup to GCS |
-| MongoDB backup | — | — | Daily backup to GCS |
+| Postgres backup | - | - | Daily backup to GCS |
+| MongoDB backup | - | - | Daily backup to GCS |
 
 ### Runners stack (`runners/compose.yaml`)
 
@@ -40,11 +40,11 @@ Docker Compose stacks for the Mac Mini M4, managed via Komodo GitOps from the
 
 | Service | Port | Purpose |
 |---------|------|---------|
-| llm-agent | 8090 | [llm-manager](https://github.com/amerenda/llm-manager) edge agent — OpenAI-compatible API, metrics, registers with the hosted backend |
+| llm-agent | 8090 | [llm-manager](https://github.com/amerenda/llm-manager) edge agent - OpenAI-compatible API, metrics, registers with the hosted backend |
 
-Runs **only** the agent container. **Ollama stays native on macOS** (Metal); the agent reaches it at `host.docker.internal:11434`. Compose sets **`RUNNER_HOSTNAME=mac-mini-m4`** (llm-manager runner name) and **`AGENT_UNIFIED_MEMORY_VRAM=true`** so the UI treats **VRAM and RAM as one pool** (container-visible unified memory; used = system RAM usage, same as llm-manager’s memory bar). The agent service uses **`pull_policy: always`**; **`pre-deploy`** pins **`AGENT_IMAGE_TAG`** from the backend target when possible. The **`llm/`** directory is bind-mounted so the agent can **self-update** (pin `.env`, pull, `compose up`). In llm-manager **Runners**, enable **auto update** for `mac-mini-m4` so a new global target triggers that path on the next heartbeat (~30s) without waiting for Komodo. Non-secret overrides for deploy (**`AGENT_ADDRESS`**, **`AGENT_IMAGE_TAG`**, etc.) go in committed **`llm/gitops.env`** (merged at deploy); change them with a PR, not on the host.
+Runs **only** the agent container. **Ollama stays native on macOS** (Metal); the agent reaches it at `host.docker.internal:11434`. Compose sets **`RUNNER_HOSTNAME=mac-mini-m4`** (llm-manager runner name) and **`AGENT_UNIFIED_MEMORY_VRAM=true`** so the UI treats **VRAM and RAM as one pool** (container-visible unified memory; used = system RAM usage, same as llm-manager's memory bar). The agent service uses **`pull_policy: always`**; **`pre-deploy`** pins **`AGENT_IMAGE_TAG`** from the backend target when possible. The **`llm/`** directory is bind-mounted so the agent can **self-update** (pin `.env`, pull, `compose up`). In llm-manager **Runners**, enable **auto update** for `mac-mini-m4` so a new global target triggers that path on the next heartbeat (~30s) without waiting for Komodo. Non-secret overrides for deploy (**`AGENT_ADDRESS`**, **`AGENT_IMAGE_TAG`**, etc.) go in committed **`llm/gitops.env`** (merged at deploy); change them with a PR, not on the host.
 
-**Ollama bind (GitOps):** commit **`OLLAMA_HOST`** (and other native tunables) in **`ollama/environment`**. Every **`llm-mac-mini-m4`** stack deploy runs **`scripts/configure-native-ollama-bind.sh`**, which sources that file and writes **`OLLAMA_HOST`** into Homebrew’s **cellar** `homebrew.mxcl.ollama.plist` (not only `~/Library/LaunchAgents`, which `brew services restart` overwrites from the cellar). **Ollama tunables** (llm-manager Runners → *Ollama Tunables*): the agent writes **`llm/ollama.env`** and merges changed keys into the **mounted** LaunchAgents plist, then runs **`brew services restart ollama`** via OrbStack’s **`mac`** CLI (`NATIVE_OLLAMA_RESTART_CMD` in `llm/.env`, defaulting to `~/.orbstack/bin/mac` when present). Re-deploy **`llm-mac-mini-m4`** after `brew upgrade ollama` if the formula resets the cellar plist. If **`OLLAMA_LAUNCH_AGENTS_DIR`** or **`NATIVE_OLLAMA_RESTART_CMD`** must differ from defaults, extend **`llm/pre-deploy.sh`** / **`llm/gitops.env`** via PR (or Ansible for host-level prerequisites), not one-off edits on the Mac Mini. **`BWS_LLM_AGENT_PSK_UUID`** in `llm/pre-deploy.sh` must point at the Bitwarden secret for `llm-manager-agent-psk` (same as k8s `agent-psk` ExternalSecret). **Backend on k3s:** OrbStack/Docker bridge often yields an unroutable agent address; set **`AGENT_ADDRESS=https://<Tailscale-or-LAN-IP>:8090`** (or DNS the cluster resolves) in **`llm/gitops.env`** so registration and TLS match the URL the backend uses. **Library “fits” on Metal:** the agent container often sees only ~8Gi cgroup RAM; **`pre-deploy`** adds **`AGENT_UNIFIED_VRAM_TOTAL_BYTES`** from **`llm/.ansible-memory-bytes`** (written by **`setup-macmini.yml`**) or a 16 GiB fallback — override in **`gitops.env`** if needed (`sysctl -n hw.memsize` on the Mac).
+**Ollama bind (GitOps):** commit **`OLLAMA_HOST`** (and other native tunables) in **`ollama/environment`**. Every **`llm-mac-mini-m4`** stack deploy runs **`scripts/configure-native-ollama-bind.sh`**, which sources that file and writes **`OLLAMA_HOST`** into Homebrew's **cellar** `homebrew.mxcl.ollama.plist` (not only `~/Library/LaunchAgents`, which `brew services restart` overwrites from the cellar). **Ollama tunables** (llm-manager Runners -> *Ollama Tunables*): the agent writes **`llm/ollama.env`** and merges changed keys into the **mounted** LaunchAgents plist, then runs **`brew services restart ollama`** via OrbStack's **`mac`** CLI (`NATIVE_OLLAMA_RESTART_CMD` in `llm/.env`, defaulting to `~/.orbstack/bin/mac` when present). Re-deploy **`llm-mac-mini-m4`** after `brew upgrade ollama` if the formula resets the cellar plist. If **`OLLAMA_LAUNCH_AGENTS_DIR`** or **`NATIVE_OLLAMA_RESTART_CMD`** must differ from defaults, extend **`llm/pre-deploy.sh`** / **`llm/gitops.env`** via PR (or Ansible for host-level prerequisites), not one-off edits on the Mac Mini. **`BWS_LLM_AGENT_PSK_UUID`** in `llm/pre-deploy.sh` must point at the Bitwarden secret for `llm-manager-agent-psk` (same as k8s `agent-psk` ExternalSecret). **Backend on k3s:** OrbStack/Docker bridge often yields an unroutable agent address; set **`AGENT_ADDRESS=https://<Tailscale-or-LAN-IP>:8090`** (or DNS the cluster resolves) in **`llm/gitops.env`** so registration and TLS match the URL the backend uses. **Library "fits" on Metal:** the agent container often sees only ~8Gi cgroup RAM; **`pre-deploy`** adds **`AGENT_UNIFIED_VRAM_TOTAL_BYTES`** from **`llm/.ansible-memory-bytes`** (written by **`setup-macmini.yml`**) or a 16 GiB fallback - override in **`gitops.env`** if needed (`sysctl -n hw.memsize` on the Mac).
 
 ### Komodo stack (`komodo/compose.yaml`)
 
@@ -88,23 +88,23 @@ Komodo + GitOps bootstrap, Tailscale, BlueBubbles install.
 ### Architecture
 
 ```
-GitHub push → pubhooks.amer.dev (k3s Traefik proxy) → Komodo Core (Mac Mini:9120)
-                                                        ├─ /sync/.../sync    → ResourceSync executes
-                                                        ├─ /stack/<id>/deploy → core/automation/monitoring (one webhook + stack id)
-                                                        ├─ /stack/<id>/deploy → runners (different stack id)
-                                                        └─ /stack/<id>/deploy → llm-mac-mini-m4 (optional — separate stack id, see below)
+GitHub push -> pubhooks.amer.dev (k3s Traefik proxy) -> Komodo Core (Mac Mini:9120)
+                                                        +- /sync/.../sync    -> ResourceSync executes
+                                                        +- /stack/<id>/deploy -> core/automation/monitoring (one webhook + stack id)
+                                                        +- /stack/<id>/deploy -> runners (different stack id)
+                                                        \- /stack/<id>/deploy -> llm-mac-mini-m4 (optional - separate stack id, see below)
 ```
 
 ### How it works
 
 1. Push to `amerenda/komodo-dean-gitops` on `main`
-2. GitHub webhooks fire (each URL is scoped to **one** Komodo stack id — see table below):
-   - **ResourceSync webhook** (`/listener/github/sync/komodo-dean-gitops/sync`) — tells Komodo to re-read `resource-sync/stacks.toml` and update stack definitions
-   - **Per-stack deploy webhooks** (`/listener/github/stack/<stack-uuid>/deploy`) — each triggers `docker compose up` only for that stack's `file_paths`
+2. GitHub webhooks fire (each URL is scoped to **one** Komodo stack id - see table below):
+   - **ResourceSync webhook** (`/listener/github/sync/komodo-dean-gitops/sync`) - tells Komodo to re-read `resource-sync/stacks.toml` and update stack definitions
+   - **Per-stack deploy webhooks** (`/listener/github/stack/<stack-uuid>/deploy`) - each triggers `docker compose up` only for that stack's `file_paths`
 3. Each stack's `pre_deploy` script runs first, fetching secrets from BWS via `bws` CLI
 4. Komodo runs `docker compose up -d` with the updated compose files
 
-**Keeping `llm-mac-mini-m4` isolated from other deploys:** The stack is defined in `resource-sync/stacks.toml`; let ResourceSync pick it up, then in Komodo create a **dedicated GitHub webhook** whose path is `/listener/github/stack/<llm-mac-mini-m4-stack-uuid>/deploy` — same HMAC secret as the others. Pushes only trigger the stacks whose webhooks you configure; the `llm-mac-mini-m4` webhook does **not** deploy core, automation, monitoring, or runners. Conversely, existing deploy webhooks only touch their own stack ids, so they never pull up `llm-mac-mini-m4` unless you merge those stacks in Komodo (this repo keeps them separate).
+**Keeping `llm-mac-mini-m4` isolated from other deploys:** The stack is defined in `resource-sync/stacks.toml`; let ResourceSync pick it up, then in Komodo create a **dedicated GitHub webhook** whose path is `/listener/github/stack/<llm-mac-mini-m4-stack-uuid>/deploy` - same HMAC secret as the others. Pushes only trigger the stacks whose webhooks you configure; the `llm-mac-mini-m4` webhook does **not** deploy core, automation, monitoring, or runners. Conversely, existing deploy webhooks only touch their own stack ids, so they never pull up `llm-mac-mini-m4` unless you merge those stacks in Komodo (this repo keeps them separate).
 
 ### Webhook configuration
 
@@ -117,8 +117,8 @@ IngressRoute that forwards `/listener/github/*` to the Mac Mini's Komodo Core).
 | ResourceSync | `606876027` | `.../sync/komodo-dean-gitops/sync` | Sync stack definitions from TOML (path updated after rename) |
 | Core/Automation/Monitoring deploy | `605400567` | `.../stack/69c4863a9781f84b58ffd7a6/deploy` | Deploy core, automation, and monitoring stacks |
 | Runners deploy | `606895878` | `.../stack/69c4863a9781f84b58ffd7a8/deploy` | Deploy runners stack |
-| LLM deploy | *(add after sync)* | `.../stack/<llm-mac-mini-m4-stack-uuid>/deploy` | Deploy `mac-mini-m4/llm/` only — use the stack id for **`llm-mac-mini-m4`** from Komodo UI after ResourceSync imports `stacks.toml` |
-| Media-server deploy (murderbot) | *(add after sync)* | `.../stack/<media-server-stack-uuid>/deploy` | Deploy `murderbot/media-server/` only — see top-level [README.md](../README.md) |
+| LLM deploy | *(add after sync)* | `.../stack/<llm-mac-mini-m4-stack-uuid>/deploy` | Deploy `mac-mini-m4/llm/` only - use the stack id for **`llm-mac-mini-m4`** from Komodo UI after ResourceSync imports `stacks.toml` |
+| Media-server deploy (murderbot) | *(add after sync)* | `.../stack/<media-server-stack-uuid>/deploy` | Deploy `murderbot/media-server/` only - see top-level [README.md](../README.md) |
 
 All webhooks use the `komodo-dean-webhook-secret` from BWS as the HMAC secret.
 
@@ -154,7 +154,7 @@ Sync definition: `resource-sync/sync.toml`
 2. Update the base image tag in `komodo/Dockerfile.periphery`
 3. On the Mac Mini: `cd ~/komodo-dean-gitops/mac-mini-m4/komodo && docker compose --env-file compose.env build periphery && docker compose --env-file compose.env up -d`
 
-Note: The Komodo stack is self-managed (has `komodo.skip` labels) — it does NOT
+Note: The Komodo stack is self-managed (has `komodo.skip` labels) - it does NOT
 auto-deploy via webhooks. You must restart it manually or via SSH after changing
 the compose.env or Dockerfile.
 
@@ -184,8 +184,8 @@ No secrets in git, no secrets in GitHub repo/org settings, no manually managed f
 ### How secrets flow
 
 ```
-BWS → inject-secrets.sh → files on disk → Docker containers read at startup
-                        → Komodo API (git provider PAT)
+BWS -> inject-secrets.sh -> files on disk -> Docker containers read at startup
+                        -> Komodo API (git provider PAT)
 ```
 
 Three triggers refresh secrets:
@@ -211,10 +211,10 @@ All three paths write to the same locations. The script is idempotent.
 | Komodo database | Git provider PAT | Komodo Core (updated via API by inject-secrets.sh) |
 
 Generated files (not in git, created by inject-secrets.sh):
-- `runners/compose.env` — non-secret runner config
-- `komodo/secrets/*` — Komodo secret files
-- `.env` — service passwords
-- `bind9/keys/key.conf` — TSIG key
+- `runners/compose.env` - non-secret runner config
+- `komodo/secrets/*` - Komodo secret files
+- `.env` - service passwords
+- `bind9/keys/key.conf` - TSIG key
 
 ### Rotating a secret
 
@@ -230,51 +230,51 @@ BWS secret IDs are defined in `ansible-playbooks/group_vars/macmini_hosts.yml`.
 ### Rules
 
 - **NEVER** commit secrets to git
-- **NEVER** set GitHub repo/org secrets — all CI secrets come from BWS via runner secret files
-- **NEVER** manually create or edit secret files on disk — use BWS + inject-secrets.sh
+- **NEVER** set GitHub repo/org secrets - all CI secrets come from BWS via runner secret files
+- **NEVER** manually create or edit secret files on disk - use BWS + inject-secrets.sh
 - `compose.env` files in git contain non-secret config only; secret values are injected by the script
 
 ## Directory Structure
 
 ```
 .
-├── docker-compose.yaml          # Services stack (HA, Technitium, Postgres, MongoDB, etc.)
-├── homeassistant/               # HA configuration (gitops-managed)
-│   ├── configuration/           # Mounted read-only into HA container
-│   └── scripts/                 # Setup/migration scripts
-├── komodo/                      # Komodo stack (self-managed, not auto-deployed)
-│   ├── compose.yaml             # Core + Periphery + FerretDB + Postgres
-│   ├── compose.env              # Config (secrets injected by script)
-│   ├── Dockerfile.periphery     # Periphery v2.1.2 + bws CLI
-│   └── secrets/                 # (gitignored) secret files on disk
-├── runners/                     # GitHub Actions runners stack
-│   ├── compose.yaml             # repo-scoped runners (no separate llm-agents repo)
-│   ├── compose.env.example      # Template for non-secret config
-│   └── entrypoint-wrapper.sh    # Reads secrets from /run/secrets into env
-├── llm/                         # llm-manager agent (native Ollama + agent container)
-│   ├── compose.yaml
-│   └── pre-deploy.sh            # BWS → llm/.env for Komodo
-├── resource-sync/               # Komodo GitOps definitions
-│   ├── stacks.toml              # Stack definitions + pre_deploy scripts
-│   └── sync.toml                # ResourceSync self-definition
-├── scripts/
-│   ├── inject-secrets.sh        # BWS → disk + Komodo API (boot, ansible, manual)
-│   ├── sync-stacks.sh           # Host-side git sync (OrbStack VirtFS workaround)
-│   ├── backup.sh                # Backup HA, pihole, bind9 data
-│   ├── healthcheck.sh           # Verify services are running
-│   └── dns-udp-proxy.py         # UDP DNS proxy with EDNS Client Subnet
-├── launchd/
-│   ├── com.local.inject-secrets.plist          # Boot-time secret injection
-│   ├── com.local.komodo-stack-sync.plist       # Host-side git sync (every 60s)
-│   ├── com.local.pf-dns-redirect.plist         # pf DNS redirect for Technitium
-│   └── com.local.dns-udp-proxy.plist           # UDP DNS proxy daemon
-├── zigbee2mqtt/                 # Zigbee2MQTT config + smart-lighting extension
-├── mosquitto/                   # MQTT broker config
-├── bind9/                       # BIND9 config + zone files (disabled)
-├── pihole/                      # Pihole config (disabled)
-├── mongo/                       # MongoDB init scripts
-├── postgres/                    # Postgres init scripts (todo, agent_kb databases)
-└── whisper/                     # Whisper model cache
++-- docker-compose.yaml          # Services stack (HA, Technitium, Postgres, MongoDB, etc.)
++-- homeassistant/               # HA configuration (gitops-managed)
+|   +-- configuration/           # Mounted read-only into HA container
+|   \-- scripts/                 # Setup/migration scripts
++-- komodo/                      # Komodo stack (self-managed, not auto-deployed)
+|   +-- compose.yaml             # Core + Periphery + FerretDB + Postgres
+|   +-- compose.env              # Config (secrets injected by script)
+|   +-- Dockerfile.periphery     # Periphery v2.1.2 + bws CLI
+|   \-- secrets/                 # (gitignored) secret files on disk
++-- runners/                     # GitHub Actions runners stack
+|   +-- compose.yaml             # repo-scoped runners (no separate llm-agents repo)
+|   +-- compose.env.example      # Template for non-secret config
+|   \-- entrypoint-wrapper.sh    # Reads secrets from /run/secrets into env
++-- llm/                         # llm-manager agent (native Ollama + agent container)
+|   +-- compose.yaml
+|   \-- pre-deploy.sh            # BWS -> llm/.env for Komodo
++-- resource-sync/               # Komodo GitOps definitions
+|   +-- stacks.toml              # Stack definitions + pre_deploy scripts
+|   \-- sync.toml                # ResourceSync self-definition
++-- scripts/
+|   +-- inject-secrets.sh        # BWS -> disk + Komodo API (boot, ansible, manual)
+|   +-- sync-stacks.sh           # Host-side git sync (OrbStack VirtFS workaround)
+|   +-- backup.sh                # Backup HA, pihole, bind9 data
+|   +-- healthcheck.sh           # Verify services are running
+|   \-- dns-udp-proxy.py         # UDP DNS proxy with EDNS Client Subnet
++-- launchd/
+|   +-- com.local.inject-secrets.plist          # Boot-time secret injection
+|   +-- com.local.komodo-stack-sync.plist       # Host-side git sync (every 60s)
+|   +-- com.local.pf-dns-redirect.plist         # pf DNS redirect for Technitium
+|   \-- com.local.dns-udp-proxy.plist           # UDP DNS proxy daemon
++-- zigbee2mqtt/                 # Zigbee2MQTT config + smart-lighting extension
++-- mosquitto/                   # Legacy - removed; active instance runs in automation stack (automation/config/mosquitto.conf)
++-- bind9/                       # BIND9 config + zone files (disabled)
++-- pihole/                      # Pihole config (disabled)
++-- mongo/                       # MongoDB init scripts
++-- postgres/                    # Postgres init scripts (todo, agent_kb databases)
+\-- whisper/                     # Whisper model cache
 ```
 
 ## Zigbee (Zigbee2MQTT)
@@ -314,7 +314,7 @@ reset --hard` on the Komodo checkout (`~/komodo/stacks/...`), restarts
 Periphery when the **directory tree** changes, and restarts **Grafana and
 Prometheus** when any path under `mac-mini-m4/monitoring/` changed so dashboard and scrape
 config updates always take effect. **Home Assistant** and **Zigbee2MQTT** use the
-same `mac-mini-m4/…` prefix for `homeassistant/` and `zigbee2mqtt/` file changes.
+same `mac-mini-m4/...` prefix for `homeassistant/` and `zigbee2mqtt/` file changes.
 
 ### Komodo ResourceSync webhook does not auto-execute
 
