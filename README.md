@@ -5,66 +5,66 @@ across Alex's home lab. Komodo Core runs on the Mac Mini M4; one Periphery
 agent per host pulls compose files from this repo and deploys them.
 
 ArgoCD lives in a sibling repo
-([`k3s-dean-gitops`](https://github.com/amerenda/k3s-dean-gitops)) — k3s
+([`k3s-dean-gitops`](https://github.com/amerenda/k3s-dean-gitops)) - k3s
 manifests do **not** live here.
 
 ## Layout
 
 ```
 komodo-dean-gitops/
-├── resource-sync/             Komodo ResourceSync TOML (single source of truth)
-│   ├── sync.toml              ResourceSync self-definition
-│   └── stacks.toml            All [[server]] and [[stack]] resources
-│
-├── mac-mini-m4/               Stacks deployed to the Mac Mini M4 Periphery
-│   ├── core/                  Technitium DNS, Postgres, MongoDB, backups
-│   ├── automation/            Home Assistant, Whisper, Piper, OWW, MQTT, Z2M
-│   ├── monitoring/            Prometheus, Grafana, exporters
-│   ├── runners/               GitHub Actions self-hosted runners
-│   ├── llm/                   llm-manager agent (talks to native Metal Ollama)
-│   ├── komodo/                Komodo Core + Periphery (self-managed)
-│   ├── homeassistant/         HA configuration (bind-mounted into automation)
-│   ├── postgres/, mongo/, …   DB init; mosquitto/, zigbee2mqtt/, ollama/, whisper/, pihole/, bind9/ (legacy config dirs, active services in their respective stacks)
-│   ├── launchd/               macOS LaunchDaemons / LaunchAgents
-│   ├── scripts/               Boot, secret injection, sync, backup
-│   └── README.md              Full Mac Mini docs
-│
-├── murderbot/                 Stacks deployed to the murderbot (Debian) Periphery
-│   ├── README.md              Host overview + Periphery setup
-│   ├── llm/                   llm-manager agent (native Ollama)
-│   └── media-server/          Jellyfin + servarr + nginx/certbot + DO dyndns
-│
-└── archlinux/                 Stacks deployed to the Arch Linux Periphery
-    ├── README.md              Host overview
-    ├── scripts/               Host helpers (e.g. native Ollama bind)
-    └── llm/                   llm-manager agent (native Ollama)
++---- resource-sync/             Komodo ResourceSync TOML (single source of truth)
+|   +---- sync.toml              ResourceSync self-definition
+|   \---- stacks.toml            All [[server]] and [[stack]] resources
+|
++---- mac-mini-m4/               Stacks deployed to the Mac Mini M4 Periphery
+|   +---- core/                  Technitium DNS, Postgres, MongoDB, backups
+|   +---- automation/            Home Assistant, Whisper, Piper, OWW, MQTT, Z2M
+|   +---- monitoring/            Prometheus, Grafana, exporters
+|   +---- runners/               GitHub Actions self-hosted runners
+|   +---- llm/                   llm-manager agent (talks to native Metal Ollama)
+|   +---- komodo/                Komodo Core + Periphery (self-managed)
+|   +---- homeassistant/         HA configuration (bind-mounted into automation)
+|   +---- postgres/, mongo/, ...   DB init; mosquitto/, zigbee2mqtt/, ollama/, whisper/, pihole/, bind9/ (legacy config dirs, active services in their respective stacks)
+|   +---- launchd/               macOS LaunchDaemons / LaunchAgents
+|   +---- scripts/               Boot, secret injection, sync, backup
+|   \---- README.md              Full Mac Mini docs
+|
++---- murderbot/                 Stacks deployed to the murderbot (Debian) Periphery
+|   +---- README.md              Host overview + Periphery setup
+|   +---- llm/                   llm-manager agent (native Ollama)
+|   \---- media-server/          Jellyfin + servarr + nginx/certbot + DO dyndns
+|
+\---- archlinux/                 Stacks deployed to the Arch Linux Periphery
+    +---- README.md              Host overview
+    +---- scripts/               Host helpers (e.g. native Ollama bind)
+    \---- llm/                   llm-manager agent (native Ollama)
 ```
 
 ## Architecture
 
 ```
 GitHub push (amerenda/komodo-dean-gitops)
-   │
-   ▼
-pubhooks.amer.dev  (k3s Traefik proxy → Komodo Core)
-   │
-   ▼
+   |
+   v
+pubhooks.amer.dev  (k3s Traefik proxy -> Komodo Core)
+   |
+   v
 Komodo Core  (mac-mini-m4 :9120)
-   │
-   ├──► Periphery on mac-mini-m4   ──► mac-mini-m4/{core,automation,monitoring,runners,llm}
-   ├──► Periphery on murderbot     ──► murderbot/{llm, media-server, …}
-   └──► Periphery on archlinux     ──► archlinux/{llm, …}
+   |
+   +---->> Periphery on mac-mini-m4   -->> mac-mini-m4/{core,automation,monitoring,runners,llm}
+   +---->> Periphery on murderbot     -->> murderbot/{llm, media-server, ...}
+   \---->> Periphery on archlinux     -->> archlinux/{llm, ...}
 ```
 
 Secrets flow:
 
 ```
 Bitwarden Secrets Manager
-   │  (per-host machine account, BWS access token at /etc/komodo/secrets/bws-access-token)
-   ▼
-stack pre_deploy  →  <stack>/.env / runner-secrets / ha-token / …
-   │
-   ▼
+   |  (per-host machine account, BWS access token at /etc/komodo/secrets/bws-access-token)
+   v
+stack pre_deploy  ->  <stack>/.env / runner-secrets / ha-token / ...
+   |
+   v
 docker compose up -d
 ```
 
@@ -113,7 +113,7 @@ is handled by [`amerenda/ansible-playbooks`](https://github.com/amerenda/ansible
 
 ## Secrets
 
-Bitwarden Secrets Manager is the **only** source of truth — no secrets in git,
+Bitwarden Secrets Manager is the **only** source of truth - no secrets in git,
 no GitHub repo/org secrets, no manually managed files. See
 [`mac-mini-m4/README.md`](mac-mini-m4/README.md#secrets) for the per-host flow
 and rotation steps.
@@ -127,13 +127,13 @@ host converges without one-off commands.
 
 ## Per-host docs
 
-- [mac-mini-m4/README.md](mac-mini-m4/README.md) — Mac Mini stacks (full operational guide)
-- [murderbot/README.md](murderbot/README.md) — murderbot Periphery setup (Debian)
+- [mac-mini-m4/README.md](mac-mini-m4/README.md) - Mac Mini stacks (full operational guide)
+- [murderbot/README.md](murderbot/README.md) - murderbot Periphery setup (Debian)
 
 ## Git: remote URL, typo trap, and safe updates
 
 **Correct GitHub repo:** `amerenda/komodo-dean-gitops` (spelled **komodo** with
-two `o`s — not `komdo-dean-gitops`). A typo in `origin` makes `git pull` fail
+two `o`s - not `komdo-dean-gitops`). A typo in `origin` makes `git pull` fail
 with keychain errors and a username prompt on HTTPS.
 
 ```bash
@@ -148,11 +148,11 @@ git remote -v
 origin/main`) while you still have **uncommitted** migration work, unless
 GitHub `main` already contains that layout. `origin/main` is still the old
 flat tree until the migration commit is **pushed**; resetting to it makes Git
-try to delete `mac-mini-m4/` and bring back root-level paths — your working
-tree will look “destroyed”.
+try to delete `mac-mini-m4/` and bring back root-level paths - your working
+tree will look "destroyed".
 
-**Safe flow:** commit (or stash) on a branch → push or open a PR → merge on
-GitHub → then `git pull` on the Mac Mini.
+**Safe flow:** commit (or stash) on a branch -> push or open a PR -> merge on
+GitHub -> then `git pull` on the Mac Mini.
 
 **Recovery after a bad checkout:** find where you were before:
 
@@ -175,7 +175,7 @@ Each stack's [`resource-sync/sync.toml`](resource-sync/sync.toml) and every
 **Testing on a feature branch:**
 
 1. Push the branch; merge to `main` only when ready for production pulls to follow `main`.
-2. In **Komodo UI → Resources → Syncs**, open the `komodo-dean-gitops` sync resource and set **Branch** to your feature branch, then save and run **Sync**.
+2. In **Komodo UI -> Resources -> Syncs**, open the `komodo-dean-gitops` sync resource and set **Branch** to your feature branch, then save and run **Sync**.
 3. Confirm stacks deploy cleanly on each Periphery.
 
 **Production:** all branches are `main`. After editing them, push to `main` and run **Sync** (or rely on the webhook). If you pointed the ResourceSync at a feature branch in Komodo UI, set **Branch** back to `main`.
