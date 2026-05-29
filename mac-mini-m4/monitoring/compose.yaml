@@ -13,6 +13,7 @@ services:
       - prometheus-data:/prometheus
       - ${MONITORING_DIR:-.}/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ${MONITORING_DIR:-.}/ha-token:/etc/prometheus/ha-token:ro
+      - ${MONITORING_DIR:-.}/rules:/etc/prometheus/rules:ro
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'

@@ -67,3 +67,17 @@ scrape_configs:
       - targets: ["10.100.20.19:9100"]
         labels:
           node: murderbot
+
+  # Cross-stack heartbeat — k3s Prometheus health probe (via MetalLB LoadBalancer)
+  - job_name: k3s-prometheus-heartbeat
+    scheme: http
+    metrics_path: /-/healthy
+    scrape_interval: 15s
+    static_configs:
+      - targets: ["10.100.20.206"]
+        labels:
+          cluster: k3s-dean
+
+  # Evaluation rules — cross-stack heartbeat alerts
+  rule_files:
+    - /etc/prometheus/rules/*.yml
