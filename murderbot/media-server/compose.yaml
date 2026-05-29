@@ -12,7 +12,7 @@ x-dns: &dns-servers
 services:
   profilarr:
     container_name: profilarr
-    image: santiagosayshey/profilarr:latest
+    image: santiagosayshey/profilarr:v1.1.4
     ports:
       - 6868:6868
     volumes:
@@ -26,7 +26,7 @@ services:
 
   prowlarr:
     container_name: prowlarr
-    image: linuxserver/prowlarr:latest
+    image: linuxserver/prowlarr:2.3.5
     networks:
       servarr:
     dns: *dns-servers
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest
+    image: lscr.io/linuxserver/sabnzbd:5.0.3
     container_name: sabnzbd
     networks:
       servarr:
@@ -60,7 +60,7 @@ services:
 
   radarr:
     container_name: radarr
-    image: lscr.io/linuxserver/radarr:latest
+    image: lscr.io/linuxserver/radarr:6.1.1
     networks:
       servarr:
     dns: *dns-servers
@@ -77,7 +77,7 @@ services:
     restart: unless-stopped
 
   sonarr:
-    image: linuxserver/sonarr:latest
+    image: linuxserver/sonarr:4.0.17
     container_name: sonarr
     networks:
       servarr:
@@ -96,7 +96,7 @@ services:
 
   bazarr:
     container_name: bazarr
-    image: linuxserver/bazarr:latest
+    image: linuxserver/bazarr:1.5.6
     networks:
       servarr:
     dns: *dns-servers
@@ -140,7 +140,7 @@ services:
     restart: unless-stopped
 
   seerr:
-    image: ghcr.io/seerr-team/seerr:latest
+    image: ghcr.io/seerr-team/seerr:v3.2.0
     init: true
     container_name: seerr
     networks:
@@ -161,18 +161,19 @@ services:
       retries: 3
     restart: unless-stopped
 
- recyclarr:
-     container_name: recyclarr
-     image: ghcr.io/recyclarr/recyclarr:7
-     user: "1000:1000"
-     environment:
-       - TZ=America/New_York
-     volumes:
-       - ${RECYCLARR_CONFIG}:/config
-     networks:
-       servarr:
-     dns: *dns-servers
-     restart: unless-stopped
+  recyclarr:
+    container_name: recyclarr
+    image: ghcr.io/recyclarr/recyclarr:7
+    user: "1000:1000"
+    environment:
+      - TZ=America/New_York
+    volumes:
+      - ${RECYCLARR_CONFIG}:/config
+    networks:
+      servarr:
+    dns: *dns-servers
+    restart: unless-stopped
+
 
 networks:
    servarr:
