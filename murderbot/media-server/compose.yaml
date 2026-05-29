@@ -161,18 +161,19 @@ services:
       retries: 3
     restart: unless-stopped
 
- recyclarr:
-     container_name: recyclarr
-     image: ghcr.io/recyclarr/recyclarr:7
-     user: "1000:1000"
-     environment:
-       - TZ=America/New_York
-     volumes:
-       - ${RECYCLARR_CONFIG}:/config
-     networks:
-       servarr:
-     dns: *dns-servers
-     restart: unless-stopped
+  recyclarr:
+    container_name: recyclarr
+    image: ghcr.io/recyclarr/recyclarr:7
+    user: "1000:1000"
+    environment:
+      - TZ=America/New_York
+    volumes:
+      - ${RECYCLARR_CONFIG}:/config
+    networks:
+      servarr:
+    dns: *dns-servers
+    restart: unless-stopped
+
 
 networks:
    servarr:
