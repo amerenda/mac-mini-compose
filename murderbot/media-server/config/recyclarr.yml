@@ -1,0 +1,78 @@
+# Recyclarr configuration for murderbot media-server.
+# Syncs Custom Formats, Quality Profiles, and Naming rules to Sonarr + Radarr.
+# Source templates: https://github.com/recyclarr/config-templates
+# Updated by Recyclarr — do not edit manually.
+
+sonarr:
+  default-sonarr-v4:
+    base_url: http://sonarr:8989
+    api_key: ${SONARR_API_KEY}
+    include:
+      - template: sonarr-quality-definition-default
+      - template: sonarr-v4-custom-formats-default
+
+    custom_formats:
+      # Language filtering — block non-original language releases
+      - trash_ids:
+          - d6e9318c875905d6cfb5bee961afcea9  # Language: Not Original
+        assign_scores_to:
+          - name: Standard - 1080p
+            score: -10000
+          - name: Standard - 720p
+            score: -10000
+          - name: Remux-1080p - Anime
+            score: -10000
+
+      # Anime-specific filters
+      - trash_ids:
+          - 418f50b10f1907201b6cfdf881f467b7  # Anime Dual Audio
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: 0
+
+      - trash_ids:
+          - b2550eb333d27b75833e25b8c2557b38  # 10bit
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: 0
+
+      - trash_ids:
+          - 026d5aadd1a6b4e550b134cb6c72b3ca  # Uncensored
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: 0
+
+      - trash_ids:
+          - f9d6ceafab5f4e8da9d4a3be9728efac  # No Subs / NSub — reject releases without subtitles
+        assign_scores_to:
+          - name: Remux-1080p - Anime
+            score: -10000
+
+      # General quality filters for live-action shows
+      - trash_ids:
+          - a5d148168c4506b55cf53984107c396e  # HDR — prefer SDR for anime
+        assign_scores_to:
+          - name: Standard - 1080p
+            score: 0
+
+radarr:
+  default-radarr-v4:
+    base_url: http://radarr:7878
+    api_key: ${RADARR_API_KEY}
+    include:
+      - template: radarr-quality-definition-default
+      - template: radarr-custom-formats-default
+
+    custom_formats:
+      # Language filtering — block non-original language releases
+      - trash_ids:
+          - d6e9318c875905d6cfb5bee961afcea9  # Language: Not Original
+        assign_scores_to:
+          - name: HD - BluRay x264
+            score: -10000
+
+      - trash_ids:
+          - f9d6ceafab5f4e8da9d4a3be9728efac  # No Subs / NSub
+        assign_scores_to:
+          - name: HD - BluRay x264
+            score: -10000

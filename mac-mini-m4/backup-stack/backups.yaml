@@ -1,0 +1,133 @@
+# Backup Stack — All services (core + monitoring)
+# Add these to docker-compose.yaml as additional services under `services:`.
+# Add the shared `backups-local` volume declaration at the bottom of the file.
+#
+# Architecture: all backup scripts write locally only → gcs-sync reads from shared staging volume
+# and uploads to GCS via unified sync script with safety caps.
+
+services:
+  # ============================================================
+  # Zigbee2MQTT Coordinator Backup — EmberZNet state + device bindings
+  # Runs daily at 01:30. Local retention: keep latest 7 backups per file type.
+  # Backs up: coordinator_backup.json (network key, pan_id), database.db (bindings table)
+  # ============================================================
+  z2m-backup:
+    image: alpine:3
+    container_name: z2m-backup
+    restart: unless-stopped
+    depends_on: [zigbee2mqtt]
+    volumes:
+      - zigbee2mqtt-data:/app/data:ro           # read-only mount of Z2M volume for backup
+      - backups-local:/backups-local            # shared staging directory (all backup containers write here)
+      - ./backup-stack/backup-scripts/z2m.sh:/z2m.sh:ro
+    command: >
+      sh -c "
+        while true; do
+          /z2m.sh 2>&1 | tee -a /var/log/z2m-backup.log
+          echo '[\$(date)] Sleeping until next backup (24 hours)...'
+          sleep 86400
+        done
+      "
+
+  # ============================================================
+  # Home Assistant Volume Backup — scenes.yaml, .storage/ directory
+  # Runs daily at 03:30. Local retention: keep latest 7 backups per file type.
+  # Backs up only what cannot be recovered from gitops repo:
+  #   - scenes.yaml (created in HA UI)
+  #   - sl_custom_scenes.json (custom scene packs — optional, may not exist)
+  #   - .storage/ (helper values, auth tokens, Lovelace config, entity registry)
+  # ============================================================
+  ha-backup:
+    image: alpine:3
+    container_name: ha-backup
+    restart: unless-stopped
+    depends_on: [homeassistant]
+    volumes:
+      - ha-config:/config:ro                    # read-only mount of HA volume (where scenes.yaml, .storage/ live)
+      - backups-local:/backups-local            # shared staging directory (all backup containers write here)
+      - ./backup-stack/backup-scripts/ha.sh:/ha.sh:ro
+    command: >
+      sh -c "
+        while true; do
+          /ha.sh 2>&1 | tee -a /var/log/ha-backup.log
+          echo '[\$(date)] Sleeping until next backup (24 hours)...'
+          sleep 86400
+        done
+      "
+
+  # ============================================================
+  # Grafana Dashboard Export — exports dashboards via REST API to JSON files
+  # Runs daily at 04:00. Local retention: keeps latest 5 per dashboard.
+  # Exports: all dashboards from /api/search → /api/dashboards/uid/{uid}
+  #           datasources from /api/datasources
+  # ============================================================
+  grafana-backup:
+    image: alpine:3
+    container_name: grafana-backup
+    restart: unless-stopped
+    depends_on: [grafana]
+    volumes:
+      - backups-local:/backups-local            # shared staging directory (all backup containers write here)
+      - ./backup-stack/backup-scripts/grafana-export.sh:/export.sh:ro
+    environment:
+      GRAFANA_URL: "http://grafana:3000"       # Docker service name (internal networking)
+      GRAFANA_API_TOKEN: "${GRAFANA_API_TOKEN}"  # API token from .env
+    command: >
+      sh -c "
+        apk add --no-cache curl jq &&
+        while true; do
+          /export.sh 2>&1 | tee -a /var/log/grafana-backup.log
+          echo '[\$(date)] Sleeping until next backup (24 hours)...'
+          sleep 86400
+        done
+      "
+
+  # ============================================================
+  # Prometheus Config Backup — exports scrape targets and global config only
+  # Runs daily at 04:30. Local retention: keep latest 7 backups.
+  # NOTE: Time-series data NOT backed up here (ephemeral ~30-day retention).
+  #       If full recovery needed, rely on remote_write targets or K3s Prometheus setup.
+  # ============================================================
+  prometheus-config-backup:
+    image: alpine:3
+    container_name: prometheus-config-backup
+    restart: unless-stopped
+    depends_on: [prometheus]
+    volumes:
+      - prometheus-data:/prometheus/data:ro     # read-only mount of Prometheus data volume
+      - backups-local:/backups-local            # shared staging directory (all backup containers write here)
+      - ./backup-stack/backup-scripts/prometheus-config.sh:/promconfig.sh:ro
+    command: >
+      sh -c "
+        while true; do
+          /promconfig.sh 2>&1 | tee -a /var/log/prometheus-config-backup.log
+          echo '[\$(date)] Sleeping until next backup (24 hours)...'
+          sleep 86400
+        done
+      "
+
+  # ============================================================
+  # Unified GCS Sync — uploads all staged local backups to cloud storage
+  # Run manually via: docker exec -it gcs-sync sh /gcs-sync.sh --force
+  # Or schedule in Komodo stack deploy (e.g. on-demand webhook trigger)
+  # SAFETY: dry-run by default, passes --dry-run flag; --force required for actual uploads
+  # ============================================================
+  gcs-sync:
+    image: alpine:3
+    container_name: gcs-sync
+    restart: "no"                               # One-shot service — does not auto-start
+    volumes:
+      - backups-local:/backups-local            # reads staged backups from all services
+      - ./backup-stack/backup-scripts/gcs-sync.sh:/gcs-sync.sh:ro
+    environment:
+      GCS_ENDPOINT: "${BACKUP_ENDPOINT}"
+      GCS_ACCESS_KEY: "${BACKUP_ACCESS_KEY}"
+      GCS_SECRET_KEY: "${BACKUP_SECRET_KEY}"
+      GCS_BUCKET: "amerenda-backups"
+      GCS_REMOTE_PREFIX: "us/mac-mini/dean"
+      # SAFETY CAPS — prevent runaway costs
+      GCS_MAX_SIZE_MB: "1024"                   # 1 GB default cap (override with --force + env)
+      GCS_CLEANUP_AFTER_SYNC: "${GCS_CLEANUP_AFTER_SYNC:-false}"
+
+volumes:
+  backups-local:                                # Shared staging volume for all backup containers
