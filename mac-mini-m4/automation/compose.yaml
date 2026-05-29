@@ -96,7 +96,7 @@ services:
     network_mode: host
     volumes:
       - mosquitto-data:/mosquitto/data
-      - ../mosquitto/config:/mosquitto/config:ro
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
 
   # ============================================================
   # Zigbee2MQTT — Zigbee coordinator bridge
