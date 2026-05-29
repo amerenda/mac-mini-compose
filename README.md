@@ -24,7 +24,7 @@ komodo-dean-gitops/
 │   ├── llm/                   llm-manager agent (talks to native Metal Ollama)
 │   ├── komodo/                Komodo Core + Periphery (self-managed)
 │   ├── homeassistant/         HA configuration (bind-mounted into automation)
-│   ├── postgres/, mongo/, …   DB init; mosquitto/, zigbee2mqtt/, ollama/, whisper/, pihole/, bind9/
+│   ├── postgres/, mongo/, …   DB init; mosquitto/, zigbee2mqtt/, ollama/, whisper/, pihole/, bind9/ (legacy config dirs, active services in their respective stacks)
 │   ├── launchd/               macOS LaunchDaemons / LaunchAgents
 │   ├── scripts/               Boot, secret injection, sync, backup
 │   └── README.md              Full Mac Mini docs
@@ -92,12 +92,13 @@ is handled by [`amerenda/ansible-playbooks`](https://github.com/amerenda/ansible
 ## Adding a new stack
 
 1. Create `<host>/<stack>/compose.yaml` with the service definitions.
-2. If secrets are required, add a `<host>/<stack>/pre-deploy.sh` that pulls
+2. **Every container image MUST be pinned to a specific semver version tag.** Never use `:latest`. Use simple X.Y.Z tags (not commit hashes or digests). Document current versions in that stack's CLAUDE.md file.
+3. If secrets are required, add a `<host>/<stack>/pre-deploy.sh` that pulls
    from BWS and writes a `.env` next to the compose (mirror the patterns under
    [`mac-mini-m4/core/`](mac-mini-m4/core/) or [`murderbot/media-server/`](murderbot/media-server/)).
-3. Add a `[[stack]]` block to [`resource-sync/stacks.toml`](resource-sync/stacks.toml)
+4. Add a `[[stack]]` block to [`resource-sync/stacks.toml`](resource-sync/stacks.toml)
    with `server`, `repo`, `file_paths`, `branch`, and `pre_deploy.command`.
-4. Push your branch (or `main` after merge). The ResourceSync webhook (or poll)
+5. Push your branch (or `main` after merge). The ResourceSync webhook (or poll)
    registers the stack in Komodo. Then add a per-stack deploy webhook in GitHub
    (`/listener/github/stack/<stack-uuid>/deploy`) so future pushes deploy that
    stack without touching others.
@@ -165,33 +166,16 @@ git checkout -B recovery-branch abc1234
 Then fix `git remote` if needed and either commit your migration and push, or
 `git stash` / cherry-pick as appropriate.
 
-## Pointing Komodo at a non-`main` branch (layout migration)
+## Pointing Komodo at a non-`main` branch
 
-This repo’s [`resource-sync/sync.toml`](resource-sync/sync.toml) and every
+Each stack's [`resource-sync/sync.toml`](resource-sync/sync.toml) and every
 `[[stack]]` in [`resource-sync/stacks.toml`](resource-sync/stacks.toml) carry a
-`branch = "..."` field. Komodo uses that branch when it clones compose sources
-and when it applies ResourceSync updates from git.
+`branch = "..."` field. Komodo uses that branch when it clones compose sources.
 
-**While testing on `feat/komodo-repo-layout` (or any feature branch):**
+**Testing on a feature branch:**
 
-1. **GitHub:** push the branch; merge to `main` only when you are ready for
-   production pulls to follow `main` again.
-2. **Komodo UI → Resources → Syncs** (or **Resource Sync**): open the
-   `komodo-dean-gitops` sync resource and set **Branch** to
-   `feat/komodo-repo-layout`, then save and run **Sync** (or wait for the
-   webhook after your next push to that branch).
-3. Confirm stacks show the new `mac-mini-m4/...` and `murderbot/...` file paths
-   and deploy cleanly on each Periphery.
+1. Push the branch; merge to `main` only when ready for production pulls to follow `main`.
+2. In **Komodo UI → Resources → Syncs**, open the `komodo-dean-gitops` sync resource and set **Branch** to your feature branch, then save and run **Sync**.
+3. Confirm stacks deploy cleanly on each Periphery.
 
-**Production:** `resource-sync/sync.toml` and every `[[stack]]` in
-`resource-sync/stacks.toml` use `branch = "main"`. After editing them, push to
-`main` and run **Sync** on the `komodo-dean-gitops` ResourceSync (or rely on the
-webhook). If you ever pointed the ResourceSync at a feature branch in the Komodo
-UI, set **Branch** back to `main` there too.
-
-## One-time migration checklist
-
-If you're reading this shortly after the rename from `mac-mini-compose`,
-follow [MIGRATION.md](MIGRATION.md) end-to-end. It covers the leaked DO token
-rotation, BWS secret creation, Ansible re-runs, webhook updates, and old-repo
-archival. Delete `MIGRATION.md` once everything is green.
+**Production:** all branches are `main`. After editing them, push to `main` and run **Sync** (or rely on the webhook). If you pointed the ResourceSync at a feature branch in Komodo UI, set **Branch** back to `main`.

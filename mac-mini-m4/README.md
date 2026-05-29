@@ -269,7 +269,7 @@ BWS secret IDs are defined in `ansible-playbooks/group_vars/macmini_hosts.yml`.
 │   ├── com.local.pf-dns-redirect.plist         # pf DNS redirect for Technitium
 │   └── com.local.dns-udp-proxy.plist           # UDP DNS proxy daemon
 ├── zigbee2mqtt/                 # Zigbee2MQTT config + smart-lighting extension
-├── mosquitto/                   # MQTT broker config
+├── mosquitto/                   # Legacy — removed; active instance runs in automation stack (automation/config/mosquitto.conf)
 ├── bind9/                       # BIND9 config + zone files (disabled)
 ├── pihole/                      # Pihole config (disabled)
 ├── mongo/                       # MongoDB init scripts
