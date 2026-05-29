@@ -30,7 +30,7 @@ services:
   # No receivers configured yet — alerts visible in UI only for now.
   # ============================================================
   alertmanager:
-    image: prom/alertmanager:v0.27.1
+    image: prom/alertmanager:v0.28.1
     container_name: alertmanager
     restart: unless-stopped
     network_mode: host
