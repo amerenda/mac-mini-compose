@@ -79,3 +79,99 @@ scrape_configs:
       - targets: ["10.100.20.10:9090"]
         labels:
           cluster: k3s-dean
+
+  # Blackbox exporter itself — metrics about the probe system health
+  - job_name: blackbox-exporter
+    static_configs:
+      - targets: ["localhost:9115"]
+
+  # HTTPS probes for core web services — one job per target to carry unique {service} labels for alerting
+  - job_name: https-probes-media
+    metrics_path: /probe
+    params:
+      module: [https_2xx]
+    static_configs:
+      - targets: ["media.amer.dev"]
+        labels:
+          stack: web-services
+          service: jellyfin
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: localhost:9115
+        target_label: __address__
+
+  - job_name: https-probes-komodo
+    metrics_path: /probe
+    params:
+      module: [https_2xx]
+    static_configs:
+      - targets: ["komodo.amer.dev"]
+        labels:
+          stack: web-services
+          service: komodo
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: localhost:9115
+        target_label: __address__
+
+  - job_name: https-probes-argo
+    metrics_path: /probe
+    params:
+      module: [https_2xx]
+    static_configs:
+      - targets: ["argo.amer.dev"]
+        labels:
+          stack: web-services
+          service: argo-workflows
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: localhost:9115
+        target_label: __address__
+
+  - job_name: https-probes-argocd
+    metrics_path: /probe
+    params:
+      module: [https_2xx]
+    static_configs:
+      - targets: ["argocd.amer.dev"]
+        labels:
+          stack: web-services
+          service: argocd
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: localhost:9115
+        target_label: __address__
+
+  - job_name: https-probes-grafana
+    metrics_path: /probe
+    params:
+      module: [https_2xx]
+    static_configs:
+      - targets: ["grafana.amer.dev"]
+        labels:
+          stack: web-services
+          service: grafana
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: localhost:9115
+        target_label: __address__
+
+  - job_name: https-probes-z2m
+    metrics_path: /probe
+    params:
+      module: [https_2xx]
+    static_configs:
+      - targets: ["z2m-dean-1.amer.dev"]
+        labels:
+          stack: web-services
+          service: zigbee2mqtt
+    relabel_configs:
+      - source_labels: [__param_target]
+        target_label: instance
+      - replacement: localhost:9115
+        target_label: __address__
