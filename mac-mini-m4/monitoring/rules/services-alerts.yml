@@ -13,9 +13,12 @@ groups:
             HTTPS probe to {{ $labels.instance }} has been failing for more than 5 minutes.
 
       # TLS cert expiring within 30 days — any probed domain, only when target is still reachable
-      - alert: TLSCertExpiringSoon
-        expr: probe_ssl_earliest_cert_expiry - time() < 30 * 86400
-          and on(job, __param_target) probe_success{job=~"https-probes.*"} == 1
+     - alert: TLSCertExpiringSoon
+        expr: probe_ssl_earliest_cert_expiry - time() < 30 * 86400 and probe_success{job=~"https-probes.*"} == 1
+
+      # Cert expiring within 7 days — urgent
+      - alert: TLSCertExpiringSoonCritical
+        expr: probe_ssl_earliest_cert_expiry - time() < 7 * 86400 and probe_success{job=~"https-probes.*"} == 1
         for: 5m
         labels:
           severity: warning
