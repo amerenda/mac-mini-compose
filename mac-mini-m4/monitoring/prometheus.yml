@@ -93,6 +93,8 @@ scrape_configs:
           stack: web-services
           service: jellyfin
     relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - replacement: localhost:9115
@@ -108,6 +110,8 @@ scrape_configs:
           stack: web-services
           service: komodo
     relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - replacement: localhost:9115
@@ -123,6 +127,8 @@ scrape_configs:
           stack: web-services
           service: argo-workflows
     relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - replacement: localhost:9115
@@ -138,6 +144,8 @@ scrape_configs:
           stack: web-services
           service: argocd
     relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - replacement: localhost:9115
@@ -153,6 +161,8 @@ scrape_configs:
           stack: web-services
           service: grafana
     relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - replacement: localhost:9115
@@ -168,6 +178,8 @@ scrape_configs:
           stack: web-services
           service: zigbee2mqtt
     relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - replacement: localhost:9115
