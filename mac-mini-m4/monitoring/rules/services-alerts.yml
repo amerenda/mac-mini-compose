@@ -1,0 +1,33 @@
+groups:
+  - name: https-probe-alerts
+    rules:
+      # Fires per-service when any HTTPS probe target is unreachable for >5m
+      - alert: WebServiceDown
+        expr: probe_success{job=~"https-probes.*"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.instance }} ({{ $labels.service }}) is unreachable"
+          description: >
+            HTTPS probe to {{ $labels.instance }} has been failing for more than 5 minutes.
+
+      # TLS cert expiring within 30 days — any probed domain, only when target is still reachable
+      - alert: TLSCertExpiringSoon
+        expr: probe_ssl_earliest_cert_expiry - time() < 30 * 86400
+          and on(job, __param_target) probe_success{job=~"https-probes.*"} == 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "TLS cert for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}"
+
+      # Cert expiring within 7 days — urgent
+      - alert: TLSCertExpiringSoonCritical
+        expr: probe_ssl_earliest_cert_expiry - time() < 7 * 86400
+          and on(job, __param_target) probe_success{job=~"https-probes.*"} == 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "TLS cert for {{ $labels.instance }} expires in {{ $value | humanizeDuration }}"

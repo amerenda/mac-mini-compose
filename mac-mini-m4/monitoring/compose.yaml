@@ -138,6 +138,20 @@ services:
       TECHNITIUM_STATS_RANGE: "LastHour"
       EXPORTER_PORT: "9105"
 
+  # ============================================================
+  # Blackbox Exporter — HTTP/HTTPS/TCP probes for external services
+  # ============================================================
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: blackbox-exporter
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ${MONITORING_DIR:-.}/blackbox.yml:/etc/blackbox/blackbox.yml:ro
+    command:
+      - '--config.file=/etc/blackbox/blackbox.yml'
+      - '--web.listen-address=:9115'
+
 volumes:
   prometheus-data:
   alertmanager-data:
