@@ -41,10 +41,7 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9105"]
 
-  - job_name: mac-mini-komodo
-    static_configs:
-      - targets: ["localhost:9120"]
-
+ # Komodo Core HTTPS health probe (https-probes-komodo) replaces this — port 9120 served only HTML, no metrics
   # LLM metrics — murderbot: llama.cpp metrics endpoint
   - job_name: murderbot-llama-cpp
     metrics_path: /metrics
