@@ -37,8 +37,8 @@ If asked to "update" or "upgrade" a service, confirm the target version explicit
 
 **All changes to mac-mini-m4 stacks must be made locally in the git repo and pushed — never edit files directly on the host.**
 
-- The `komodo-dean-gitops` repo is synced via ArgoCD → Komodo automatically deploys to mac-mini-m4
+- The `komodo-dean-gitops` repo is cloned at `~/komodo-dean-gitops` on mac-mini-m4
+- A LaunchDaemon (`com.local.komodo-stack-sync.plist`) runs `scripts/sync-stacks.sh` every 60s, which does `git fetch && git pull` and restarts changed compose stacks via Komodo
 - Make changes only on murderbot (this machine) in `~/claude/projects/komodo-dean-gitops/mac-mini-m4/`
-- Commit and push — ArgoCD picks up the change and rolls it out to the host
+- Commit and push — the sync script picks up changes within 60 seconds
 - **Never** SSH into mac-mini-m4 and edit files directly, run `git pull`, or modify running containers
-- If a deployment fails, inspect the ArgoCD UI (https://argocd.amer.dev) for sync status instead of manually intervening on the host
