@@ -68,12 +68,14 @@ scrape_configs:
         labels:
           node: murderbot
 
-  # Cross-stack heartbeat — k3s Prometheus health probe (direct node port)
+  # Cross-stack heartbeat — k3s Prometheus health probe (MetalLB LoadBalancer VIP)
   - job_name: k3s-prometheus-heartbeat
     scheme: http
     scrape_interval: 30s
     static_configs:
-      - targets: ["10.100.20.10:9090"]
+      # MetalLB VIP assigned by the k3s-prometheus-heartbeat Service;
+      # k3s Prometheus does not listen directly on node ports.
+      - targets: ["10.100.20.206:9090"]
         labels:
           cluster: k3s-dean
 
