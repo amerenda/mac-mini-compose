@@ -18,6 +18,14 @@
         "defaults": {
           "color": {
             "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "#EAB839", "value": 1},
+              {"color": "red", "value": 5}
+            ]
           }
         },
         "overrides": []
@@ -40,23 +48,7 @@
         }
       ],
       "title": "Alert Status Overview",
-      "type": "bargauge",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {"color": "green", "value": null},
-              {"color": "#EAB839", "value": 1},
-              {"color": "red", "value": 5}
-            ]
-          }
-        },
-        "overrides": []
-      }
+      "type": "bargauge"
     },
     {
       "datasource": {

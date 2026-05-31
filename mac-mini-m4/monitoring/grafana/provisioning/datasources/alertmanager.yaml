@@ -9,3 +9,6 @@ datasources:
     url: http://localhost:9093
     isDefault: false
     editable: true
+    jsonData:
+      implementation: prometheus
+      handleGrafanaManagedAlerts: false
