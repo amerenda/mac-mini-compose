@@ -32,3 +32,13 @@ If asked to "update" or "upgrade" a service, confirm the target version explicit
 | `launchd/` | macOS launchd plists for host-level services |
 | `scripts/` | Deployment scripts (inject-secrets, etc.) |
 | `manual_runs/` | One-off commands requiring manual execution |
+
+## Deployment Workflow
+
+**All changes to mac-mini-m4 stacks must be made locally in the git repo and pushed — never edit files directly on the host.**
+
+- The `komodo-dean-gitops` repo is synced via ArgoCD → Komodo automatically deploys to mac-mini-m4
+- Make changes only on murderbot (this machine) in `~/claude/projects/komodo-dean-gitops/mac-mini-m4/`
+- Commit and push — ArgoCD picks up the change and rolls it out to the host
+- **Never** SSH into mac-mini-m4 and edit files directly, run `git pull`, or modify running containers
+- If a deployment fails, inspect the ArgoCD UI (https://argocd.amer.dev) for sync status instead of manually intervening on the host
