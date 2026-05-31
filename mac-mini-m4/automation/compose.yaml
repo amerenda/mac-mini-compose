@@ -123,7 +123,8 @@ services:
       - mosquitto
     network_mode: host
     volumes:
-      - zigbee2mqtt-data:/app/data
+      - ../zigbee2mqtt/z2m-data:/app/data
+      - ../zigbee2mqtt/external_extensions:/app/data/external_extensions:ro
     environment:
       TZ: "America/New_York"
 
@@ -140,6 +141,3 @@ volumes:
   mosquitto-data:
     external: true
     name: services_mosquitto-data
-  zigbee2mqtt-data:
-    external: true
-    name: services_zigbee2mqtt-data

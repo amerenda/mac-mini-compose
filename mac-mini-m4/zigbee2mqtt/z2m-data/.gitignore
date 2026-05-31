@@ -1,0 +1,5 @@
+# Ignore all Z2M runtime files — only track critical recovery files
+*
+!.gitignore
+!configuration.yaml
+!coordinator_backup.json
