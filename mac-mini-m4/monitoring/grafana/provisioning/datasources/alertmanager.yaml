@@ -1,1 +1,11 @@
-# Provisioning file disabled — datasources created via API to avoid read-only mount issues
+apiVersion: 1
+
+datasources:
+  - name: Alertmanager
+    uid: alertmanager
+    orgId: 1
+    type: alertmanager
+    access: proxy
+    url: http://localhost:9093
+    isDefault: false
+    editable: true
