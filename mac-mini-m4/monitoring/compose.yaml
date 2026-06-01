@@ -1,3 +1,4 @@
+# monitoring stack
 services:
   # ============================================================
   # Prometheus — Central metrics store
