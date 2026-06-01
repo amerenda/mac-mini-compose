@@ -32,7 +32,7 @@ groups:
 
       # RAID array has degraded — any disk failed or removed. Losing a second drive means data loss.
       - alert: RaidArrayDegraded
-        expr: node_md_degraded{device="md0"} == 1 or sum(node_md_disks{device="md0",state="failed"}) > 0
+        expr: node_md_degraded{device="md0"} == 1
         for: 1m
         labels:
           severity: critical
@@ -40,8 +40,8 @@ groups:
           summary: "RAID array md0 on {{ $labels.instance }} has degraded"
           description: |
             The RAID-5 array (md0) on {{ $labels.node }} is in a degraded state.
-            Failed disk count: {{ sum(node_md_disks{device="md0",state="failed"}) | humanize }}.
-            Spare disk count: {{ sum(node_md_disks{device="md0",state="spare"}) | humanize }}.
+            
+            This indicates a drive failure or removal.
             If another drive fails, data loss will occur. Replace the failed drive immediately.
 
       # Array is recovering (after rebuild/replacement) — warning so you know it's happening.
